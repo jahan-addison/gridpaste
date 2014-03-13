@@ -6,4 +6,16 @@ gridpaste
 A tool to paste functions, transformations, and proofs on a geometric plane
 
 Dependencies:
-- MySQL server (MySQL, Percona, etc)
+- A MySQL server (MySQL, Percona, etc)
+
+Add a config.js to the base directory:
+```
+var config = {}
+
+config.dbname = "gridpaste"
+config.dbhost = "your_database_host"
+config.dbuser = "your_database_user"
+config.dbpassword = "your_database_password"
+
+module.exports = config;
+```
