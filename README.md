@@ -1,7 +1,7 @@
 gridpaste
 =========
 
-![gridpaste](http://imgur.com/mYnpz7V.png)
+![gridpaste](http://i.imgur.com/BM8Vtwi.png)
 
 A tool to paste functions, transformations, and proofs on a geometric plane
 
