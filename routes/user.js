@@ -3,11 +3,12 @@
  * GET users listing.
  */
 
-exports.list = function(req, res){
-    req.db.query('SELECT * FROM `users`', function(err, rows, fields) {
-        if (err) throw err;
-        for(var i = 0; i < rows.length; i++) {
-            res.send(rows[i].username + "\n");
-        }
-    });
+exports.list = function(req, res) {
+	req.db.users.findAll().success(function(results) {
+		for(var u in results) {
+			res.send(results[u].username);
+		}
+	});
 };
+
+

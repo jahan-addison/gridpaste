@@ -4,15 +4,17 @@
  */
 
 var express = require('express')
+  , expressValidator = require('express-validator')
   , routes = require('./routes')
   , user = require('./routes/user')
+  , register = require('./routes/register')
   , http = require('http')
   , path = require('path')
   , db = require('./database');
 
 var app = express();
 
-db.connect("gridpaste");
+db.connect();
 
 app.configure(function(){
     app.set('port', process.env.PORT || 3000);
@@ -25,6 +27,7 @@ app.configure(function(){
     app.use(express.favicon());
     app.use(express.logger('dev'));
     app.use(express.bodyParser());
+    app.use(expressValidator({}));
     app.use(express.methodOverride());
     app.use(app.router);
     app.use(express.static(path.join(__dirname, 'public')));
@@ -36,6 +39,7 @@ app.configure('development', function(){
 
 app.get('/', routes.index);
 app.get('/users', user.list);
+app.post('/register', register.action);
 
 http.createServer(app).listen(app.get('port'), function(){
   console.log("Express server listening on port " + app.get('port'));
