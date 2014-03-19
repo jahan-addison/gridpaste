@@ -11,7 +11,8 @@
     "mysql": "~2.1.0",
     "bcrypt-nodejs": "0.0.3",
     "sequelize": "~1.7.0",
-    "express-validator": "~2.1.0"
+    "express-validator": "~2.1.0",
+    "superagent": "^0.17.0"
   },
   "devDependencies": {
     "grunt": "~0.4.1",

@@ -7,7 +7,7 @@ var users = require('../services/userservice');
 var util = require('util');
 
 exports.action = function(req, res) {
-	req.checkBody('username', 'Invalid username!').notEmpty().isAlpha();
+	req.checkBody('username', 'Invalid username!').notEmpty().isAlphanumeric();
 	req.checkBody('password', 'Invalid password!').notEmpty();
 	req.checkBody('email', 'Invalid email!').notEmpty().isEmail();
 
