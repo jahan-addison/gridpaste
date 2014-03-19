@@ -16,12 +16,12 @@ exports.emailExists = function(db, umail, callback) {
 		callback(results != null);
 	});	
 }
-exports
-.register = function(db, uname, upass, umail, callback) {
+
+exports.register = function(db, uname, upass, umail, callback) {
 	bcrypt.hash(upass, null, null, function(err, hash){
   	db.users.create({
 			username: uname,
-			password: upass,
+			password: hash,
 			email: umail
 		}).success(callback);
 	});

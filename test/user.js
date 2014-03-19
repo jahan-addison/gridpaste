@@ -1,33 +1,44 @@
-
 var assert     = require('assert'),
     db         = require('../database'),
-    users      = require('../services/userservice');
-
+    users      = require('../services/userservice'),
+    bcrypt     = require('bcrypt-nodejs');
 
 describe('User', function() {
 
     db.connect();
 
+    var mockUsername       = 'dummy',
+        mockUnusedUsername = 'dummy2',
+        mockPassword       = 'dummy1',
+        mockEmail          = 'dummy@example.com',
+        mockUnusedEmail    = 'dummy2@example.com';
+
     before(function(done) {
-        users.register(db, "dummy", "dummy1", "dummy@example.com", function() {
-            done();
+        bcrypt.hash(mockPassword, null, null, function(err, hash){
+            db.users.create({
+                    username: mockUsername,
+                    password: hash,
+                    email: mockEmail
+            }).success(function() {
+                done();
+            })
         });
     });
 
     after(function(done) {
-        db.users.find({email: 'dummy@example.com'})
-        .success(function(results) {
-            db.query('DELETE FROM users WHERE email = "dummy@example.com"')
+        db.users.destroy({
+            email: mockEmail
+        }).success(function() {
             done();
-        });
+        })
     });
 
     describe('#usernameExists()', function() {
         it('should prevent duplicate username entries', function(done) {
-            users.usernameExists(db, 'dummy', function(result) {
+            users.usernameExists(db, mockUsername, function(result) {
                 assert.equal(result, true);
             });
-            users.usernameExists(db, 'dummy2', function(result) {
+            users.usernameExists(db, mockUnusedUsername, function(result) {
                 assert.equal(result, false);
             });
             done();
@@ -36,10 +47,10 @@ describe('User', function() {
 
     describe('#emailExists()', function() {
         it('should prevent duplicate email entries', function(done) {
-            users.emailExists(db, 'dummy@example.com', function(result) {
+            users.emailExists(db, mockEmail, function(result) {
                 assert.equal(result, true);
             });
-            users.emailExists(db, 'dummy2@example.com', function(result) {
+            users.emailExists(db, mockUnusedEmail, function(result) {
                 assert.equal(result, false);
             });
             done();
@@ -48,10 +59,9 @@ describe('User', function() {
 
     describe('#register()', function() {
         it('should register successfully', function(done) {
-            users.register(db, 'dummy', 'dummy1', 'dummy@example.com', function() {
+            users.register(db, mockUsername, mockPassword, mockEmail, function() {
                 done();
             })
         });
     })
-
 });
