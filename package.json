@@ -20,6 +20,7 @@
     "grunt-contrib-watch": "~0.5.3",
     "request": "~2.27.0",
     "time-grunt": "~0.1.1",
-    "load-grunt-tasks": "~0.2.0"
+    "load-grunt-tasks": "~0.2.0",
+    "grunt-contrib-sass": "^0.7.3"
   }
 }

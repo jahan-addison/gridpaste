@@ -5,6 +5,8 @@ var request = require('request');
 module.exports = function (grunt) {
   // show elapsed time at the end
   require('time-grunt')(grunt);
+  // sass
+  require('grunt-contrib-sass')(grunt);
   // load all grunt tasks
   require('load-grunt-tasks')(grunt);
 
@@ -12,6 +14,13 @@ module.exports = function (grunt) {
 
   grunt.initConfig({
     pkg: grunt.file.readJSON('package.json'),
+    sass: {
+      dist: {
+        files: {
+          'public/css/main.css' : 'public/css/main.scss'
+        }
+      }
+    },
     develop: {
       server: {
         file: 'app.js'
@@ -35,8 +44,9 @@ module.exports = function (grunt) {
           livereload: reloadPort
         }
       },
-      css: {
-        files: ['public/css/*.css'],
+      sass: {
+        files: ['public/css/**/*.scss'],
+        tasks: ['sass'],
         options: {
           livereload: reloadPort
         }
