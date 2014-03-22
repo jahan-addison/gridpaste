@@ -9,6 +9,7 @@ var express = require('express')
   , user = require('./routes/user')
   , register = require('./routes/register')
   , http = require('http')
+  , swig = require('swig')
   , path = require('path')
   , db = require('./database');
 
@@ -19,7 +20,8 @@ db.connect();
 app.configure(function(){
     app.set('port', process.env.PORT || 3000);
     app.set('views', __dirname + '/views');
-    app.set('view engine', 'jade');
+    app.set('view engine', 'swig');
+    app.engine('html', swig.renderFile);
     app.use(function(req, res, next){
         req.db = db;
         next();
