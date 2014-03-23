@@ -5,8 +5,6 @@ var request = require('request');
 module.exports = function (grunt) {
   // show elapsed time at the end
   require('time-grunt')(grunt);
-  // sass
-  require('grunt-contrib-sass')(grunt);
   // load all grunt tasks
   require('load-grunt-tasks')(grunt);
 
@@ -17,8 +15,8 @@ module.exports = function (grunt) {
     compass: {
       dist: {
         options: {
-          sassDir: 'public/css/',
-          cssDir: 'public/css/'
+          sassDir: 'public/css/sass',
+          cssDir: 'public/css/build'
         }
       }
     },
@@ -46,7 +44,7 @@ module.exports = function (grunt) {
         }
       },
       sass: {
-        files: ['public/css/**/*.scss'],
+        files: ['public/css/sass/**/*.scss'],
         tasks: ['compass'],
         options: {
           livereload: reloadPort

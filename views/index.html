@@ -1,0 +1,28 @@
+{% extends 'layout.html' %}
+{% block head %}
+  {% parent %}
+  <script type="text/javascript" src="//use.typekit.net/cmr6vjy.js"></script>
+  <script type="text/javascript">try{Typekit.load();}catch(e){}</script>
+{% endblock %}
+{% block content %}
+    <div id="application" role="application">
+        <main id="left-bar">
+          <header>
+            <img src="images/gridpaste-logo.svg" alt="logo" />
+            <p>
+              <span class="red">Lorem ipsum</span> dolor sit amet, consectetur adipiscing elit. Cras sapien leo, molestie sit amet tellus a, viverra ornare augue. Vestibulum quam sem, molestie eu velit ut, rhoncus molestie augue. Mauris ultrices sapien nec lorem bibendum semper. Mauris id quam mollis, luctus enim vitae, vehicula odio. N nec est. Nulla facilisi. Aenean non
+            </p>
+          </header>
+          <section id="auth">
+            <div class="col"><a href="#">Sign Up</a></div>
+            <div class="col"><a href="#">Login</a></div>
+          </section>
+          <section id="run-function">
+            <span id="f">f</span> <input type="text" class="function" name="run" value="e^z" />
+          </section>
+        </main>
+        <section id="grid">
+        </section>
+    </div>
+    <script src='http://localhost:35729/livereload.js'></script>
+{% endblock %}
