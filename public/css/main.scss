@@ -1,5 +1,11 @@
-@import "../../components/meyer-reset/stylesheets/meyer-reset";
+// Reset
+@import "../components/meyer-reset/stylesheets/meyer-reset";
 
+// Vendor
+@import "compass/css3/border-radius";
+@import "partials/jsxgraph";
+
+// Partials
 @import "partials/base";
 @import "partials/typography"; 
 @import "partials/containers";

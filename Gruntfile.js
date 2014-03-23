@@ -15,7 +15,7 @@ module.exports = function (grunt) {
     compass: {
       dist: {
         options: {
-          sassDir: 'public/css/sass',
+          sassDir: 'public/css',
           cssDir: 'public/css/build'
         }
       }
@@ -44,13 +44,13 @@ module.exports = function (grunt) {
         }
       },
       sass: {
-        files: ['public/css/sass/**/*.scss'],
+        files: ['public/css/**/*.scss'],
         tasks: ['compass'],
         options: {
           livereload: reloadPort
         }
       },
-      swig: {
+      views: {
         files: ['views/*.html'],
         options: {
           livereload: reloadPort

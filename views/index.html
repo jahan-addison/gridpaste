@@ -3,16 +3,17 @@
   {% parent %}
   <script type="text/javascript" src="//use.typekit.net/cmr6vjy.js"></script>
   <script type="text/javascript">try{Typekit.load();}catch(e){}</script>
+  <script type="text/javascript" src="/js/jsxgraph.js"></script>
 {% endblock %}
 {% block content %}
     <div id="application" role="application">
         <main id="left-bar">
           <header>
-            <img src="images/gridpaste-logo.svg" alt="logo" />
+            <img src="/images/gridpaste-logo.svg" alt="logo" />
             <p>
               <span class="red">Lorem ipsum</span> dolor sit amet, consectetur adipiscing elit. Cras sapien leo, molestie sit amet tellus a, viverra ornare augue. Vestibulum quam sem, molestie eu velit ut, rhoncus molestie augue. Mauris ultrices sapien nec lorem bibendum semper. Mauris id quam mollis, luctus enim vitae, vehicula odio. N nec est. Nulla facilisi. Aenean non
             </p>
-          </header>
+          </header> 
           <section id="auth">
             <div class="col"><a href="#">Sign Up</a></div>
             <div class="col"><a href="#">Login</a></div>
@@ -20,9 +21,62 @@
           <section id="run-function">
             <span id="f">f</span> <input type="text" class="function" name="run" value="e^z" />
           </section>
+          <h2>Elements</h2>
+          <section id="elements">
+            <div class="col">
+              <div class="button">Crcle</div>
+              <div class="button">Angle</div>
+              <div class="button">Arc</div>
+            </div>
+            <div class="col">
+              <div class="button">Ellipse</div>
+              <div class="button">Hyperbola</div>
+              <div class="button">Line</div>
+            </div>
+            <div class="col">
+              <div class="button">Parabola</div>
+              <div class="button">Polygon</div>
+              <div class="button">Point</div>
+            </div>
+          </section>
+          <h2>Transform</h2>
+          <section id="transform">
+            <div class="col">
+              <div class="button">Rotation</div>
+              <div class="button">Reflection</div>
+              <div class="button">Shear</div>
+            </div>
+            <div class="col">
+              <div class="button">Translation</div>
+              <div class="button">Scaling</div>
+            </div>
+          </section>
+          <h2>Misc</h2>
+          <section id="misc">
+            <div class="col">
+              <div class="button">Text</div>
+            </div>
+          </section>
+          <section id="bottom">
+            <div class="col">
+              <div class="button">Start Record</div>
+              <div class="button">End Record</div>
+            </div>
+            <div class="col">
+              <div class="button">Share</div>
+            </div>
+            <footer>
+              <p>
+                Vivamus mollis leo at accumsan cursus. Interdum et malesuada fames ac ante ipsum primis in faucibus. Nullam pharetra nunc enim, sit amet vehicula purus volutpat sit amet. Nunc interdum malesuada pulvinar. it amet nunc.
+              </p>
+              <address>Copyright &copy; 2014</address>
+            </footer>
+          </section>
         </main>
         <section id="grid">
         </section>
     </div>
     <script src='http://localhost:35729/livereload.js'></script>
+    <script src="//ajax.googleapis.com/ajax/libs/jquery/1.11.0/jquery.min.js"></script>
+    <script src="/js/main.js"></script>
 {% endblock %}

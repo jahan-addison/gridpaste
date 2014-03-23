@@ -1,7 +1,12 @@
 html,body,#application {
   width: 100%;
   height:100%;
-  @include adelle(14px);
+  @include adelle(12px);
+}
+
+p {
+  @include adelle(13px);
+  color: #EBE9E8;
 }
 
 body {
@@ -16,21 +21,95 @@ a {
   color: $light-brown;
 }
 
+#misc {
+  @include clearfix();
+}
+
 #f {
   @include fertigo(20px);
   color: $off-white;
   margin-left:8px;
 }
 
+address {
+  color: $light-brown;
+  font-size:1em;
+  padding: 0 8px;
+}
+
 input {
   background: #514645;
   padding:10px;
+  height:27px;
+  margin-left:15px;
+  width:75%;
+  @include border-radius(2px);
   @include monaco(12px);
   border:none;
   outline:none;
   &:active {
     outline:none;
   }
+}
+
+
+h2 {
+  font-size:14px;
+  padding: 14px 8px;
+  clear:both;
+  font-weight:normal;
+}
+
+.button {
+  background: $pale-brown;
+  padding:    10px 18px;
+  float:left;
+  cursor: pointer;
+  margin: 3px 6px;
+  @include border-radius(2px);
+  color: $off-white;
+  @include adelle(12.2px);
+}
+
+#elements {
+  @include clearfix();
+  .col + .col {
+    .button:first-child {
+      padding: 10px 12px;
+    }
+    .button + .button {
+      padding: 10px 10px;
+    }
+  }
+  .col + .col + .col {
+    .button {
+      margin:3px 2px 3px 6px;
+    }
+  }
+}
+
+#transform {
+  @include clearfix();
+  .col:first-child {
+    .button {
+      padding:10px 8px;
+    }
+  }
+}
+
+#bottom footer p {
+  padding: 15px 8px;
+  clear:both;
+}
+
+#bottom {
+  border-top: rgba($light-brown, .45) 1px dashed;
+  width:95%;
+  & > .col:first-child {
+    margin-top:15px;
+  }
+  margin-top:20px;
+  @include clearfix();
 }
 
 #left-bar {
@@ -68,6 +147,7 @@ input {
 .col {
   float:left;
   width: intrinsic;    
+  @include clearfix();
   width: -moz-max-content; 
 }
 
