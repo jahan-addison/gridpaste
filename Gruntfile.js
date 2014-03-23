@@ -14,10 +14,11 @@ module.exports = function (grunt) {
 
   grunt.initConfig({
     pkg: grunt.file.readJSON('package.json'),
-    sass: {
+    compass: {
       dist: {
-        files: {
-          'public/css/main.css' : 'public/css/main.scss'
+        options: {
+          sassDir: 'public/css/',
+          cssDir: 'public/css/'
         }
       }
     },
@@ -46,7 +47,7 @@ module.exports = function (grunt) {
       },
       sass: {
         files: ['public/css/**/*.scss'],
-        tasks: ['sass'],
+        tasks: ['compass'],
         options: {
           livereload: reloadPort
         }
