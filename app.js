@@ -22,7 +22,7 @@ app.configure(function(){
     app.set('port', process.env.PORT || 3000);
     app.set('views', __dirname + '/views');
     app.set('view engine', 'swig');
-    app.set('env',  process.env.NODE_ENV || 'development');
+    app.set('env',  process.env.NODE_ENV || 'production');
     app.engine('html', swig.renderFile);
     app.use(function(req, res, next){
         req.db  = db;
