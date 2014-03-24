@@ -17,13 +17,16 @@ var app = express();
 
 db.connect();
 
+
 app.configure(function(){
     app.set('port', process.env.PORT || 3000);
     app.set('views', __dirname + '/views');
     app.set('view engine', 'swig');
+    app.set('env',  process.env.NODE_ENV || 'development');
     app.engine('html', swig.renderFile);
     app.use(function(req, res, next){
-        req.db = db;
+        req.db  = db;
+        req.env = app.get('env'); 
         next();
     });
     app.use(express.favicon());
@@ -36,9 +39,9 @@ app.configure(function(){
     app.use(express.static(path.join(__dirname, 'public')));
 });
 
-app.configure('development', function(){
+if ('development' == app.get('env')) {
   app.use(express.errorHandler());
-});
+}
 
 app.get('/', routes.index);
 app.get('/users', user.list);
