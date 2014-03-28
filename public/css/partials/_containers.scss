@@ -74,17 +74,24 @@ h2 {
 #elements {
   @include clearfix();
   .col + .col {
-    .button:first-child {
+    & > .button:first-child {
       padding: 10px 12px;
     }
-    .button + .button {
-      padding: 10px 10px;
+    & > .button + .button {
+      padding: 10px 14px;
     }
+  }
+  .col:first-child + .col .button {
+    margin-left: 5px;
   }
   .col + .col + .col {
     .button {
       margin:3px 2px 3px 6px;
     }
+  }
+  .col:first-child + .col + .col .button {
+    padding:10px 12px;
+    margin-right:1px;
   }
 }
 
