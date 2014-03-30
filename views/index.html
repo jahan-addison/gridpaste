@@ -3,7 +3,7 @@
   {% parent %}
   <script type="text/javascript" src="//use.typekit.net/cmr6vjy.js"></script>
   <script type="text/javascript">try{Typekit.load();}catch(e){}</script>
-  <script type="text/javascript" src="/js/jsxgraph.js"></script>
+  <script type="text/javascript" src="/js/external/jsxgraph.js"></script>
 {% endblock %}
 {% block content %}
     <div id="application" role="application">
@@ -24,7 +24,7 @@
           <h2>Elements</h2>
           <section id="elements">
             <div class="col">
-              <div class="button">Crcle</div>
+              <div class="button">Circle</div>
               <div class="button">Angle</div>
               <div class="button">Arc</div>
             </div>
@@ -80,5 +80,5 @@
     <script src='http://localhost:35729/livereload.js'></script>
     {% endif %}
     <script src="//ajax.googleapis.com/ajax/libs/jquery/1.11.0/jquery.min.js"></script>
-    <script src="/js/main.js"></script>
+    <script src="/js/build.js"></script>
 {% endblock %}

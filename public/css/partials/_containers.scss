@@ -17,6 +17,35 @@ body {
   color: $red;
 }
 
+.slider {
+
+  .draw-element {
+    margin-left:5%;
+    width: intrinsic;  
+    input, label {
+      clear:both;
+    }  
+    @include clearfix();
+    width: -moz-max-content;
+  }
+
+  .button.draw {
+    margin-top:18px;
+  }
+
+  .close-slider {
+    right:2%;
+    cursor:pointer;
+    @include monaco(12px, $off-white);
+    position:absolute;
+    width:10px;
+    height:10px;
+  }
+  background: #6D6262;
+  padding:10px;
+  @include border-radius(0 5px 0 5px 0);
+}
+
 a {
   color: $light-brown;
 }
