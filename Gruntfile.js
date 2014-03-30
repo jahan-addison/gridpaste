@@ -20,6 +20,20 @@ module.exports = function (grunt) {
         }
       }
     },
+    browserify: {
+      libs: {
+        options: {
+          shim: {
+            jsxgraph: {
+              path: 'public/js/external/jsxgraph.js',
+              exports: 'JSXGraph'
+            }
+          }
+        },
+        src: ['public/js/main.js'],
+        dest: 'public/js/build.js'
+      },
+    },
     develop: {
       server: {
         file: 'app.js'
@@ -46,6 +60,13 @@ module.exports = function (grunt) {
       sass: {
         files: ['public/css/**/*.scss'],
         tasks: ['compass'],
+        options: {
+          livereload: reloadPort
+        }
+      },
+      browserify: {
+        files: ['public/js/*.js'],
+        tasks: ['browserify'],
         options: {
           livereload: reloadPort
         }
@@ -78,5 +99,5 @@ module.exports = function (grunt) {
     }, 500);
   });
 
-  grunt.registerTask('default', ['develop', 'watch']);
+  grunt.registerTask('default', ['develop', 'compass', 'browserify', 'watch']);
 };

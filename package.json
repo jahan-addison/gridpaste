@@ -21,6 +21,8 @@
     "request": "~2.27.0",
     "time-grunt": "~0.1.1",
     "load-grunt-tasks": "~0.2.0",
-    "grunt-contrib-compass": "^0.7.2"
+    "grunt-contrib-compass": "^0.7.2",
+    "browserify": "~3.38.0",
+    "grunt-browserify": "~2.0.1"
   }
 }
