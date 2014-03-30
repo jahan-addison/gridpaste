@@ -1,16 +1,16 @@
 (function e(t,n,r){function s(o,u){if(!n[o]){if(!t[o]){var a=typeof require=="function"&&require;if(!u&&a)return a(o,!0);if(i)return i(o,!0);throw new Error("Cannot find module '"+o+"'")}var f=n[o]={exports:{}};t[o][0].call(f.exports,function(e){var n=t[o][1][e];return s(n?n:e)},f,f.exports,e,t,n,r)}return n[o].exports}var i=typeof require=="function"&&require;for(var o=0;o<r.length;o++)s(r[o]);return s})({1:[function(require,module,exports){
 /*
-  Element Factory
+  BoardElement Factory
   */
 
-var element = function(board, element, options) {
+var BoardElement = function(board, element, options) {
   this.element = element;
   this.options = options;
 
   return new this[element](board, options);
 }
 
-element.prototype = (function() {
+BoardElement.prototype = (function() {
 
 /*--
   Interface element {
@@ -269,7 +269,7 @@ element.prototype = (function() {
   };
 
   return {
-    Constructor: element,
+    Constructor: BoardElement,
     circle:      circleElement,
     angle:       angleElement,
     arc:         arcElement,
@@ -283,7 +283,7 @@ element.prototype = (function() {
 
 })();
 
-module.exports = element; 
+module.exports = BoardElement; 
 },{}],2:[function(require,module,exports){
 var slider    = require('./slider'),
     element   = require('./element')

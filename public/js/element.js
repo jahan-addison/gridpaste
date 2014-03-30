@@ -1,15 +1,15 @@
 /*
-  Element Factory
+  BoardElement Factory
   */
 
-var element = function(board, element, options) {
+var BoardElement = function(board, element, options) {
   this.element = element;
   this.options = options;
 
   return new this[element](board, options);
 }
 
-element.prototype = (function() {
+BoardElement.prototype = (function() {
 
 /*--
   Interface element {
@@ -268,7 +268,7 @@ element.prototype = (function() {
   };
 
   return {
-    Constructor: element,
+    Constructor: BoardElement,
     circle:      circleElement,
     angle:       angleElement,
     arc:         arcElement,
@@ -282,4 +282,4 @@ element.prototype = (function() {
 
 })();
 
-module.exports = element; 
+module.exports = BoardElement; 
