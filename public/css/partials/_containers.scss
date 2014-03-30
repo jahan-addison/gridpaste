@@ -26,7 +26,10 @@ body {
       clear:both;
     }  
     @include clearfix();
-    width: -moz-max-content;
+    width: 192px;
+  }
+  .inside {
+    padding:8px;
   }
 
   .button.draw {
