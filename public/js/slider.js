@@ -16,6 +16,10 @@ module.exports = function(content, width, height, top) {
     left: 0
   }, 400);
   $('.close-slider').click(function() {
+    // prevent duplicate form clicks
+    $(this).parent()
+      .find('input, textarea')
+      .prop('disabled', true);
     $block.animate({
       left: -width || -230
     }, 400, function() {
