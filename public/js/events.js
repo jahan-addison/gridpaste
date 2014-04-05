@@ -1,5 +1,5 @@
 var slider    = require('./slider'),
-    element   = require('./element')
+    element   = require('./element'),
     Events    = {};
 
 /* Extend jQuery for input to coordinates */

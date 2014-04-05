@@ -1,6 +1,7 @@
 'use strict';
 
-var request = require('request');
+var request = require('request'),
+    shim    = require('browserify-shim');
 
 module.exports = function (grunt) {
   // show elapsed time at the end
@@ -20,19 +21,22 @@ module.exports = function (grunt) {
         }
       }
     },
-    browserify: {
-      libs: {
-        options: {
-          shim: {
-            jsxgraph: {
-              path: 'public/js/external/jsxgraph.js',
-              exports: 'JSXGraph'
-            }
-          }
+    browserify2: {
+      compile: {
+        expose: {
+          jquery: './public/components/jquery/dist/jquery.min.js',
         },
-        src: ['public/js/main.js'],
-        dest: 'public/js/build.js'
-      },
+        entry: './public/js/main.js',
+        compile: './public/js/build.js',
+        beforeHook: function(bundle) {
+          shim(bundle, {
+            RxJS: {
+              path: './public/components/rxjs.lite.js',
+              exports: 'rxjs'
+            },
+          });
+        }
+      }
     },
     develop: {
       server: {
@@ -52,7 +56,7 @@ module.exports = function (grunt) {
         tasks: ['develop', 'delayed-livereload']
       },
       js: {
-        files: ['public/js/*.js'],
+        files: ['public/js/*.js', './Gruntfile.js'],
         options: {
           livereload: reloadPort
         }
@@ -66,7 +70,7 @@ module.exports = function (grunt) {
       },
       browserify: {
         files: ['public/js/*.js'],
-        tasks: ['browserify'],
+        tasks: ['browserify2:compile'],
         options: {
           livereload: reloadPort
         }
@@ -99,5 +103,5 @@ module.exports = function (grunt) {
     }, 500);
   });
 
-  grunt.registerTask('default', ['develop', 'compass', 'browserify', 'watch']);
+  grunt.registerTask('default', ['develop', 'compass', 'browserify2:compile', 'watch']);
 };

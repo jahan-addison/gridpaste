@@ -8,5 +8,9 @@
   ],
   "dependencies": {
     "meyer-reset": "*"
+  },
+  "devDependencies": {
+    "rxjs": "~2.2.18",
+    "jquery": "~2.1.0"
   }
 }
