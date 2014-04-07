@@ -22,10 +22,6 @@ module.exports = function (grunt) {
       }
     },
     browserify2: {
-      compile: {
-        expose: {
-          jquery: './public/components/jquery/dist/jquery.min.js',
-        },
         entry: './public/js/main.js',
         compile: './public/js/build.js',
         beforeHook: function(bundle) {
