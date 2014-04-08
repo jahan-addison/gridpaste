@@ -22,16 +22,15 @@ module.exports = function (grunt) {
       }
     },
     browserify2: {
-        entry: './public/js/main.js',
-        compile: './public/js/build.js',
-        beforeHook: function(bundle) {
-          shim(bundle, {
-            RxJS: {
-              path: './public/components/rxjs.lite.js',
-              exports: 'rxjs'
-            },
-          });
-        }
+      entry: './public/js/main.js',
+      compile: './public/js/build.js',
+      beforeHook: function(bundle) {
+        shim(bundle, {
+          RxJS: {
+            path: './public/components/rxjs.lite.js',
+            exports: 'rxjs'
+          },
+        });
       }
     },
     develop: {
