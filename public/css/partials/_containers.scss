@@ -17,6 +17,10 @@ body {
   color: $red;
 }
 
+[data-html] {
+  display:none
+}
+
 .slider {
 
   .draw-element {

@@ -9,7 +9,7 @@ module.exports = function (grunt) {
   // load all grunt tasks
   require('load-grunt-tasks')(grunt);
 
-  var reloadPort = 35729, files;
+  var reloadPort = 35728, files;
 
   grunt.initConfig({
     pkg: grunt.file.readJSON('package.json'),
@@ -22,15 +22,17 @@ module.exports = function (grunt) {
       }
     },
     browserify2: {
-      entry: './public/js/main.js',
-      compile: './public/js/build.js',
-      beforeHook: function(bundle) {
-        shim(bundle, {
-          RxJS: {
-            path: './public/components/rxjs.lite.js',
-            exports: 'rxjs'
-          },
-        });
+      compile: {
+        entry: './public/js/main.js',
+        compile: './public/js/dist/build.js',
+        beforeHook: function(bundle) {
+          shim(bundle, {
+            RxJS: {
+              path: './public/components/rxjs/rx.js',
+              exports: 'rxjs'
+            },
+          });
+        }
       }
     },
     develop: {

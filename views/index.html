@@ -24,19 +24,87 @@
           <h2>Elements</h2>
           <section id="elements">
             <div class="col">
-              <div class="button">Circle</div>
-              <div class="button">Angle</div>
-              <div class="button">Arc</div>
+              <div class="button circle">Circle</div>
+              <div data-html="circle">
+                <div class="draw-element">
+                  <label for="circle-p1">Center Point (x,y):</label><input type="text" name="center" class="inside" value="0.0,0.0" />
+                  <label for="radius">Radius:</label><input type="text" name="radius" class="inside" value="0" />
+                  <div class="button draw">Draw to board</div>
+                </div>
+              </div>
+              <div class="button angle">Angle</div>
+              <div data-html="angle">
+                <div class="draw-element">
+                  <label for="point1">Point 1 (x,y):</label><input type="text" name="point1" class="inside" value="0.0,0.0" />
+                  <label for="point2">Center Point (x,y):</label><input type="text" name="point2" class="inside" value="0.0,0.0" />
+                  <label for="point3">Point 3 (x,y):</label><input type="text" name="point3" class="inside" value="0.0,0.0" />
+                  <div class="button draw">Draw to board</div>
+                </div>
+              </div>
+              <div class="button arc">Arc</div>
+              <div data-html="arc">
+                <div class="draw-element">
+                  <label for="point1">Center Point (x,y):</label><input type="text" name="point1" class="inside" value="0.0,0.0" />
+                  <label for="point2">Point 2 (x,y):</label><input type="text" name="point2" class="inside" value="0.0,0.0" />
+                  <label for="point3">Point 3 (x,y):</label><input type="text" name="point3" class="inside" value="0.0,0.0" />
+                  <div class="button draw">Draw to board</div>
+                </div>
+              </div>
             </div>
             <div class="col">
-              <div class="button">Ellipse</div>
-              <div class="button">Segment</div>
-              <div class="button">Line</div>
+              <div class="button ellipse">Ellipse</div>
+              <div data-html="ellipse">
+                <div class="draw-element">
+                  <label for="point1">Point 1 (x,y):</label><input type="text" name="point1" class="inside" value="0.0,0.0" />
+                  <label for="point2">Point 2 (x,y):</label><input type="text" name="point2" class="inside" value="0.0,0.0" />
+                  <label for="point3">Point 3 (x,y):</label><input type="text" name="point3" class="inside" value="0.0,0.0" />
+                  <div class="button draw">Draw to board</div>
+                </div>
+              </div>
+              <div class="button segment">Segment</div>
+              <div data-html="segment">
+                <div class="draw-element">
+                  <label for="point1">End Point 1 (x,y):</label><input type="text" name="point1" class="inside" value="0.0,0.0" />
+                  <br/><label for="point2">End Point 2 (x,y):</label><input type="text" name="point2" class="inside" value="0.0,0.0" />
+                  <div class="button draw">Draw to board</div>
+                </div>
+              </div>
+              <div class="button line">Line</div>
+              <div data-html="line">
+                <div class="draw-element">
+                  <label for="point1">Point 1 (x,y):</label><input type="text" name="point1" class="inside" value="0.0,0.0" />
+                  <label for="point2">Point 2 (x,y):</label><input type="text" name="point2" class="inside" value="0.0,0.0" />
+                  <div class="button draw">Draw to board</div>
+                </div>
+              </div>
             </div>
             <div class="col">
-              <div class="button">Parabola</div>
-              <div class="button">Polygon</div>
-              <div class="button">Point</div>
+              <div class="button parabola">Parabola</div>
+              <div data-html="parabola">
+                <div class="draw-element">
+                  <label for="point1">Line Point 1 (x,y):</label><input type="text" name="point1" class="inside" value="0.0,0.0" />
+                  <br /><label for="point2">Line point 2 (x,y):</label><input type="text" name="point2" class="inside" value="0.0,0.0" />
+                  <label for="point3">Center Point (x,y):</label><input type="text" name="point3" class="inside" value="0.0,0.0" />
+                  <div class="button draw">Draw to board</div>
+                </div>
+              </div>
+              <div class="button polygon">Polygon</div>
+              <div data-html="polygon">
+                <div class="draw-element">
+                  <label for="point1">Point 1 (x,y):</label><input type="text" name="point1" class="inside" value="0.0,0.0" />
+                  <label for="point2">Point 2 (x,y):</label><input type="text" name="point2" class="inside" value="0.0,0.0" />
+                  <label for="point3">Point 3 (x,y):</label><input type="text" name="point3" class="inside" value="0.0,0.0" />
+                  <div class="button more">Add point</div>
+                  <div class="button draw">Draw to board</div>
+                </div>
+              </div>
+              <div class="button point">Point</div>
+              <div data-html="point">
+                <div class="draw-element">
+                  <label for="point1">Point (x,y):</label><input type="text" name="point" class="inside" value="0.0,0.0" />
+                  <div class="button draw">Draw to board</div>
+                </div>
+              </div>
             </div>
           </section>
           <h2>Transform</h2>
@@ -77,8 +145,8 @@
         </section>
     </div>
     {% if env == "development" %}
-    <script src='//localhost:35729/livereload.js'></script>
+    <script src='//localhost:35728/livereload.js'></script>
     {% endif %}
     <script src="//code.jquery.com/jquery-1.11.0.min.js"></script>
-    <script src="/js/build.js"></script>
+    <script src="/js/dist/build.js"></script>
 {% endblock %}
