@@ -30,10 +30,8 @@ $(function() {
 },{"./subscribe":2}],2:[function(require,module,exports){
 var execute         = require('./operation'),
     command         = require('./events/run'),
-    drawSource      = require('./events/draw'),
     slider          = require('./helper/slider'),
     more            = require('./helper/more')(),
-    transformSource = require('./events/transform');
     Rx              = require('../components/rxjs/rx.lite').Rx;
 
 module.exports = function(board) {
@@ -78,13 +76,12 @@ module.exports = function(board) {
   return operationExec;
 };
 
-},{"./operation":3,"./events/run":4,"./events/draw":5,"./helper/slider":6,"./helper/more":7,"./events/transform":8,"../components/rxjs/rx.lite":9}],3:[function(require,module,exports){
+},{"./operation":3,"./events/run":4,"./helper/more":5,"./helper/slider":6,"../components/rxjs/rx.lite":7}],3:[function(require,module,exports){
 /* The Invoker */
 
 var Operation = function(board) {
   this.commands = [];
   this.storeAndExecute = function(command) {
-    console.log(command);
     var args =  command(board);
     this.commands.push({
       arguments: args,
@@ -126,7 +123,7 @@ module.exports = function(content, width, height, source, top) {
     });
   });
 };
-},{}],7:[function(require,module,exports){
+},{}],5:[function(require,module,exports){
 module.exports = function() {
   $(function() {
     var points = 3;
@@ -138,8 +135,6 @@ module.exports = function() {
   });
 };
 },{}],8:[function(require,module,exports){
-
-},{}],10:[function(require,module,exports){
 // shim for using process in browser
 
 var process = module.exports = {};
@@ -194,7 +189,7 @@ process.chdir = function (dir) {
     throw new Error('process.chdir is not supported');
 };
 
-},{}],9:[function(require,module,exports){
+},{}],7:[function(require,module,exports){
 (function(process,global){// Copyright (c) Microsoft Open Technologies, Inc. All rights reserved. See License.txt in the project root for license information.
 
 ;(function (undefined) {
@@ -5672,7 +5667,7 @@ process.chdir = function (dir) {
     }
 }.call(this));
 })(require("__browserify_process"),window)
-},{"__browserify_process":10}],4:[function(require,module,exports){
+},{"__browserify_process":8}],4:[function(require,module,exports){
 
 module.exports = {
   draw: require('./draw'),
@@ -5680,7 +5675,9 @@ module.exports = {
 }
 
 
-},{"./draw":5,"./transform":8}],5:[function(require,module,exports){
+},{"./draw":9,"./transform":10}],10:[function(require,module,exports){
+
+},{}],9:[function(require,module,exports){
 var element = require('../board/element');
 
 /* Commands */

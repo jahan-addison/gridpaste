@@ -1,9 +1,7 @@
 var execute         = require('./operation'),
     command         = require('./events/run'),
-    drawSource      = require('./events/draw'),
     slider          = require('./helper/slider'),
     more            = require('./helper/more')(),
-    transformSource = require('./events/transform');
     Rx              = require('../components/rxjs/rx.lite').Rx;
 
 module.exports = function(board) {
