@@ -10,6 +10,6 @@
     "meyer-reset": "*"
   },
   "devDependencies": {
-    "rxjs": "~2.2.18"
+    "rxjs": "2.2.18"
   }
 }
