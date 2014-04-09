@@ -3,7 +3,6 @@
 var Operation = function(board) {
   this.commands = [];
   this.storeAndExecute = function(command) {
-    console.log(command);
     var args =  command(board);
     this.commands.push({
       arguments: args,
