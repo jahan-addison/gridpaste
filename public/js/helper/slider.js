@@ -1,10 +1,10 @@
-module.exports = function(content, width, height, top) {
+module.exports = function(content, width, height, source, top) {
   if ($('.slider').length) {
     return false;
   }
   $block = $('<div class="slider"> <div class="close-slider">x</div> </div>');
   $block.append(content)
-    .appendTo('body')
+    .appendTo(source || 'body')
     .css({
       width:  width  || 230,
       height: height || 200,

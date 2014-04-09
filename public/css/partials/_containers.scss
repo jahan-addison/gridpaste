@@ -17,13 +17,16 @@ body {
   color: $red;
 }
 
+#query {
+}
+
 [data-html] {
   display:none
 }
 
 .slider {
 
-  .draw-element {
+  div[class*="draw-"] {
     margin-left:5%;
     width: intrinsic;  
     input, label {

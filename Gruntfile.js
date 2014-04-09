@@ -28,8 +28,8 @@ module.exports = function (grunt) {
         beforeHook: function(bundle) {
           shim(bundle, {
             RxJS: {
-              path: './public/components/rxjs/rx.js',
-              exports: 'rxjs'
+              path: './public/components/rxjs/rx.lite,js',
+              exports: 'Rx'
             },
           });
         }

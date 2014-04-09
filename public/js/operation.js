@@ -1,10 +1,14 @@
 /* The Invoker */
 
-var Operation = function() {
-  var commands = [];
+var Operation = function(board) {
+  this.commands = [];
   this.storeAndExecute = function(command) {
-    commands.push(command);
-    command();
+    console.log(command);
+    var args =  command(board);
+    this.commands.push({
+      arguments: args,
+      'command': command.toString()
+    });
   }
   this.undoLastExecute = function() {
 

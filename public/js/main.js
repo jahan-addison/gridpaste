@@ -1,3 +1,4 @@
+
 $(function() {
   'use strict';
   // start board
@@ -20,7 +21,8 @@ $(function() {
      
     board.unsuspendUpdate();    
   })();
-  
-  // Attach creation events
-  require('./events').create(board);
+
+  /* Subscribe to application */
+  require('./subscribe')(board);
+
 }); 

@@ -195,12 +195,10 @@ BoardElement.prototype = (function() {
 
     var vertices = [];
     for(i in this.options) {
-      var point = new point(this.board, this.options[i]).add();
-      vertices.push(point);      
+      vertices.push(new point(this.board, this.options[i]).add());
     }
 
     this.board.create("polygon", vertices);
-
   };
 
   //-----------------------------------------------------------------------
