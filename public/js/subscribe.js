@@ -15,10 +15,11 @@ module.exports = function(board) {
 
   var $querySource       = Rx.Observable.fromEvent($querySources, 'click');
   var $querySubscription = $querySource.subscribe(function(e) {
-    console.log("Querying operation...");
+    if (!$('.slider').length) {
+      console.log("Querying operation");
 
-    var target = $(e.target);
-    slider(target.next().html(), 230, 'auto', '#application'); 
+      slider($(e.target).next().html(), 230, 'auto', '#application'); 
+    }
   }); 
 
   var $operationSources      = '.button.draw, .button.transform';
@@ -30,8 +31,7 @@ module.exports = function(board) {
   var operationExec          = new execute(board);
 
   var $operationSubscription = $operationSource.subscribe(function(e) {
-    console.log("Executing operation...");
-
+    console.log("Executing operation");
     var target    = $(e.target).parent().attr('class').split('-');
     var targetOperation = target[0],
         targetCommand   = target[1];
@@ -39,7 +39,7 @@ module.exports = function(board) {
     $('.close-slider').click();
   },
     function(e) {
-      console.log("An error occuried: %s", e.message);
+      console.log("Error: %s", e.message);
     }
   ); 
 

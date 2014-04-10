@@ -1,7 +1,5 @@
-
 $(function() {
   'use strict';
-  // start board
   var board;
   (function() {
     /* Board Options */
@@ -23,6 +21,6 @@ $(function() {
   })();
 
   /* Subscribe to application */
-  require('./subscribe')(board);
+  var App = require('./subscribe')(board);
 
 }); 

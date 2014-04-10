@@ -1,8 +1,6 @@
 ;(function(e,t,n){function i(n,s){if(!t[n]){if(!e[n]){var o=typeof require=="function"&&require;if(!s&&o)return o(n,!0);if(r)return r(n,!0);throw new Error("Cannot find module '"+n+"'")}var u=t[n]={exports:{}};e[n][0].call(u.exports,function(t){var r=e[n][1][t];return i(r?r:t)},u,u.exports)}return t[n].exports}var r=typeof require=="function"&&require;for(var s=0;s<n.length;s++)i(n[s]);return i})({1:[function(require,module,exports){
-
 $(function() {
   'use strict';
-  // start board
   var board;
   (function() {
     /* Board Options */
@@ -24,7 +22,7 @@ $(function() {
   })();
 
   /* Subscribe to application */
-  require('./subscribe')(board);
+  var App = require('./subscribe')(board);
 
 }); 
 },{"./subscribe":2}],2:[function(require,module,exports){
@@ -45,10 +43,11 @@ module.exports = function(board) {
 
   var $querySource       = Rx.Observable.fromEvent($querySources, 'click');
   var $querySubscription = $querySource.subscribe(function(e) {
-    console.log("Querying operation...");
+    if (!$('.slider').length) {
+      console.log("Querying operation");
 
-    var target = $(e.target);
-    slider(target.next().html(), 230, 'auto', '#application'); 
+      slider($(e.target).next().html(), 230, 'auto', '#application'); 
+    }
   }); 
 
   var $operationSources      = '.button.draw, .button.transform';
@@ -60,8 +59,7 @@ module.exports = function(board) {
   var operationExec          = new execute(board);
 
   var $operationSubscription = $operationSource.subscribe(function(e) {
-    console.log("Executing operation...");
-
+    console.log("Executing operation");
     var target    = $(e.target).parent().attr('class').split('-');
     var targetOperation = target[0],
         targetCommand   = target[1];
@@ -69,32 +67,36 @@ module.exports = function(board) {
     $('.close-slider').click();
   },
     function(e) {
-      console.log("An error occuried: %s", e.message);
+      console.log("Error: %s", e.message);
     }
   ); 
 
   return operationExec;
 };
 
-},{"./operation":3,"./events/run":4,"./helper/more":5,"./helper/slider":6,"../components/rxjs/rx.lite":7}],3:[function(require,module,exports){
+},{"./operation":3,"./events/run":4,"./helper/slider":5,"./helper/more":6,"../components/rxjs/rx.lite":7}],3:[function(require,module,exports){
 /* The Invoker */
 
 var Operation = function(board) {
-  this.commands = [];
+  var _commands = [];
+  Object.defineProperty(this, "length", {
+    get: function() { return _commands.length }
+  });
+  
   this.storeAndExecute = function(command) {
     var args =  command(board);
-    this.commands.push({
+    _commands.push({
       arguments: args,
       'command': command.toString()
     });
-  }
+  };
   this.undoLastExecute = function() {
 
   };
 };
 
 module.exports = Operation;
-},{}],6:[function(require,module,exports){
+},{}],5:[function(require,module,exports){
 module.exports = function(content, width, height, source, top) {
   if ($('.slider').length) {
     return false;
@@ -123,7 +125,7 @@ module.exports = function(content, width, height, source, top) {
     });
   });
 };
-},{}],5:[function(require,module,exports){
+},{}],6:[function(require,module,exports){
 module.exports = function() {
   $(function() {
     var points = 3;
