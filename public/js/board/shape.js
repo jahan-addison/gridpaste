@@ -16,7 +16,7 @@ Shape.prototype = (function() {
       var s    = this.board.create(this.shape,
         this.options,
         {
-          name: this.shape + "." + createShapeLabel.call(this),
+          name: "t" + "." + createShapeLabel.call(this),
           withLabel: true
         }
       );
