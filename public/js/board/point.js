@@ -32,7 +32,7 @@ Point.prototype = (function() {
         return point;
       }
     }
-  } 
+  }; 
 
 })();
 

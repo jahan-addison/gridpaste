@@ -15,6 +15,7 @@ $(function() {
       showNavigation:  false 
     });
     board.points = {};
+    board.shapes = [];
     var axx      = board.create('axis',[[0,0],[1,0]]);
     var axy      = board.create('axis',[[0,0],[0,1]]);
      
@@ -98,9 +99,6 @@ var Operation = function(board) {
 module.exports = Operation;
 },{}],5:[function(require,module,exports){
 module.exports = function(content, width, height, source, top) {
-  if ($('.slider').length) {
-    return false;
-  }
   $block = $('<div class="slider"> <div class="close-slider">x</div> </div>');
   $block.append(content)
     .appendTo(source || 'body')
@@ -5672,12 +5670,16 @@ process.chdir = function (dir) {
 },{"__browserify_process":8}],4:[function(require,module,exports){
 
 module.exports = {
-  draw: require('./draw'),
-  transform: require('./transform')
+  draw:      require('./draw'),
+  transform: require('./transform'),
+  // drag: require('./drag'),
+  undo:      require('./undo')
 }
 
 
-},{"./draw":9,"./transform":10}],10:[function(require,module,exports){
+},{"./draw":9,"./transform":10,"./undo":11}],10:[function(require,module,exports){
+
+},{}],11:[function(require,module,exports){
 
 },{}],9:[function(require,module,exports){
 var element = require('../board/element');
@@ -5811,8 +5813,9 @@ module.exports = {
   polygon: polygon,
   point: point
 };
-},{"../board/element":11}],11:[function(require,module,exports){
-var point = require('./point');
+},{"../board/element":12}],12:[function(require,module,exports){
+var point = require('./point'),
+    shape = require('./shape')
 
 /*
   BoardElement Factory
@@ -5846,8 +5849,7 @@ BoardElement.prototype = (function() {
 
   circleElement.prototype.draw = function() {
     var p1 = new point(this.board, this.options.center).add();
-
-    this.board.create("circle", [p1, this.options.radius]);
+    var s  = new shape(this.board, "circle", [p1, this.options.radius]).add();
   };
 
   //-----------------------------------------------------------------------
@@ -5866,13 +5868,10 @@ BoardElement.prototype = (function() {
 
   angleElement.prototype.draw = function() {
     var p1 = new point(this.board, this.options.point1).add();
-
     var p2 = new point(this.board, this.options.point2).add();
-
     var p3 = new point(this.board, this.options.point3).add();
 
-    this.board.create("angle", [p1, p2, p3]);
-
+    var s  = new shape(this.board, "angle", [p1, p2, p3]).add();
   };
 
   //-----------------------------------------------------------------------
@@ -5894,8 +5893,7 @@ BoardElement.prototype = (function() {
     var p2 = new point(this.board, this.options.point2).add();
     var p3 = new point(this.board, this.options.point3).add();
 
-    this.board.create("arc", [p1, p2, p3]);
-
+    var s  = new shape(this.board, "arc", [p1, p2, p3]).add();
   };
 
   //-----------------------------------------------------------------------
@@ -5914,12 +5912,10 @@ BoardElement.prototype = (function() {
 
   ellipseElement.prototype.draw = function() {
     var p1 = new point(this.board, this.options.point1).add();
-
     var p2 = new point(this.board, this.options.point2).add();
-
     var p3 = new point(this.board, this.options.point3).add();
 
-    this.board.create("ellipse", [p1, p2, p3]);
+    var s  = new shape(this.board, "ellipse", [p1, p2, p3]).add();
 
   };
 
@@ -5938,10 +5934,9 @@ BoardElement.prototype = (function() {
 
   segmentElement.prototype.draw = function() {
     var p1 = new point(this.board, this.options.point1).add();
-
     var p2 = new point(this.board, this.options.point2).add();
 
-    this.board.create("segment", [p1, p2]);
+    var s  = new shape(this.board, "segment", [p1, p2]).add();
 
   };
 
@@ -5962,8 +5957,7 @@ BoardElement.prototype = (function() {
     var p1 = new point(this.board, this.options.point1).add();
     var p2 = new point(this.board, this.options.point2).add();
 
-    this.board.create("line", [p1, p2]);
-
+    var s  = new shape(this.board, "line", [p1, p2]).add();
   };
 
   //-----------------------------------------------------------------------
@@ -5982,13 +5976,10 @@ BoardElement.prototype = (function() {
   parabolaElement.prototype.draw = function() {
     var p1 = new point(this.board, this.options.point1).add();  
     var p2 = new point(this.board, this.options.point2).add();
-
-    var l1 = this.board.create("line",
-      [p1, p2]
-    );
+    var s1 = new shape(this.board, "line", [p1, p2]).add();
     var p3 = new point(this.board, this.options.point3).add();
 
-    this.board.create("parabola", [p3, l1]);
+    var s  = new shape(this.board, "parabola", [p3, s1]).add();
 
   };
 
@@ -6012,7 +6003,7 @@ BoardElement.prototype = (function() {
       vertices.push(new point(this.board, this.options[i]).add());
     }
 
-    this.board.create("polygon", vertices);
+    var s = new shape(this.board, "polygon", vertices).add();
   };
 
   //-----------------------------------------------------------------------
@@ -6029,7 +6020,7 @@ BoardElement.prototype = (function() {
 
   pointElement.prototype.draw = function() {
    
-    return new point(this.board, this.options.point).add();
+    var p = new point(this.board, this.options.point).add();
    
   };
 
@@ -6049,7 +6040,7 @@ BoardElement.prototype = (function() {
 })();
 
 module.exports = BoardElement; 
-},{"./point":12}],12:[function(require,module,exports){
+},{"./point":13,"./shape":14}],13:[function(require,module,exports){
 var Point = function(board, coords) {
   this.board  = board;
   this.coords = coords;
@@ -6084,10 +6075,41 @@ Point.prototype = (function() {
         return point;
       }
     }
-  } 
+  }; 
 
 })();
 
 module.exports = Point;
+},{}],14:[function(require,module,exports){
+var Shape = function(board, shape, options) {
+  this.board   = board;
+  this.shape   = shape;
+  this.options = options;
+};
+
+Shape.prototype = (function() {
+  /* Private */
+  var createShapeLabel = function() {
+      return this.board.shapes.length + 1;
+  };
+  /* Public */
+  return {
+    Constructor: Shape,
+    add: function() {
+      var s    = this.board.create(this.shape,
+        this.options,
+        {
+          name: this.shape + "." + createShapeLabel.call(this),
+          withLabel: true
+        }
+      );
+      this.board.shapes.push(s);
+      return s;
+    }
+  };
+})();
+
+
+module.exports = Shape;
 },{}]},{},[1])
 ;

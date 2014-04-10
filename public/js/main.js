@@ -14,6 +14,7 @@ $(function() {
       showNavigation:  false 
     });
     board.points = {};
+    board.shapes = [];
     var axx      = board.create('axis',[[0,0],[1,0]]);
     var axy      = board.create('axis',[[0,0],[0,1]]);
      

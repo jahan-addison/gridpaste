@@ -1,4 +1,5 @@
-var point = require('./point');
+var point = require('./point'),
+    shape = require('./shape')
 
 /*
   BoardElement Factory
@@ -32,8 +33,7 @@ BoardElement.prototype = (function() {
 
   circleElement.prototype.draw = function() {
     var p1 = new point(this.board, this.options.center).add();
-
-    this.board.create("circle", [p1, this.options.radius]);
+    var s  = new shape(this.board, "circle", [p1, this.options.radius]).add();
   };
 
   //-----------------------------------------------------------------------
@@ -52,13 +52,10 @@ BoardElement.prototype = (function() {
 
   angleElement.prototype.draw = function() {
     var p1 = new point(this.board, this.options.point1).add();
-
     var p2 = new point(this.board, this.options.point2).add();
-
     var p3 = new point(this.board, this.options.point3).add();
 
-    this.board.create("angle", [p1, p2, p3]);
-
+    var s  = new shape(this.board, "angle", [p1, p2, p3]).add();
   };
 
   //-----------------------------------------------------------------------
@@ -80,8 +77,7 @@ BoardElement.prototype = (function() {
     var p2 = new point(this.board, this.options.point2).add();
     var p3 = new point(this.board, this.options.point3).add();
 
-    this.board.create("arc", [p1, p2, p3]);
-
+    var s  = new shape(this.board, "arc", [p1, p2, p3]).add();
   };
 
   //-----------------------------------------------------------------------
@@ -100,12 +96,10 @@ BoardElement.prototype = (function() {
 
   ellipseElement.prototype.draw = function() {
     var p1 = new point(this.board, this.options.point1).add();
-
     var p2 = new point(this.board, this.options.point2).add();
-
     var p3 = new point(this.board, this.options.point3).add();
 
-    this.board.create("ellipse", [p1, p2, p3]);
+    var s  = new shape(this.board, "ellipse", [p1, p2, p3]).add();
 
   };
 
@@ -124,10 +118,9 @@ BoardElement.prototype = (function() {
 
   segmentElement.prototype.draw = function() {
     var p1 = new point(this.board, this.options.point1).add();
-
     var p2 = new point(this.board, this.options.point2).add();
 
-    this.board.create("segment", [p1, p2]);
+    var s  = new shape(this.board, "segment", [p1, p2]).add();
 
   };
 
@@ -148,8 +141,7 @@ BoardElement.prototype = (function() {
     var p1 = new point(this.board, this.options.point1).add();
     var p2 = new point(this.board, this.options.point2).add();
 
-    this.board.create("line", [p1, p2]);
-
+    var s  = new shape(this.board, "line", [p1, p2]).add();
   };
 
   //-----------------------------------------------------------------------
@@ -168,13 +160,10 @@ BoardElement.prototype = (function() {
   parabolaElement.prototype.draw = function() {
     var p1 = new point(this.board, this.options.point1).add();  
     var p2 = new point(this.board, this.options.point2).add();
-
-    var l1 = this.board.create("line",
-      [p1, p2]
-    );
+    var s1 = new shape(this.board, "line", [p1, p2]).add();
     var p3 = new point(this.board, this.options.point3).add();
 
-    this.board.create("parabola", [p3, l1]);
+    var s  = new shape(this.board, "parabola", [p3, s1]).add();
 
   };
 
@@ -198,7 +187,7 @@ BoardElement.prototype = (function() {
       vertices.push(new point(this.board, this.options[i]).add());
     }
 
-    this.board.create("polygon", vertices);
+    var s = new shape(this.board, "polygon", vertices).add();
   };
 
   //-----------------------------------------------------------------------
@@ -215,7 +204,7 @@ BoardElement.prototype = (function() {
 
   pointElement.prototype.draw = function() {
    
-    return new point(this.board, this.options.point).add();
+    var p = new point(this.board, this.options.point).add();
    
   };
 
