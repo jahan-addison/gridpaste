@@ -148,22 +148,20 @@ BoardElement.prototype = (function() {
 
   /*
   Options: {
-    line  1: [float, float],
+    point 1: [float, float],
     point 2: [float, float]
   }
   */
-  var parabolaElement = function(board, options) {
+  var semicircleElement = function(board, options) {
     this.options = options;
     this.board   = board;
   };
 
-  parabolaElement.prototype.draw = function() {
+  semicircleElement.prototype.draw = function() {
     var p1 = new point(this.board, this.options.point1).add();  
     var p2 = new point(this.board, this.options.point2).add();
-    var s1 = new shape(this.board, "line", [p1, p2]).add();
-    var p3 = new point(this.board, this.options.point3).add();
 
-    return new shape(this.board, "parabola", [p3, s1]).add();
+    return new shape(this.board, "semicircle", [p1, p2]).add();
 
   };
 
@@ -216,7 +214,7 @@ BoardElement.prototype = (function() {
     ellipse:     ellipseElement,
     segment:     segmentElement,
     line:        lineElement,
-    parabola:    parabolaElement,
+    semicircle:  semicircleElement,
     polygon:     polygonElement,
     point:       pointElement
   };

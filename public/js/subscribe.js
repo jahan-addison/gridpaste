@@ -9,8 +9,7 @@ module.exports = function(board) {
   var $querySources  = $([
     '.circle',   '.angle',   '.arc',
     '.ellipse',  '.segment', '.line',
-    '.parabola', '.polygon', '.point',
-    '.text'
+     '.polygon', '.point',   '.text'
   ].join(','));
 
   var $querySource       = Rx.Observable.fromEvent($querySources, 'click');
@@ -29,6 +28,7 @@ module.exports = function(board) {
   );
 
   var operationExec          = new execute(board);
+  require('./helper/undo')(operationExec);  // attach event to undo button
 
   var $operationSubscription = $operationSource.subscribe(function(e) {
     console.log("Executing operation");
@@ -36,6 +36,9 @@ module.exports = function(board) {
     var targetOperation = target[0],
         targetCommand   = target[1];
     operationExec.storeAndExecute(command[targetOperation][targetCommand]);
+    if (operationExec.length > 0) {
+      $('.button.undo').addClass('visible');
+    }
     $('.close-slider').click();
   },
     function(e) {

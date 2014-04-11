@@ -38,8 +38,7 @@ module.exports = function(board) {
   var $querySources  = $([
     '.circle',   '.angle',   '.arc',
     '.ellipse',  '.segment', '.line',
-    '.parabola', '.polygon', '.point',
-    '.text'
+     '.polygon', '.point',   '.text'
   ].join(','));
 
   var $querySource       = Rx.Observable.fromEvent($querySources, 'click');
@@ -58,6 +57,7 @@ module.exports = function(board) {
   );
 
   var operationExec          = new execute(board);
+  require('./helper/undo')(operationExec);  // attach event to undo button
 
   var $operationSubscription = $operationSource.subscribe(function(e) {
     console.log("Executing operation");
@@ -65,6 +65,9 @@ module.exports = function(board) {
     var targetOperation = target[0],
         targetCommand   = target[1];
     operationExec.storeAndExecute(command[targetOperation][targetCommand]);
+    if (operationExec.length > 0) {
+      $('.button.undo').addClass('visible');
+    }
     $('.close-slider').click();
   },
     function(e) {
@@ -75,7 +78,7 @@ module.exports = function(board) {
   return operationExec;
 };
 
-},{"./operation":3,"./events/run":4,"./helper/slider":5,"./helper/more":6,"../components/rxjs/rx.lite":7}],3:[function(require,module,exports){
+},{"./operation":3,"./events/run":4,"./helper/slider":5,"./helper/more":6,"../components/rxjs/rx.lite":7,"./helper/undo":8}],3:[function(require,module,exports){
 /* The Invoker */
 
 var Operation = function(board) {
@@ -138,7 +141,7 @@ module.exports = function() {
     });
   });
 };
-},{}],8:[function(require,module,exports){
+},{}],9:[function(require,module,exports){
 // shim for using process in browser
 
 var process = module.exports = {};
@@ -5671,7 +5674,18 @@ process.chdir = function (dir) {
     }
 }.call(this));
 })(require("__browserify_process"),window)
-},{"__browserify_process":8}],4:[function(require,module,exports){
+},{"__browserify_process":9}],8:[function(require,module,exports){
+module.exports = function(App) {
+  $(function() {
+    $('.button.undo').click(function() {
+      App.undoLastExecute();
+      if(App.length === 0) {
+        $(this).removeClass('visible');
+      }
+    });
+  });
+};
+},{}],4:[function(require,module,exports){
 
 module.exports = {
   draw:      require('./draw'),
@@ -5680,9 +5694,9 @@ module.exports = {
 }
 
 
-},{"./draw":9,"./transform":10}],10:[function(require,module,exports){
+},{"./draw":10,"./transform":11}],11:[function(require,module,exports){
 
-},{}],9:[function(require,module,exports){
+},{}],10:[function(require,module,exports){
 var element = require('../board/element');
 
 /* Commands */
@@ -5723,7 +5737,6 @@ var angle = function(board, args) {
 
   this.angle  = new element(board, "angle", args);
   this.remove = function() {
-    console.log(this.angleElement);
     delete board.points[this.angleElement.point1.name];
     delete board.points[this.angleElement.point2.name];
     delete board.points[this.angleElement.point3.name];
@@ -5826,28 +5839,17 @@ var line = function(board, args) {
   };
 };
 
-var parabola = function(board, args) {
+var semicircle = function(board, args) {
   var args = args || {
     point1: $('input[name="point1"]:last').coord(),
     point2: $('input[name="point2"]:last').coord(),
-    point3: $('input[name="point3"]:last').coord(),
   };
-
-  this.parabola = new element(board, "parabola", args);
-  this.remove   = function() {
-    delete board.points[this.parabolaElement.point1];
-    delete board.points[this.parabolaElement.point2];
-    delete board.points[this.parabolaElement.point3];
-    board.removeObject(this.parabolaElement.point);
-    board.removeObject(this.parabolaElement.point2);
-    board.removeObject(this.parabolaElement.point3);    
-    board.removeObject(this.parabolaElement);
-    board.shapes.pop();
-    // line
-    board.shapes.pop();
+  this.semicircle    = new element(board, "semicircle", args);
+  this.remove  = function() {
+    console.log(this.semicircleElement);
   };
-  this.execute  = function() {
-    this.parabolaElement = this.parabola.draw();
+  this.execute = function() {
+    this.semicircleElement = this.semicircle.draw();
     return args;
   };
 };
@@ -5862,7 +5864,6 @@ var polygon = function(board, args) {
 
   this.polygon = new element(board, "polygon", args);
   this.remove = function() {
-    console.log(this.polygonElement);
     this.polygonElement.vertices.pop();
     this.polygonElement.vertices.forEach(function(vertex) {
       delete board.points[vertex.name];
@@ -5911,11 +5912,11 @@ module.exports = {
   ellipse: ellipse,
   segment: segment,
   line: line,
-  parabola: parabola,
+  semicircle: semicircle,
   polygon: polygon,
   point: point
 };
-},{"../board/element":11}],11:[function(require,module,exports){
+},{"../board/element":12}],12:[function(require,module,exports){
 var point = require('./point'),
     shape = require('./shape')
 
@@ -6066,22 +6067,20 @@ BoardElement.prototype = (function() {
 
   /*
   Options: {
-    line  1: [float, float],
+    point 1: [float, float],
     point 2: [float, float]
   }
   */
-  var parabolaElement = function(board, options) {
+  var semicircleElement = function(board, options) {
     this.options = options;
     this.board   = board;
   };
 
-  parabolaElement.prototype.draw = function() {
+  semicircleElement.prototype.draw = function() {
     var p1 = new point(this.board, this.options.point1).add();  
     var p2 = new point(this.board, this.options.point2).add();
-    var s1 = new shape(this.board, "line", [p1, p2]).add();
-    var p3 = new point(this.board, this.options.point3).add();
 
-    return new shape(this.board, "parabola", [p3, s1]).add();
+    return new shape(this.board, "semicircle", [p1, p2]).add();
 
   };
 
@@ -6134,7 +6133,7 @@ BoardElement.prototype = (function() {
     ellipse:     ellipseElement,
     segment:     segmentElement,
     line:        lineElement,
-    parabola:    parabolaElement,
+    semicircle:  semicircleElement,
     polygon:     polygonElement,
     point:       pointElement
   };
@@ -6142,7 +6141,7 @@ BoardElement.prototype = (function() {
 })();
 
 module.exports = BoardElement; 
-},{"./point":12,"./shape":13}],12:[function(require,module,exports){
+},{"./point":13,"./shape":14}],13:[function(require,module,exports){
 var Point = function(board, coords) {
   this.board  = board;
   this.coords = coords;
@@ -6183,7 +6182,7 @@ Point.prototype = (function() {
 })();
 
 module.exports = Point;
-},{}],13:[function(require,module,exports){
+},{}],14:[function(require,module,exports){
 var Shape = function(board, shape, options) {
   this.board   = board;
   this.shape   = shape;
@@ -6202,7 +6201,7 @@ Shape.prototype = (function() {
       var s    = this.board.create(this.shape,
         this.options,
         {
-          name: "t" + "." + createShapeLabel.call(this),
+          name: "T" + "." + createShapeLabel.call(this),
           withLabel: true
         }
       );

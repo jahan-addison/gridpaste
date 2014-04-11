@@ -24,6 +24,13 @@ body {
   display:none
 }
 
+.button.undo {
+  &.visible {
+    display: block !important;
+  }
+  display:none;
+}
+
 .slider {
 
   div[class*="draw-"] {

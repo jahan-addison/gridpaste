@@ -38,7 +38,6 @@ var angle = function(board, args) {
 
   this.angle  = new element(board, "angle", args);
   this.remove = function() {
-    console.log(this.angleElement);
     delete board.points[this.angleElement.point1.name];
     delete board.points[this.angleElement.point2.name];
     delete board.points[this.angleElement.point3.name];
@@ -141,28 +140,17 @@ var line = function(board, args) {
   };
 };
 
-var parabola = function(board, args) {
+var semicircle = function(board, args) {
   var args = args || {
     point1: $('input[name="point1"]:last').coord(),
     point2: $('input[name="point2"]:last').coord(),
-    point3: $('input[name="point3"]:last').coord(),
   };
-
-  this.parabola = new element(board, "parabola", args);
-  this.remove   = function() {
-    delete board.points[this.parabolaElement.point1];
-    delete board.points[this.parabolaElement.point2];
-    delete board.points[this.parabolaElement.point3];
-    board.removeObject(this.parabolaElement.point);
-    board.removeObject(this.parabolaElement.point2);
-    board.removeObject(this.parabolaElement.point3);    
-    board.removeObject(this.parabolaElement);
-    board.shapes.pop();
-    // line
-    board.shapes.pop();
+  this.semicircle    = new element(board, "semicircle", args);
+  this.remove  = function() {
+    console.log(this.semicircleElement);
   };
-  this.execute  = function() {
-    this.parabolaElement = this.parabola.draw();
+  this.execute = function() {
+    this.semicircleElement = this.semicircle.draw();
     return args;
   };
 };
@@ -177,7 +165,6 @@ var polygon = function(board, args) {
 
   this.polygon = new element(board, "polygon", args);
   this.remove = function() {
-    console.log(this.polygonElement);
     this.polygonElement.vertices.pop();
     this.polygonElement.vertices.forEach(function(vertex) {
       delete board.points[vertex.name];
@@ -226,7 +213,7 @@ module.exports = {
   ellipse: ellipse,
   segment: segment,
   line: line,
-  parabola: parabola,
+  semicircle: semicircle,
   polygon: polygon,
   point: point
 };
