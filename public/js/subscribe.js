@@ -46,5 +46,18 @@ module.exports = function(board) {
     }
   ); 
 
+  var $zoomSources      = $('.zoom.in, .zoom.out');
+  var $zoomSource       = Rx.Observable.fromEvent($zoomSources, "click");
+
+  var $zoomSubscription = $zoomSource.subscribe(function(e) {
+    var target          = $(e.target),
+        targetCommand = target.hasClass('in') ? 'zoomIn' : 'zoomOut'; 
+
+    operationExec.storeAndExecute(command['zoom'][targetCommand]);
+    if (operationExec.length > 0) {
+      $('.button.undo').addClass('visible');
+    }    
+  });
+
   return operationExec;
 };

@@ -18,8 +18,6 @@ $(function() {
     board.shapes = [];
     var axx      = board.create('axis',[[0,0],[1,0]]);
     var axy      = board.create('axis',[[0,0],[0,1]]);
-    // zoom
-    var zoom     = require('./helper/zoom')(board);
      
     board.unsuspendUpdate();    
   })();
@@ -28,20 +26,7 @@ $(function() {
   var App = require('./subscribe')(board);
 
 }); 
-},{"./helper/zoom":2,"./subscribe":3}],2:[function(require,module,exports){
-module.exports = function(board) {
-  $(function() {
-    $('.zoom').click(function() {
-      if ($(this).attr('class').indexOf('in') != -1) {
-        board.zoomIn();
-      }
-      if ($(this).attr('class').indexOf('out') != -1) {
-        board.zoomOut();
-    }
-    });
-  });
-};
-},{}],3:[function(require,module,exports){
+},{"./subscribe":2}],2:[function(require,module,exports){
 var execute         = require('./operation'),
     command         = require('./events/run'),
     slider          = require('./helper/slider'),
@@ -90,10 +75,23 @@ module.exports = function(board) {
     }
   ); 
 
+  var $zoomSources      = $('.zoom.in, .zoom.out');
+  var $zoomSource       = Rx.Observable.fromEvent($zoomSources, "click");
+
+  var $zoomSubscription = $zoomSource.subscribe(function(e) {
+    var target          = $(e.target),
+        targetCommand = target.hasClass('in') ? 'zoomIn' : 'zoomOut'; 
+
+    operationExec.storeAndExecute(command['zoom'][targetCommand]);
+    if (operationExec.length > 0) {
+      $('.button.undo').addClass('visible');
+    }    
+  });
+
   return operationExec;
 };
 
-},{"./operation":4,"./events/run":5,"./helper/slider":6,"./helper/more":7,"../components/rxjs/rx.lite":8,"./helper/undo":9}],4:[function(require,module,exports){
+},{"./operation":3,"./events/run":4,"./helper/slider":5,"./helper/more":6,"../components/rxjs/rx.lite":7,"./helper/undo":8}],3:[function(require,module,exports){
 /* The Invoker */
 
 var Operation = function(board) {
@@ -119,7 +117,7 @@ var Operation = function(board) {
 };
 
 module.exports = Operation;
-},{}],6:[function(require,module,exports){
+},{}],5:[function(require,module,exports){
 module.exports = function(content, width, height, source, top) {
   $block = $('<div class="slider"> <div class="close-slider">x</div> </div>');
   $block.append(content)
@@ -145,7 +143,7 @@ module.exports = function(content, width, height, source, top) {
     });
   });
 };
-},{}],7:[function(require,module,exports){
+},{}],6:[function(require,module,exports){
 module.exports = function() {
   $(function() {
     var points = 3;
@@ -156,7 +154,7 @@ module.exports = function() {
     });
   });
 };
-},{}],9:[function(require,module,exports){
+},{}],8:[function(require,module,exports){
 module.exports = function(App) {
   $(function() {
     $('.button.undo').click(function() {
@@ -167,7 +165,7 @@ module.exports = function(App) {
     });
   });
 };
-},{}],10:[function(require,module,exports){
+},{}],9:[function(require,module,exports){
 // shim for using process in browser
 
 var process = module.exports = {};
@@ -222,7 +220,7 @@ process.chdir = function (dir) {
     throw new Error('process.chdir is not supported');
 };
 
-},{}],8:[function(require,module,exports){
+},{}],7:[function(require,module,exports){
 (function(process,global){// Copyright (c) Microsoft Open Technologies, Inc. All rights reserved. See License.txt in the project root for license information.
 
 ;(function (undefined) {
@@ -5700,18 +5698,66 @@ process.chdir = function (dir) {
     }
 }.call(this));
 })(require("__browserify_process"),window)
-},{"__browserify_process":10}],5:[function(require,module,exports){
+},{"__browserify_process":9}],4:[function(require,module,exports){
 
 module.exports = {
   draw:      require('./draw'),
   transform: require('./transform'),
+  zoom:      require('./zoom'),
   // drag: require('./drag')
+};
+
+
+},{"./draw":10,"./transform":11,"./zoom":12}],12:[function(require,module,exports){
+/* Commands */
+
+/*--
+Interface Command {
+  public void   constructor(JSXGraph board, Object Arguments)
+  public void   remove()
+  public object execute()
 }
+--*/
 
+var zoomIn = function(board, args) {
+  this.remove = function() {
+    board.zoomOut();
+  };
+  this.execute = function() {
+    board.zoomIn();
+  }
+  return args;
+};
 
-},{"./draw":11,"./transform":12}],12:[function(require,module,exports){
+var zoomOut = function(board, args) {
+  this.remove = function() {
+    board.zoomIn();
+  };
+  this.execute = function() {
+    board.zoomOut();
+  };
+  return args;
+};
 
+var zoom100 = function(board, args) {
+  this.X = board.zoomX;
+  this.Y = board.zoomY;
+  this.remove = function() {
+  };
+  this.execute = function() {
+    board.zoom100();
+  };
+  return args;
+};
+
+module.exports = {
+  zoomIn: zoomIn,
+  zoomOut: zoomOut,
+  zoom100: zoom100
+};
 },{}],11:[function(require,module,exports){
+
+},{}],10:[function(require,module,exports){
 var element = require('../board/element'),
     coords  = require('../helper/coords')();
 

@@ -17,8 +17,6 @@ $(function() {
     board.shapes = [];
     var axx      = board.create('axis',[[0,0],[1,0]]);
     var axy      = board.create('axis',[[0,0],[0,1]]);
-    // zoom
-    var zoom     = require('./helper/zoom')(board);
      
     board.unsuspendUpdate();    
   })();
