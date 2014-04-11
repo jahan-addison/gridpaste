@@ -5708,7 +5708,9 @@ module.exports = {
 };
 
 
-},{"./draw":10,"./transform":11,"./zoom":12}],12:[function(require,module,exports){
+},{"./draw":10,"./transform":11,"./zoom":12}],11:[function(require,module,exports){
+
+},{}],12:[function(require,module,exports){
 /* Commands */
 
 /*--
@@ -5755,8 +5757,6 @@ module.exports = {
   zoomOut: zoomOut,
   zoom100: zoom100
 };
-},{}],11:[function(require,module,exports){
-
 },{}],10:[function(require,module,exports){
 var element = require('../board/element'),
     coords  = require('../helper/coords')();
