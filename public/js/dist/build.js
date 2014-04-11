@@ -78,7 +78,7 @@ module.exports = function(board) {
   return operationExec;
 };
 
-},{"./operation":3,"./events/run":4,"./helper/slider":5,"./helper/more":6,"../components/rxjs/rx.lite":7,"./helper/undo":8}],3:[function(require,module,exports){
+},{"./operation":3,"./events/run":4,"./helper/slider":5,"../components/rxjs/rx.lite":6,"./helper/more":7,"./helper/undo":8}],3:[function(require,module,exports){
 /* The Invoker */
 
 var Operation = function(board) {
@@ -127,17 +127,6 @@ module.exports = function(content, width, height, source, top) {
       left: -width || -230
     }, 400, function() {
       $(this).remove();
-    });
-  });
-};
-},{}],6:[function(require,module,exports){
-module.exports = function() {
-  $(function() {
-    var points = 3;
-    $('#application').on('click', '.more', function() {
-      points++;
-      var more = '<br /><label for="point'+ points + '">Point ' + points + ' (x,y):</label><input type="text" name="point'+ points +'" class="inside" value="0.0,0.0" />';
-      $(this).before(more);
     });
   });
 };
@@ -196,7 +185,7 @@ process.chdir = function (dir) {
     throw new Error('process.chdir is not supported');
 };
 
-},{}],7:[function(require,module,exports){
+},{}],6:[function(require,module,exports){
 (function(process,global){// Copyright (c) Microsoft Open Technologies, Inc. All rights reserved. See License.txt in the project root for license information.
 
 ;(function (undefined) {
@@ -5674,7 +5663,18 @@ process.chdir = function (dir) {
     }
 }.call(this));
 })(require("__browserify_process"),window)
-},{"__browserify_process":9}],8:[function(require,module,exports){
+},{"__browserify_process":9}],7:[function(require,module,exports){
+module.exports = function() {
+  $(function() {
+    var points = 3;
+    $('#application').on('click', '.more', function() {
+      points++;
+      var more = '<br /><label for="point'+ points + '">Point ' + points + ' (x,y):</label><input type="text" name="point'+ points +'" class="inside" value="0.0,0.0" />';
+      $(this).before(more);
+    });
+  });
+};
+},{}],8:[function(require,module,exports){
 module.exports = function(App) {
   $(function() {
     $('.button.undo').click(function() {
@@ -5761,10 +5761,10 @@ var arc = function(board, args) {
 
    this.arc     = new element(board, "arc", args);
    this.remove  = function() {
-      delete board.points[this.arcElement.point1.name];
+      delete board.points[this.arcElement.center.name];
       delete board.points[this.arcElement.point2.name];
       delete board.points[this.arcElement.point3.name];
-      board.removeObject(this.arcElement.point1);
+      board.removeObject(this.arcElement.center);
       board.removeObject(this.arcElement.point2);
       board.removeObject(this.arcElement.point3);
       board.removeObject(this.arcElement);
@@ -5784,14 +5784,12 @@ var ellipse = function(board, args) {
   };
   this.ellipse = new element(board, "ellipse", args);
   this.remove  = function() {
-    delete board.points[this.ellipseElement.point1.name];
-    delete board.points[this.ellipseElement.point2.name];
-    delete board.points[this.ellipseElement.point3.name];
-    board.removeObject(this.ellipseElement.point1);
-    board.removeObject(this.ellipseElement.point2);
-    board.removeObject(this.ellipseElement.point3);
-    board.removeObject(this.ellipse);
+    board.removeObject(this.ellipseElement);
     board.shapes.pop();
+    // curve points
+    board.removeObject(board.shapes.pop());
+    board.removeObject(board.shapes.pop());
+    board.removeObject(board.shapes.pop());
   };
   this.execute = function() {
     this.ellipseElement = this.ellipse.draw()
@@ -6014,9 +6012,10 @@ BoardElement.prototype = (function() {
   };
 
   ellipseElement.prototype.draw = function() {
-    var p1 = new point(this.board, this.options.point1).add();
-    var p2 = new point(this.board, this.options.point2).add();
-    var p3 = new point(this.board, this.options.point3).add();
+    // curve points
+    var p1 = new shape(this.board, "point", this.options.point1).add();
+    var p2 = new shape(this.board, "point", this.options.point2).add();
+    var p3 = new shape(this.board, "point", this.options.point3).add();
 
     return new shape(this.board, "ellipse", [p1, p2, p3]).add();
 

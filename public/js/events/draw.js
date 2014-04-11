@@ -62,10 +62,10 @@ var arc = function(board, args) {
 
    this.arc     = new element(board, "arc", args);
    this.remove  = function() {
-      delete board.points[this.arcElement.point1.name];
+      delete board.points[this.arcElement.center.name];
       delete board.points[this.arcElement.point2.name];
       delete board.points[this.arcElement.point3.name];
-      board.removeObject(this.arcElement.point1);
+      board.removeObject(this.arcElement.center);
       board.removeObject(this.arcElement.point2);
       board.removeObject(this.arcElement.point3);
       board.removeObject(this.arcElement);
@@ -85,14 +85,12 @@ var ellipse = function(board, args) {
   };
   this.ellipse = new element(board, "ellipse", args);
   this.remove  = function() {
-    delete board.points[this.ellipseElement.point1.name];
-    delete board.points[this.ellipseElement.point2.name];
-    delete board.points[this.ellipseElement.point3.name];
-    board.removeObject(this.ellipseElement.point1);
-    board.removeObject(this.ellipseElement.point2);
-    board.removeObject(this.ellipseElement.point3);
-    board.removeObject(this.ellipse);
+    board.removeObject(this.ellipseElement);
     board.shapes.pop();
+    // curve points
+    board.removeObject(board.shapes.pop());
+    board.removeObject(board.shapes.pop());
+    board.removeObject(board.shapes.pop());
   };
   this.execute = function() {
     this.ellipseElement = this.ellipse.draw()

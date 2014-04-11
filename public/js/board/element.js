@@ -95,9 +95,10 @@ BoardElement.prototype = (function() {
   };
 
   ellipseElement.prototype.draw = function() {
-    var p1 = new point(this.board, this.options.point1).add();
-    var p2 = new point(this.board, this.options.point2).add();
-    var p3 = new point(this.board, this.options.point3).add();
+    // curve points
+    var p1 = new shape(this.board, "point", this.options.point1).add();
+    var p2 = new shape(this.board, "point", this.options.point2).add();
+    var p3 = new shape(this.board, "point", this.options.point3).add();
 
     return new shape(this.board, "ellipse", [p1, p2, p3]).add();
 
