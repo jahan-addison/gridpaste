@@ -22,7 +22,6 @@ $(function() {
   })();
 
   /* Subscribe to application */
-  window.board = board;
   var App = require('./subscribe')(board);
 
 }); 
