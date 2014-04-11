@@ -52,11 +52,14 @@ module.exports = function(board) {
   var $zoomSubscription = $zoomSource.subscribe(function(e) {
     var target          = $(e.target),
         targetCommand = target.hasClass('in') ? 'zoomIn' : 'zoomOut'; 
+    if ((targetCommand == 'zoomIn'  && board.zoomX < 5.9) ||
+        (targetCommand == 'zoomOut' && board.zoomX > 0.167)) {
 
-    operationExec.storeAndExecute(command['zoom'][targetCommand]);
-    if (operationExec.length > 0) {
-      $('.button.undo').addClass('visible');
-    }    
+      operationExec.storeAndExecute(command['zoom'][targetCommand]);
+      if (operationExec.length > 0) {
+        $('.button.undo').addClass('visible');
+      }   
+    } 
   });
 
   return operationExec;

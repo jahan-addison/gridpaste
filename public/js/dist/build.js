@@ -23,6 +23,7 @@ $(function() {
   })();
 
   /* Subscribe to application */
+  window.board = board;
   var App = require('./subscribe')(board);
 
 }); 
@@ -81,11 +82,14 @@ module.exports = function(board) {
   var $zoomSubscription = $zoomSource.subscribe(function(e) {
     var target          = $(e.target),
         targetCommand = target.hasClass('in') ? 'zoomIn' : 'zoomOut'; 
+    if ((targetCommand == 'zoomIn'  && board.zoomX < 5.9) ||
+        (targetCommand == 'zoomOut' && board.zoomX > 0.167)) {
 
-    operationExec.storeAndExecute(command['zoom'][targetCommand]);
-    if (operationExec.length > 0) {
-      $('.button.undo').addClass('visible');
-    }    
+      operationExec.storeAndExecute(command['zoom'][targetCommand]);
+      if (operationExec.length > 0) {
+        $('.button.undo').addClass('visible');
+      }   
+    } 
   });
 
   return operationExec;
@@ -151,17 +155,6 @@ module.exports = function() {
       points++;
       var more = '<br /><label for="point'+ points + '">Point ' + points + ' (x,y):</label><input type="text" name="point'+ points +'" class="inside" value="0.0,0.0" />';
       $(this).before(more);
-    });
-  });
-};
-},{}],8:[function(require,module,exports){
-module.exports = function(App) {
-  $(function() {
-    $('.button.undo').click(function() {
-      App.undoLastExecute();
-      if(App.length === 0) {
-        $(this).removeClass('visible');
-      }
     });
   });
 };
@@ -5698,7 +5691,18 @@ process.chdir = function (dir) {
     }
 }.call(this));
 })(require("__browserify_process"),window)
-},{"__browserify_process":9}],4:[function(require,module,exports){
+},{"__browserify_process":9}],8:[function(require,module,exports){
+module.exports = function(App) {
+  $(function() {
+    $('.button.undo').click(function() {
+      App.undoLastExecute();
+      if(App.length === 0) {
+        $(this).removeClass('visible');
+      }
+    });
+  });
+};
+},{}],4:[function(require,module,exports){
 
 module.exports = {
   draw:      require('./draw'),
