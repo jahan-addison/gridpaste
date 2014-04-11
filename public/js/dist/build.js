@@ -18,6 +18,8 @@ $(function() {
     board.shapes = [];
     var axx      = board.create('axis',[[0,0],[1,0]]);
     var axy      = board.create('axis',[[0,0],[0,1]]);
+    // zoom
+    var zoom     = require('./helper/zoom')(board);
      
     board.unsuspendUpdate();    
   })();
@@ -26,7 +28,20 @@ $(function() {
   var App = require('./subscribe')(board);
 
 }); 
-},{"./subscribe":2}],2:[function(require,module,exports){
+},{"./helper/zoom":2,"./subscribe":3}],2:[function(require,module,exports){
+module.exports = function(board) {
+  $(function() {
+    $('.zoom').click(function() {
+      if ($(this).attr('class').indexOf('in') != -1) {
+        board.zoomIn();
+      }
+      if ($(this).attr('class').indexOf('out') != -1) {
+        board.zoomOut();
+    }
+    });
+  });
+};
+},{}],3:[function(require,module,exports){
 var execute         = require('./operation'),
     command         = require('./events/run'),
     slider          = require('./helper/slider'),
@@ -78,7 +93,7 @@ module.exports = function(board) {
   return operationExec;
 };
 
-},{"./operation":3,"./events/run":4,"./helper/slider":5,"./helper/more":6,"../components/rxjs/rx.lite":7,"./helper/undo":8}],3:[function(require,module,exports){
+},{"./operation":4,"./events/run":5,"./helper/slider":6,"./helper/more":7,"../components/rxjs/rx.lite":8,"./helper/undo":9}],4:[function(require,module,exports){
 /* The Invoker */
 
 var Operation = function(board) {
@@ -104,7 +119,7 @@ var Operation = function(board) {
 };
 
 module.exports = Operation;
-},{}],5:[function(require,module,exports){
+},{}],6:[function(require,module,exports){
 module.exports = function(content, width, height, source, top) {
   $block = $('<div class="slider"> <div class="close-slider">x</div> </div>');
   $block.append(content)
@@ -130,18 +145,7 @@ module.exports = function(content, width, height, source, top) {
     });
   });
 };
-},{}],8:[function(require,module,exports){
-module.exports = function(App) {
-  $(function() {
-    $('.button.undo').click(function() {
-      App.undoLastExecute();
-      if(App.length === 0) {
-        $(this).removeClass('visible');
-      }
-    });
-  });
-};
-},{}],6:[function(require,module,exports){
+},{}],7:[function(require,module,exports){
 module.exports = function() {
   $(function() {
     var points = 3;
@@ -153,6 +157,17 @@ module.exports = function() {
   });
 };
 },{}],9:[function(require,module,exports){
+module.exports = function(App) {
+  $(function() {
+    $('.button.undo').click(function() {
+      App.undoLastExecute();
+      if(App.length === 0) {
+        $(this).removeClass('visible');
+      }
+    });
+  });
+};
+},{}],10:[function(require,module,exports){
 // shim for using process in browser
 
 var process = module.exports = {};
@@ -207,7 +222,7 @@ process.chdir = function (dir) {
     throw new Error('process.chdir is not supported');
 };
 
-},{}],7:[function(require,module,exports){
+},{}],8:[function(require,module,exports){
 (function(process,global){// Copyright (c) Microsoft Open Technologies, Inc. All rights reserved. See License.txt in the project root for license information.
 
 ;(function (undefined) {
@@ -5685,7 +5700,7 @@ process.chdir = function (dir) {
     }
 }.call(this));
 })(require("__browserify_process"),window)
-},{"__browserify_process":9}],4:[function(require,module,exports){
+},{"__browserify_process":10}],5:[function(require,module,exports){
 
 module.exports = {
   draw:      require('./draw'),
@@ -5694,9 +5709,9 @@ module.exports = {
 }
 
 
-},{"./draw":10,"./transform":11}],11:[function(require,module,exports){
+},{"./draw":11,"./transform":12}],12:[function(require,module,exports){
 
-},{}],10:[function(require,module,exports){
+},{}],11:[function(require,module,exports){
 var element = require('../board/element'),
     coords  = require('../helper/coords')();
 
@@ -5904,7 +5919,7 @@ module.exports = {
   polygon: polygon,
   point: point
 };
-},{"../board/element":12,"../helper/coords":13}],13:[function(require,module,exports){
+},{"../board/element":13,"../helper/coords":14}],14:[function(require,module,exports){
 module.exports = function() {
   jQuery.fn.coord = function() {
     if (this.val()) {
@@ -5918,7 +5933,7 @@ module.exports = function() {
   };
 };
 
-},{}],12:[function(require,module,exports){
+},{}],13:[function(require,module,exports){
 var point = require('./point'),
     shape = require('./shape')
 
@@ -6144,7 +6159,7 @@ BoardElement.prototype = (function() {
 })();
 
 module.exports = BoardElement; 
-},{"./point":14,"./shape":15}],14:[function(require,module,exports){
+},{"./point":15,"./shape":16}],15:[function(require,module,exports){
 var Point = function(board, coords) {
   this.board  = board;
   this.coords = coords;
@@ -6185,7 +6200,7 @@ Point.prototype = (function() {
 })();
 
 module.exports = Point;
-},{}],15:[function(require,module,exports){
+},{}],16:[function(require,module,exports){
 var Shape = function(board, shape, options) {
   this.board   = board;
   this.shape   = shape;
