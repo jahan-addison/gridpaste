@@ -26,7 +26,8 @@ Point.prototype = (function() {
         var p = this.board.create("point", this.coords);
         Object.defineProperty(this.board.points, p.name, 
           {value: p,
-           enumerable: true});
+           enumerable:   true,
+           configurable: true});
         return p;
       } else {
         return point;

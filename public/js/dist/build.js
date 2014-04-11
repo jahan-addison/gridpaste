@@ -85,14 +85,18 @@ var Operation = function(board) {
   });
   
   this.storeAndExecute = function(command) {
-    var args =  command(board);
+    var $command =  new command(board),
+        args     =  $command.execute();
     _commands.push({
-      arguments: args,
-      'command': command.toString()
+      arguments:   args,
+      'command':   $command,
+      'toString':  $command.toString()
     });
   };
+  
   this.undoLastExecute = function() {
-
+   var $command = _commands.pop();
+   $command.command.remove();
   };
 };
 
@@ -5672,19 +5676,24 @@ process.chdir = function (dir) {
 module.exports = {
   draw:      require('./draw'),
   transform: require('./transform'),
-  // drag: require('./drag'),
-  undo:      require('./undo')
+  // drag: require('./drag')
 }
 
 
-},{"./draw":9,"./transform":10,"./undo":11}],10:[function(require,module,exports){
-
-},{}],11:[function(require,module,exports){
+},{"./draw":9,"./transform":10}],10:[function(require,module,exports){
 
 },{}],9:[function(require,module,exports){
 var element = require('../board/element');
 
 /* Commands */
+
+/*--
+  Interface Command {
+    public void   constructor(JSXGraph board, Object Arguments)
+    public void   remove()
+    public object execute()
+  }
+--*/
 
 var circle = function(board, args) {
   var args = args || {
@@ -5692,9 +5701,17 @@ var circle = function(board, args) {
     radius: parseFloat($('input[name="radius"]:last').val())
   };
 
-  var circle = new element(board, "circle", args);
-  circle.draw();
-  return args;
+  this.circle  = new element(board, "circle", args);
+  this.remove  = function() {
+    delete board.points[this.circleElement.center.name];
+    board.removeObject(this.circleElement.center);
+    board.removeObject(this.circleElement);
+    board.shapes.pop();
+  };
+  this.execute = function() {
+    this.circleElement = this.circle.draw(); 
+    return args;
+  };
 };
 
 var angle = function(board, args) {
@@ -5704,9 +5721,22 @@ var angle = function(board, args) {
     point3: $('input[name="point3"]:last').coord()
   };
 
-  var angle = new element(board, "angle", args);
-  angle.draw();
-  return args;
+  this.angle  = new element(board, "angle", args);
+  this.remove = function() {
+    console.log(this.angleElement);
+    delete board.points[this.angleElement.point1.name];
+    delete board.points[this.angleElement.point2.name];
+    delete board.points[this.angleElement.point3.name];
+    board.removeObject(this.angleElement.point1);
+    board.removeObject(this.angleElement.point2);
+    board.removeObject(this.angleElement.point3);
+    board.removeObject(this.angleElement);
+    board.shapes.pop();
+  };
+  this.execute = function() {
+    this.angleElement = this.angle.draw();
+    return args;
+  };
 };
 
 var arc = function(board, args) {
@@ -5716,9 +5746,21 @@ var arc = function(board, args) {
     point3: $('input[name="point3"]:last').coord()
   };
 
-  var arc = new element(board, "arc", args);
-  arc.draw();
-  return args;
+   this.arc     = new element(board, "arc", args);
+   this.remove  = function() {
+      delete board.points[this.arcElement.point1.name];
+      delete board.points[this.arcElement.point2.name];
+      delete board.points[this.arcElement.point3.name];
+      board.removeObject(this.arcElement.point1);
+      board.removeObject(this.arcElement.point2);
+      board.removeObject(this.arcElement.point3);
+      board.removeObject(this.arcElement);
+      board.shapes.pop();
+   };
+   this.execute = function() {
+      this.arcElement = this.arc.draw();
+      return args;
+   };
 };
 
 var ellipse = function(board, args) {
@@ -5727,10 +5769,21 @@ var ellipse = function(board, args) {
     point2: $('input[name="point2"]:last').coord(),
     point3: $('input[name="point3"]:last').coord()
   };
-
-  var ellipse = new element(board, "ellipse", args);
-  ellipse.draw();
-  return args;
+  this.ellipse = new element(board, "ellipse", args);
+  this.remove  = function() {
+    delete board.points[this.ellipseElement.point1.name];
+    delete board.points[this.ellipseElement.point2.name];
+    delete board.points[this.ellipseElement.point3.name];
+    board.removeObject(this.ellipseElement.point1);
+    board.removeObject(this.ellipseElement.point2);
+    board.removeObject(this.ellipseElement.point3);
+    board.removeObject(this.ellipse);
+    board.shapes.pop();
+  };
+  this.execute = function() {
+    this.ellipseElement = this.ellipse.draw()
+    return args;
+  };
 };
 
 var segment = function(board, args) {
@@ -5738,10 +5791,19 @@ var segment = function(board, args) {
     point1: $('input[name="point1"]:last').coord(),
     point2: $('input[name="point2"]:last').coord(),
   };
-  
-  var segment = new element(board, "segment", args);
-  segment.draw();
-  return args;
+  this.segment = new element(board, "segment", args);
+  this.remove  = function() {
+    delete board.points[this.segmentElement.point1.name];
+    delete board.points[this.segmentElement.point2.name];
+    board.removeObject(this.segmentElement.point1);
+    board.removeObject(this.segmentElement.point2);
+    board.removeObject(this.segmentElement);
+    board.shapes.pop();
+  };
+  this.execute = function() {
+    this.segmentElement = this.segment.draw();
+    return args;
+  };
 };
 
 var line = function(board, args) {
@@ -5749,10 +5811,19 @@ var line = function(board, args) {
     point1: $('input[name="point1"]:last').coord(),
     point2: $('input[name="point2"]:last').coord(),
   };
-
-  var line = new element(board, "line", args);
-  line.draw();
-  return args;
+  this.line    = new element(board, "line", args);
+  this.remove  = function() {
+    delete board.points[this.lineElement.point1.name];
+    delete board.points[this.lineElement.point2.name];
+    board.removeObject(this.lineElement.point1);
+    board.removeObject(this.lineElement.point2);
+    board.removeObject(this.lineElement);
+    board.shapes.pop();
+  };
+  this.execute = function() {
+    this.lineElement = this.line.draw();
+    return args;
+  };
 };
 
 var parabola = function(board, args) {
@@ -5762,9 +5833,23 @@ var parabola = function(board, args) {
     point3: $('input[name="point3"]:last').coord(),
   };
 
-  var parabola = new element(board, "parabola", args);
-  parabola.draw();
-  return args;
+  this.parabola = new element(board, "parabola", args);
+  this.remove   = function() {
+    delete board.points[this.parabolaElement.point1];
+    delete board.points[this.parabolaElement.point2];
+    delete board.points[this.parabolaElement.point3];
+    board.removeObject(this.parabolaElement.point);
+    board.removeObject(this.parabolaElement.point2);
+    board.removeObject(this.parabolaElement.point3);    
+    board.removeObject(this.parabolaElement);
+    board.shapes.pop();
+    // line
+    board.shapes.pop();
+  };
+  this.execute  = function() {
+    this.parabolaElement = this.parabola.draw();
+    return args;
+  };
 };
 
 var polygon = function(board, args) {
@@ -5775,19 +5860,36 @@ var polygon = function(board, args) {
   });
   args = args || vertices;
 
-  var polygon = new element(board, "polygon", args);
-  polygon.draw();
-  return args;
+  this.polygon = new element(board, "polygon", args);
+  this.remove = function() {
+    console.log(this.polygonElement);
+    this.polygonElement.vertices.pop();
+    this.polygonElement.vertices.forEach(function(vertex) {
+      delete board.points[vertex.name];
+      board.removeObject(vertex);
+    });
+    board.removeObject(this.polygonElement);
+    board.shapes.pop();
+  };
+  this.execute = function() {
+    this.polygonElement = this.polygon.draw();
+    return args;
+  };
 };
 
 var point = function(board, args) {
   var args = args || {
     point: $('input[name="point"]:last').coord(),
   };
-
-  var point = new element(board, "point", args);
-  point.draw();
-  return args;
+  this.point = new element(board, "point", args);
+  this.remove  = function() {
+    delete board.points[this.pointElement.name];
+    board.removeObject(this.pointElement);
+  };
+  this.execute = function() {
+    this.pointElement = this.point.draw();
+    return args;
+  };
 };
 
 /* Extend jQuery for input to coordinates */
@@ -5813,7 +5915,7 @@ module.exports = {
   polygon: polygon,
   point: point
 };
-},{"../board/element":12}],12:[function(require,module,exports){
+},{"../board/element":11}],11:[function(require,module,exports){
 var point = require('./point'),
     shape = require('./shape')
 
@@ -5849,7 +5951,7 @@ BoardElement.prototype = (function() {
 
   circleElement.prototype.draw = function() {
     var p1 = new point(this.board, this.options.center).add();
-    var s  = new shape(this.board, "circle", [p1, this.options.radius]).add();
+    return new shape(this.board, "circle", [p1, this.options.radius]).add();
   };
 
   //-----------------------------------------------------------------------
@@ -5871,7 +5973,7 @@ BoardElement.prototype = (function() {
     var p2 = new point(this.board, this.options.point2).add();
     var p3 = new point(this.board, this.options.point3).add();
 
-    var s  = new shape(this.board, "angle", [p1, p2, p3]).add();
+    return new shape(this.board, "angle", [p1, p2, p3]).add();
   };
 
   //-----------------------------------------------------------------------
@@ -5893,7 +5995,7 @@ BoardElement.prototype = (function() {
     var p2 = new point(this.board, this.options.point2).add();
     var p3 = new point(this.board, this.options.point3).add();
 
-    var s  = new shape(this.board, "arc", [p1, p2, p3]).add();
+    return new shape(this.board, "arc", [p1, p2, p3]).add();
   };
 
   //-----------------------------------------------------------------------
@@ -5915,7 +6017,7 @@ BoardElement.prototype = (function() {
     var p2 = new point(this.board, this.options.point2).add();
     var p3 = new point(this.board, this.options.point3).add();
 
-    var s  = new shape(this.board, "ellipse", [p1, p2, p3]).add();
+    return new shape(this.board, "ellipse", [p1, p2, p3]).add();
 
   };
 
@@ -5936,7 +6038,7 @@ BoardElement.prototype = (function() {
     var p1 = new point(this.board, this.options.point1).add();
     var p2 = new point(this.board, this.options.point2).add();
 
-    var s  = new shape(this.board, "segment", [p1, p2]).add();
+    return new shape(this.board, "segment", [p1, p2]).add();
 
   };
 
@@ -5957,7 +6059,7 @@ BoardElement.prototype = (function() {
     var p1 = new point(this.board, this.options.point1).add();
     var p2 = new point(this.board, this.options.point2).add();
 
-    var s  = new shape(this.board, "line", [p1, p2]).add();
+    return new shape(this.board, "line", [p1, p2]).add();
   };
 
   //-----------------------------------------------------------------------
@@ -5979,7 +6081,7 @@ BoardElement.prototype = (function() {
     var s1 = new shape(this.board, "line", [p1, p2]).add();
     var p3 = new point(this.board, this.options.point3).add();
 
-    var s  = new shape(this.board, "parabola", [p3, s1]).add();
+    return new shape(this.board, "parabola", [p3, s1]).add();
 
   };
 
@@ -6003,7 +6105,7 @@ BoardElement.prototype = (function() {
       vertices.push(new point(this.board, this.options[i]).add());
     }
 
-    var s = new shape(this.board, "polygon", vertices).add();
+    return new shape(this.board, "polygon", vertices).add();
   };
 
   //-----------------------------------------------------------------------
@@ -6020,7 +6122,7 @@ BoardElement.prototype = (function() {
 
   pointElement.prototype.draw = function() {
    
-    var p = new point(this.board, this.options.point).add();
+    return new point(this.board, this.options.point).add();
    
   };
 
@@ -6040,7 +6142,7 @@ BoardElement.prototype = (function() {
 })();
 
 module.exports = BoardElement; 
-},{"./point":13,"./shape":14}],13:[function(require,module,exports){
+},{"./point":12,"./shape":13}],12:[function(require,module,exports){
 var Point = function(board, coords) {
   this.board  = board;
   this.coords = coords;
@@ -6069,7 +6171,8 @@ Point.prototype = (function() {
         var p = this.board.create("point", this.coords);
         Object.defineProperty(this.board.points, p.name, 
           {value: p,
-           enumerable: true});
+           enumerable:   true,
+           configurable: true});
         return p;
       } else {
         return point;
@@ -6080,7 +6183,7 @@ Point.prototype = (function() {
 })();
 
 module.exports = Point;
-},{}],14:[function(require,module,exports){
+},{}],13:[function(require,module,exports){
 var Shape = function(board, shape, options) {
   this.board   = board;
   this.shape   = shape;

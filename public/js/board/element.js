@@ -33,7 +33,7 @@ BoardElement.prototype = (function() {
 
   circleElement.prototype.draw = function() {
     var p1 = new point(this.board, this.options.center).add();
-    var s  = new shape(this.board, "circle", [p1, this.options.radius]).add();
+    return new shape(this.board, "circle", [p1, this.options.radius]).add();
   };
 
   //-----------------------------------------------------------------------
@@ -55,7 +55,7 @@ BoardElement.prototype = (function() {
     var p2 = new point(this.board, this.options.point2).add();
     var p3 = new point(this.board, this.options.point3).add();
 
-    var s  = new shape(this.board, "angle", [p1, p2, p3]).add();
+    return new shape(this.board, "angle", [p1, p2, p3]).add();
   };
 
   //-----------------------------------------------------------------------
@@ -77,7 +77,7 @@ BoardElement.prototype = (function() {
     var p2 = new point(this.board, this.options.point2).add();
     var p3 = new point(this.board, this.options.point3).add();
 
-    var s  = new shape(this.board, "arc", [p1, p2, p3]).add();
+    return new shape(this.board, "arc", [p1, p2, p3]).add();
   };
 
   //-----------------------------------------------------------------------
@@ -99,7 +99,7 @@ BoardElement.prototype = (function() {
     var p2 = new point(this.board, this.options.point2).add();
     var p3 = new point(this.board, this.options.point3).add();
 
-    var s  = new shape(this.board, "ellipse", [p1, p2, p3]).add();
+    return new shape(this.board, "ellipse", [p1, p2, p3]).add();
 
   };
 
@@ -120,7 +120,7 @@ BoardElement.prototype = (function() {
     var p1 = new point(this.board, this.options.point1).add();
     var p2 = new point(this.board, this.options.point2).add();
 
-    var s  = new shape(this.board, "segment", [p1, p2]).add();
+    return new shape(this.board, "segment", [p1, p2]).add();
 
   };
 
@@ -141,7 +141,7 @@ BoardElement.prototype = (function() {
     var p1 = new point(this.board, this.options.point1).add();
     var p2 = new point(this.board, this.options.point2).add();
 
-    var s  = new shape(this.board, "line", [p1, p2]).add();
+    return new shape(this.board, "line", [p1, p2]).add();
   };
 
   //-----------------------------------------------------------------------
@@ -163,7 +163,7 @@ BoardElement.prototype = (function() {
     var s1 = new shape(this.board, "line", [p1, p2]).add();
     var p3 = new point(this.board, this.options.point3).add();
 
-    var s  = new shape(this.board, "parabola", [p3, s1]).add();
+    return new shape(this.board, "parabola", [p3, s1]).add();
 
   };
 
@@ -187,7 +187,7 @@ BoardElement.prototype = (function() {
       vertices.push(new point(this.board, this.options[i]).add());
     }
 
-    var s = new shape(this.board, "polygon", vertices).add();
+    return new shape(this.board, "polygon", vertices).add();
   };
 
   //-----------------------------------------------------------------------
@@ -204,7 +204,7 @@ BoardElement.prototype = (function() {
 
   pointElement.prototype.draw = function() {
    
-    var p = new point(this.board, this.options.point).add();
+    return new point(this.board, this.options.point).add();
    
   };
 

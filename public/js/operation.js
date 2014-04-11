@@ -7,14 +7,18 @@ var Operation = function(board) {
   });
   
   this.storeAndExecute = function(command) {
-    var args =  command(board);
+    var $command =  new command(board),
+        args     =  $command.execute();
     _commands.push({
-      arguments: args,
-      'command': command.toString()
+      arguments:   args,
+      'command':   $command,
+      'toString':  $command.toString()
     });
   };
+  
   this.undoLastExecute = function() {
-
+   var $command = _commands.pop();
+   $command.command.remove();
   };
 };
 
