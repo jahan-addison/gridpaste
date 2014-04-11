@@ -1,4 +1,5 @@
-var element = require('../board/element');
+var element = require('../board/element'),
+    coords  = require('../helper/coords')();
 
 /* Commands */
 
@@ -192,17 +193,6 @@ var point = function(board, args) {
   };
 };
 
-/* Extend jQuery for input to coordinates */
-$.fn.coord = function() {
-  if (this.val()) {
-    if (this.val().indexOf(',') !== -1) {
-      return this.val().split(',')
-        .map(function(e) {
-          return parseFloat(e);
-        });
-    }
-  }
-};
 
 module.exports = {
   circle: circle,

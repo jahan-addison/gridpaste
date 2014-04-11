@@ -78,7 +78,7 @@ module.exports = function(board) {
   return operationExec;
 };
 
-},{"./operation":3,"./events/run":4,"./helper/slider":5,"../components/rxjs/rx.lite":6,"./helper/more":7,"./helper/undo":8}],3:[function(require,module,exports){
+},{"./operation":3,"./events/run":4,"./helper/slider":5,"./helper/more":6,"../components/rxjs/rx.lite":7,"./helper/undo":8}],3:[function(require,module,exports){
 /* The Invoker */
 
 var Operation = function(board) {
@@ -127,6 +127,28 @@ module.exports = function(content, width, height, source, top) {
       left: -width || -230
     }, 400, function() {
       $(this).remove();
+    });
+  });
+};
+},{}],8:[function(require,module,exports){
+module.exports = function(App) {
+  $(function() {
+    $('.button.undo').click(function() {
+      App.undoLastExecute();
+      if(App.length === 0) {
+        $(this).removeClass('visible');
+      }
+    });
+  });
+};
+},{}],6:[function(require,module,exports){
+module.exports = function() {
+  $(function() {
+    var points = 3;
+    $('#application').on('click', '.more', function() {
+      points++;
+      var more = '<br /><label for="point'+ points + '">Point ' + points + ' (x,y):</label><input type="text" name="point'+ points +'" class="inside" value="0.0,0.0" />';
+      $(this).before(more);
     });
   });
 };
@@ -185,7 +207,7 @@ process.chdir = function (dir) {
     throw new Error('process.chdir is not supported');
 };
 
-},{}],6:[function(require,module,exports){
+},{}],7:[function(require,module,exports){
 (function(process,global){// Copyright (c) Microsoft Open Technologies, Inc. All rights reserved. See License.txt in the project root for license information.
 
 ;(function (undefined) {
@@ -5663,29 +5685,7 @@ process.chdir = function (dir) {
     }
 }.call(this));
 })(require("__browserify_process"),window)
-},{"__browserify_process":9}],7:[function(require,module,exports){
-module.exports = function() {
-  $(function() {
-    var points = 3;
-    $('#application').on('click', '.more', function() {
-      points++;
-      var more = '<br /><label for="point'+ points + '">Point ' + points + ' (x,y):</label><input type="text" name="point'+ points +'" class="inside" value="0.0,0.0" />';
-      $(this).before(more);
-    });
-  });
-};
-},{}],8:[function(require,module,exports){
-module.exports = function(App) {
-  $(function() {
-    $('.button.undo').click(function() {
-      App.undoLastExecute();
-      if(App.length === 0) {
-        $(this).removeClass('visible');
-      }
-    });
-  });
-};
-},{}],4:[function(require,module,exports){
+},{"__browserify_process":9}],4:[function(require,module,exports){
 
 module.exports = {
   draw:      require('./draw'),
@@ -5697,7 +5697,8 @@ module.exports = {
 },{"./draw":10,"./transform":11}],11:[function(require,module,exports){
 
 },{}],10:[function(require,module,exports){
-var element = require('../board/element');
+var element = require('../board/element'),
+    coords  = require('../helper/coords')();
 
 /* Commands */
 
@@ -5891,17 +5892,6 @@ var point = function(board, args) {
   };
 };
 
-/* Extend jQuery for input to coordinates */
-$.fn.coord = function() {
-  if (this.val()) {
-    if (this.val().indexOf(',') !== -1) {
-      return this.val().split(',')
-        .map(function(e) {
-          return parseFloat(e);
-        });
-    }
-  }
-};
 
 module.exports = {
   circle: circle,
@@ -5914,7 +5904,21 @@ module.exports = {
   polygon: polygon,
   point: point
 };
-},{"../board/element":12}],12:[function(require,module,exports){
+},{"../board/element":12,"../helper/coords":13}],13:[function(require,module,exports){
+module.exports = function() {
+  jQuery.fn.coord = function() {
+    if (this.val()) {
+      if (this.val().indexOf(',') !== -1) {
+        return this.val().split(',')
+          .map(function(e) {
+            return parseFloat(e);
+          });
+      }
+    }
+  };
+};
+
+},{}],12:[function(require,module,exports){
 var point = require('./point'),
     shape = require('./shape')
 
@@ -6140,7 +6144,7 @@ BoardElement.prototype = (function() {
 })();
 
 module.exports = BoardElement; 
-},{"./point":13,"./shape":14}],13:[function(require,module,exports){
+},{"./point":14,"./shape":15}],14:[function(require,module,exports){
 var Point = function(board, coords) {
   this.board  = board;
   this.coords = coords;
@@ -6181,7 +6185,7 @@ Point.prototype = (function() {
 })();
 
 module.exports = Point;
-},{}],14:[function(require,module,exports){
+},{}],15:[function(require,module,exports){
 var Shape = function(board, shape, options) {
   this.board   = board;
   this.shape   = shape;
