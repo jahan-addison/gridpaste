@@ -68,6 +68,7 @@ body {
     width: intrinsic;  
     input, label {
       clear:both;
+      display:block;
     }  
     @include clearfix();
     width: 192px;

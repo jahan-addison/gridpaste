@@ -251,6 +251,7 @@ body {
 /* line 69, ../partials/_containers.scss */
 .slider div[class*="draw-"] input, .slider div[class*="draw-"] label {
   clear: both;
+  display: block;
 }
 /* line 11, ../partials/_base.scss */
 .slider div[class*="draw-"]:before, .slider div[class*="draw-"]:after {
@@ -261,15 +262,15 @@ body {
 .slider div[class*="draw-"]:after {
   clear: both;
 }
-/* line 75, ../partials/_containers.scss */
+/* line 76, ../partials/_containers.scss */
 .slider .inside {
   padding: 8px;
 }
-/* line 79, ../partials/_containers.scss */
+/* line 80, ../partials/_containers.scss */
 .slider .button.draw {
   margin-top: 18px;
 }
-/* line 83, ../partials/_containers.scss */
+/* line 84, ../partials/_containers.scss */
 .slider .close-slider {
   right: 2%;
   cursor: pointer;
@@ -281,12 +282,12 @@ body {
   height: 10px;
 }
 
-/* line 96, ../partials/_containers.scss */
+/* line 97, ../partials/_containers.scss */
 a {
   color: #ca9c4e;
 }
 
-/* line 100, ../partials/_containers.scss */
+/* line 101, ../partials/_containers.scss */
 #misc {
   *zoom: 1;
 }
@@ -300,7 +301,7 @@ a {
   clear: both;
 }
 
-/* line 104, ../partials/_containers.scss */
+/* line 105, ../partials/_containers.scss */
 #f {
   color: #f8f7f6;
   font-size: 20px;
@@ -309,14 +310,14 @@ a {
   margin-left: 8px;
 }
 
-/* line 110, ../partials/_containers.scss */
+/* line 111, ../partials/_containers.scss */
 address {
   color: #ca9c4e;
   font-size: 1em;
   padding: 0 8px;
 }
 
-/* line 116, ../partials/_containers.scss */
+/* line 117, ../partials/_containers.scss */
 input {
   background: #514645;
   padding: 10px;
@@ -334,12 +335,12 @@ input {
   border: none;
   outline: none;
 }
-/* line 126, ../partials/_containers.scss */
+/* line 127, ../partials/_containers.scss */
 input:active {
   outline: none;
 }
 
-/* line 132, ../partials/_containers.scss */
+/* line 133, ../partials/_containers.scss */
 h2 {
   font-size: 14px;
   padding: 14px 8px;
@@ -347,7 +348,7 @@ h2 {
   font-weight: normal;
 }
 
-/* line 139, ../partials/_containers.scss */
+/* line 140, ../partials/_containers.scss */
 .button {
   background: #c8a973;
   padding: 10px 18px;
@@ -365,7 +366,7 @@ h2 {
   font-family: "adelle",serif;
 }
 
-/* line 150, ../partials/_containers.scss */
+/* line 151, ../partials/_containers.scss */
 #elements {
   *zoom: 1;
 }
@@ -378,29 +379,29 @@ h2 {
 #elements:after {
   clear: both;
 }
-/* line 153, ../partials/_containers.scss */
+/* line 154, ../partials/_containers.scss */
 #elements .col + .col > .button:first-child {
   padding: 10px 12px;
 }
-/* line 156, ../partials/_containers.scss */
+/* line 157, ../partials/_containers.scss */
 #elements .col + .col > .button + .button {
   padding: 10px 14px;
 }
-/* line 160, ../partials/_containers.scss */
+/* line 161, ../partials/_containers.scss */
 #elements .col:first-child + .col .button {
   margin-left: 5px;
 }
-/* line 164, ../partials/_containers.scss */
+/* line 165, ../partials/_containers.scss */
 #elements .col + .col + .col .button {
   margin: 3px 2px 3px 6px;
 }
-/* line 168, ../partials/_containers.scss */
+/* line 169, ../partials/_containers.scss */
 #elements .col:first-child + .col + .col .button {
   padding: 10px 12px;
   margin-right: 1px;
 }
 
-/* line 174, ../partials/_containers.scss */
+/* line 175, ../partials/_containers.scss */
 #transform {
   *zoom: 1;
 }
@@ -413,26 +414,26 @@ h2 {
 #transform:after {
   clear: both;
 }
-/* line 177, ../partials/_containers.scss */
+/* line 178, ../partials/_containers.scss */
 #transform .col:first-child .button {
   padding: 10px 8px;
 }
 
-/* line 184, ../partials/_containers.scss */
+/* line 185, ../partials/_containers.scss */
 #bottom footer p {
   padding: 15px 8px;
   clear: both;
   width: 95%;
 }
 
-/* line 190, ../partials/_containers.scss */
+/* line 191, ../partials/_containers.scss */
 #bottom {
   border-top: rgba(202, 156, 78, 0.45) 1px dashed;
   width: 95%;
   margin-top: 20px;
   *zoom: 1;
 }
-/* line 193, ../partials/_containers.scss */
+/* line 194, ../partials/_containers.scss */
 #bottom > .col:first-child {
   margin-top: 15px;
 }
@@ -446,7 +447,7 @@ h2 {
   clear: both;
 }
 
-/* line 200, ../partials/_containers.scss */
+/* line 201, ../partials/_containers.scss */
 #left-bar {
   padding-left: 8px;
   width: 259px;
@@ -454,18 +455,18 @@ h2 {
   float: left;
   background: #3d3332;
 }
-/* line 201, ../partials/_containers.scss */
+/* line 202, ../partials/_containers.scss */
 #left-bar header img {
   width: 195px;
   height: 96px;
 }
-/* line 206, ../partials/_containers.scss */
+/* line 207, ../partials/_containers.scss */
 #left-bar header p {
   width: 95%;
   margin: 0 auto;
 }
 
-/* line 216, ../partials/_containers.scss */
+/* line 217, ../partials/_containers.scss */
 #auth {
   *zoom: 1;
   margin: 15px 5px;
@@ -480,21 +481,21 @@ h2 {
 #auth:after {
   clear: both;
 }
-/* line 220, ../partials/_containers.scss */
+/* line 221, ../partials/_containers.scss */
 #auth a {
   text-decoration: none;
 }
-/* line 222, ../partials/_containers.scss */
+/* line 223, ../partials/_containers.scss */
 #auth a:hover {
   color: #ca9c4e;
   text-decoration: underline;
 }
-/* line 227, ../partials/_containers.scss */
+/* line 228, ../partials/_containers.scss */
 #auth .col:first-child {
   padding-right: 35px;
 }
 
-/* line 232, ../partials/_containers.scss */
+/* line 233, ../partials/_containers.scss */
 .col {
   float: left;
   width: intrinsic;
@@ -511,7 +512,7 @@ h2 {
   clear: both;
 }
 
-/* line 239, ../partials/_containers.scss */
+/* line 240, ../partials/_containers.scss */
 #grid {
   width: calc(100% - 259px);
   height: 100%;

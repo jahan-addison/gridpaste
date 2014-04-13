@@ -193,6 +193,22 @@ var point = function(board, args) {
   };
 };
 
+var text = function(board, args) {
+  var args = args || {
+    position: $('input[name="position"]:last').coord(),
+    size:     parseInt($('input[name="size"]:last').val()),
+    text:     $('input[name="text"]:last').val()       
+  };
+  this.text = new element(board, "text", args);
+  this.remove = function() {
+    board.removeObject(this.textElement);
+  };
+  this.execute = function() {
+    this.textElement = this.text.draw();
+    return args;
+  };
+};
+
 
 module.exports = {
   circle: circle,
@@ -203,5 +219,6 @@ module.exports = {
   line: line,
   semicircle: semicircle,
   polygon: polygon,
-  point: point
+  point: point,
+  text: text
 };

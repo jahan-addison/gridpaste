@@ -23,7 +23,6 @@ $(function() {
   })();
 
   /* Subscribe to application */
-  window.board = board;
   var App = require('./subscribe')(board);
 
 }); 
@@ -44,10 +43,11 @@ module.exports = function(board) {
 
   var $querySource       = Rx.Observable.fromEvent($querySources, 'click');
   var $querySubscription = $querySource.subscribe(function(e) {
+    var target = $(e.target);
     if (!$('.slider').length) {
       console.log("Querying operation");
 
-      slider($(e.target).next().html(), 230, 'auto', '#application'); 
+      slider(target.next().html(), 230, 'auto', '#application', target.parent().parent()); 
     }
   }); 
 
@@ -130,19 +130,19 @@ module.exports = function(content, width, height, source, top) {
       width:  width  || 230,
       height: height || 200,
       position: 'absolute',
-      top: top       || $('#elements').offset().top,
+      top: top.offset().top  || $('#elements').offset().top,
       left: -width   || -230
     })
   $block.animate({
     left: 0
-  }, 400);
+  }, 320);
   $('.close-slider').click(function() {
     $(this).parent()
       .find('*')
       .unbind('click');
     $block.animate({
       left: -width || -230
-    }, 400, function() {
+    }, 320, function() {
       $(this).remove();
     });
   });
@@ -5957,6 +5957,22 @@ var point = function(board, args) {
   };
 };
 
+var text = function(board, args) {
+  var args = args || {
+    position: $('input[name="position"]:last').coord(),
+    size:     parseInt($('input[name="size"]:last').val()),
+    text:     $('input[name="text"]:last').val()       
+  };
+  this.text = new element(board, "text", args);
+  this.remove = function() {
+    board.removeObject(this.textElement);
+  };
+  this.execute = function() {
+    this.textElement = this.text.draw();
+    return args;
+  };
+};
+
 
 module.exports = {
   circle: circle,
@@ -5967,7 +5983,8 @@ module.exports = {
   line: line,
   semicircle: semicircle,
   polygon: polygon,
-  point: point
+  point: point,
+  text: text
 };
 },{"../board/element":13,"../helper/coords":14}],14:[function(require,module,exports){
 module.exports = function() {
@@ -6193,6 +6210,30 @@ BoardElement.prototype = (function() {
    
   };
 
+  //-----------------------------------------------------------------------
+
+  /*
+  Options: {
+    position: [float, float],
+    size:     int,
+    text:     string
+  }
+  */
+
+  var textElement = function(board, options) {
+    this.options = options;
+    this.board   = board;
+  };
+
+  textElement.prototype.draw = function() {
+    return this.board.create('text',
+      [this.options.position[0],
+        this.options.position[1],
+        this.options.text], {
+        fontSize: this.options.size
+      });
+  };
+
   return {
     Constructor: BoardElement,
     circle:      circleElement,
@@ -6203,7 +6244,8 @@ BoardElement.prototype = (function() {
     line:        lineElement,
     semicircle:  semicircleElement,
     polygon:     polygonElement,
-    point:       pointElement
+    point:       pointElement,
+    text:        textElement
   };
 
 })();

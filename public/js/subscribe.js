@@ -14,10 +14,11 @@ module.exports = function(board) {
 
   var $querySource       = Rx.Observable.fromEvent($querySources, 'click');
   var $querySubscription = $querySource.subscribe(function(e) {
+    var target = $(e.target);
     if (!$('.slider').length) {
       console.log("Querying operation");
 
-      slider($(e.target).next().html(), 230, 'auto', '#application'); 
+      slider(target.next().html(), 230, 'auto', '#application', target.parent().parent()); 
     }
   }); 
 

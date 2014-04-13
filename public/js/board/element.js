@@ -207,6 +207,30 @@ BoardElement.prototype = (function() {
    
   };
 
+  //-----------------------------------------------------------------------
+
+  /*
+  Options: {
+    position: [float, float],
+    size:     int,
+    text:     string
+  }
+  */
+
+  var textElement = function(board, options) {
+    this.options = options;
+    this.board   = board;
+  };
+
+  textElement.prototype.draw = function() {
+    return this.board.create('text',
+      [this.options.position[0],
+        this.options.position[1],
+        this.options.text], {
+        fontSize: this.options.size
+      });
+  };
+
   return {
     Constructor: BoardElement,
     circle:      circleElement,
@@ -217,7 +241,8 @@ BoardElement.prototype = (function() {
     line:        lineElement,
     semicircle:  semicircleElement,
     polygon:     polygonElement,
-    point:       pointElement
+    point:       pointElement,
+    text:        textElement
   };
 
 })();
