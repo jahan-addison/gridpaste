@@ -17,13 +17,58 @@ body {
   color: $red;
 }
 
+#query {
+}
+
+[data-html] {
+  display:none
+}
+
+.zoom {
+  background: $pale-brown;
+  width:46px;
+  z-index:200;
+  height:38px;
+  overflow:hidden;
+  cursor: pointer;
+  @include clearfix();
+  &.in {
+    left:20px + 259px;
+    span {
+      position: relative;
+      bottom:12px;
+      left:6px;
+      @include adelle(5em);
+    }
+  }
+  &.out {
+    span {
+      position: relative;
+      bottom:32px;
+      left:10px;
+      @include adelle(4.4em);
+    }    
+    left:75px + 259px;
+  }
+  position:absolute;
+  bottom:0;
+}
+
+.button.undo {
+  &.visible {
+    display: block !important;
+  }
+  display:none;
+}
+
 .slider {
 
-  .draw-element {
+  div[class*="draw-"] {
     margin-left:5%;
     width: intrinsic;  
     input, label {
       clear:both;
+      display:block;
     }  
     @include clearfix();
     width: 192px;
@@ -136,9 +181,11 @@ h2 {
   }
 }
 
+
 #bottom footer p {
   padding: 15px 8px;
   clear:both;
+  width:95%;
 }
 
 #bottom {

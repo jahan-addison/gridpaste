@@ -1,28 +1,24 @@
-module.exports = function(content, width, height, top) {
-  if ($('.slider').length) {
-    return false;
-  }
+module.exports = function(content, width, height, source, top) {
   $block = $('<div class="slider"> <div class="close-slider">x</div> </div>');
   $block.append(content)
-    .appendTo('body')
+    .appendTo(source || 'body')
     .css({
       width:  width  || 230,
       height: height || 200,
       position: 'absolute',
-      top: top       || $('#elements').offset().top,
+      top: top.offset().top  || $('#elements').offset().top,
       left: -width   || -230
     })
   $block.animate({
     left: 0
-  }, 400);
+  }, 320);
   $('.close-slider').click(function() {
-    // prevent duplicate form clicks
     $(this).parent()
-      .find('input, textarea')
-      .prop('disabled', true);
+      .find('*')
+      .unbind('click');
     $block.animate({
       left: -width || -230
-    }, 400, function() {
+    }, 320, function() {
       $(this).remove();
     });
   });
