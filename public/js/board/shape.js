@@ -13,13 +13,15 @@ Shape.prototype = (function() {
   return {
     Constructor: Shape,
     add: function() {
-      var s    = this.board.create(this.shape,
+      var points = this.options.pop(), 
+          s      = this.board.create(this.shape,
         this.options,
         {
           name: "Q" + createShapeLabel.call(this),
           withLabel: true
         }
       );
+      s.usrSetCoords = points;
       this.board.shapes.push(s);
       return s;
     }

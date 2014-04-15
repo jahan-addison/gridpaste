@@ -9,7 +9,8 @@ module.exports = function(board) {
   var $querySources  = $([
     '.circle',   '.angle',   '.arc',
     '.ellipse',  '.segment', '.line',
-     '.polygon', '.point',   '.text'
+     '.polygon', '.point',   '.text',
+     '.rotation'
   ].join(','));
 
   var $querySource       = Rx.Observable.fromEvent($querySources, 'click');
@@ -36,6 +37,7 @@ module.exports = function(board) {
     var target    = $(e.target).parent().attr('class').split('-');
     var targetOperation = target[0],
         targetCommand   = target[1];
+
     operationExec.storeAndExecute(command[targetOperation][targetCommand]);
     if (operationExec.length > 0) {
       $('.button.undo').addClass('visible');

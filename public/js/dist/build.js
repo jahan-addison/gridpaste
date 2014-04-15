@@ -22,6 +22,8 @@ $(function() {
     board.unsuspendUpdate();    
   })();
 
+  window.board = board;
+
   /* Subscribe to application */
   var App = require('./subscribe')(board);
 
@@ -38,7 +40,8 @@ module.exports = function(board) {
   var $querySources  = $([
     '.circle',   '.angle',   '.arc',
     '.ellipse',  '.segment', '.line',
-     '.polygon', '.point',   '.text'
+     '.polygon', '.point',   '.text',
+     '.rotation'
   ].join(','));
 
   var $querySource       = Rx.Observable.fromEvent($querySources, 'click');
@@ -65,6 +68,7 @@ module.exports = function(board) {
     var target    = $(e.target).parent().attr('class').split('-');
     var targetOperation = target[0],
         targetCommand   = target[1];
+
     operationExec.storeAndExecute(command[targetOperation][targetCommand]);
     if (operationExec.length > 0) {
       $('.button.undo').addClass('visible');
@@ -155,6 +159,17 @@ module.exports = function() {
       points++;
       var more = '<label for="point'+ points + '">Point ' + points + ' (x,y):</label><input type="text" name="point'+ points +'" class="inside" value="0.0,0.0" />';
       $(this).before(more);
+    });
+  });
+};
+},{}],8:[function(require,module,exports){
+module.exports = function(App) {
+  $(function() {
+    $('.button.undo').click(function() {
+      App.undoLastExecute();
+      if(App.length === 0) {
+        $(this).removeClass('visible');
+      }
     });
   });
 };
@@ -5691,18 +5706,7 @@ process.chdir = function (dir) {
     }
 }.call(this));
 })(require("__browserify_process"),window)
-},{"__browserify_process":9}],8:[function(require,module,exports){
-module.exports = function(App) {
-  $(function() {
-    $('.button.undo').click(function() {
-      App.undoLastExecute();
-      if(App.length === 0) {
-        $(this).removeClass('visible');
-      }
-    });
-  });
-};
-},{}],4:[function(require,module,exports){
+},{"__browserify_process":9}],4:[function(require,module,exports){
 
 module.exports = {
   draw:      require('./draw'),
@@ -5712,7 +5716,7 @@ module.exports = {
 };
 
 
-},{"./transform":10,"./zoom":11,"./draw":12}],11:[function(require,module,exports){
+},{"./draw":10,"./transform":11,"./zoom":12}],12:[function(require,module,exports){
 /* Commands */
 
 /*--
@@ -5760,8 +5764,6 @@ module.exports = {
   zoom100: zoom100
 };
 },{}],10:[function(require,module,exports){
-
-},{}],12:[function(require,module,exports){
 var element = require('../board/element'),
     coords  = require('../helper/coords')();
 
@@ -5986,7 +5988,63 @@ module.exports = {
   point: point,
   text: text
 };
-},{"../board/element":13,"../helper/coords":14}],14:[function(require,module,exports){
+},{"../board/element":13,"../helper/coords":14}],11:[function(require,module,exports){
+var transform = require('../board/transform'),
+    coords    = require('../helper/coords')();
+
+/* Commands */
+
+/*--
+Interface Command {
+  public void   constructor(JSXGraph board, Object Arguments)
+  public void   remove()
+  public object execute()
+}
+--*/
+
+var rotate = function(board, args) {
+  var args   = args || {
+    figure:  $('input[name="figure"]:last').val(),
+    degrees: parseInt($('input[name="degrees"]:last').val()),
+  },
+    usrPoints = this.points = {};  
+
+  args.points = [];
+
+  board.shapes.forEach(function(shape) {
+    if (shape.name == args.figure) {
+      args.points = shape.usrSetCoords;
+    }
+  });
+  delete args.figure;
+  this.rotate = new transform(board, "rotate", args);
+  this.remove = function() {
+    for (p in this.points) {
+      if (this.points.hasOwnProperty(p)) {
+        board.points[p].moveTo(this.points[p]);
+        board.points[p].update();
+      }
+    }
+  };
+  this.execute = function() {
+    args.points.forEach(function(p) {
+      Object.defineProperty(usrPoints, p.name, {
+        value: [
+          p.coords.usrCoords[1],
+          p.coords.usrCoords[2]
+        ],
+        enumerable: true
+      });
+    });
+    this.rotateTransform = this.rotate.apply();
+    return args;
+  };
+};
+
+module.exports = {
+  rotate: rotate
+};
+},{"../board/transform":15,"../helper/coords":14}],14:[function(require,module,exports){
 module.exports = function() {
   jQuery.fn.coord = function() {
     if (this.val()) {
@@ -6000,6 +6058,60 @@ module.exports = function() {
   };
 };
 
+},{}],15:[function(require,module,exports){
+/*
+  BoardTransform Factory
+  */
+
+var BoardTransform = function(board, transform, options) {
+  this.board  = board;
+  this.otions = options;
+  return new this[transform](board, options);
+};
+
+BoardTransform.prototype = (function() {
+
+  var degreeToRadian = function(deg) {
+    return ( Math.PI / 180 ) * deg; 
+  };
+
+/*--
+  Interface Transform {
+    public void   constructor(JSXGraph board, Object options)
+    public void   apply()
+  }
+*--*/
+
+  /*
+  Options: {
+    degrees: signed int
+    points:  [Point p1, Point p2, ...]
+  }
+  */
+
+  var RotateTransform = function(board, options) {
+    this.options = options;
+    this.board   = board;
+  };
+
+  RotateTransform.prototype.apply = function() {
+    var transform = board.create("transform", 
+      [degreeToRadian.call(this, this.options.degrees)],
+      {type: "rotate"});
+
+    transform.bindTo(this.options.points);
+    board.update();
+  };
+
+
+  return {
+    Constructor: BoardTransform,
+    rotate:      RotateTransform
+  };
+
+})();
+
+module.exports = BoardTransform;
 },{}],13:[function(require,module,exports){
 var point = require('./point'),
     shape = require('./shape')
@@ -6021,7 +6133,7 @@ BoardElement.prototype = (function() {
     public void   constructor(JSXGraph board, Object options)
     public void   draw()
   }
-*--/
+*--*/
 
   /*
   Options: {
@@ -6036,7 +6148,7 @@ BoardElement.prototype = (function() {
 
   circleElement.prototype.draw = function() {
     var p1 = new point(this.board, this.options.center).add();
-    return new shape(this.board, "circle", [p1, this.options.radius]).add();
+    return new shape(this.board, "circle", [p1, this.options.radius, [p1]]).add();
   };
 
   //-----------------------------------------------------------------------
@@ -6058,7 +6170,7 @@ BoardElement.prototype = (function() {
     var p2 = new point(this.board, this.options.point2).add();
     var p3 = new point(this.board, this.options.point3).add();
 
-    return new shape(this.board, "angle", [p1, p2, p3]).add();
+    return new shape(this.board, "angle", [p1, p2, p3, [p1, p2, p3]]).add();
   };
 
   //-----------------------------------------------------------------------
@@ -6080,7 +6192,7 @@ BoardElement.prototype = (function() {
     var p2 = new point(this.board, this.options.point2).add();
     var p3 = new point(this.board, this.options.point3).add();
 
-    return new shape(this.board, "arc", [p1, p2, p3]).add();
+    return new shape(this.board, "arc", [p1, p2, p3, [p1, p2, p3]]).add();
   };
 
   //-----------------------------------------------------------------------
@@ -6103,7 +6215,7 @@ BoardElement.prototype = (function() {
     var p2 = new shape(this.board, "point", this.options.point2).add();
     var p3 = new shape(this.board, "point", this.options.point3).add();
 
-    return new shape(this.board, "ellipse", [p1, p2, p3]).add();
+    return new shape(this.board, "ellipse", [p1, p2, p3, [p1, p2, p3]]).add();
 
   };
 
@@ -6124,7 +6236,7 @@ BoardElement.prototype = (function() {
     var p1 = new point(this.board, this.options.point1).add();
     var p2 = new point(this.board, this.options.point2).add();
 
-    return new shape(this.board, "segment", [p1, p2]).add();
+    return new shape(this.board, "segment", [p1, p2, [p1, p2]]).add();
 
   };
 
@@ -6145,7 +6257,7 @@ BoardElement.prototype = (function() {
     var p1 = new point(this.board, this.options.point1).add();
     var p2 = new point(this.board, this.options.point2).add();
 
-    return new shape(this.board, "line", [p1, p2]).add();
+    return new shape(this.board, "line", [p1, p2, [p1, p2]]).add();
   };
 
   //-----------------------------------------------------------------------
@@ -6165,7 +6277,7 @@ BoardElement.prototype = (function() {
     var p1 = new point(this.board, this.options.point1).add();  
     var p2 = new point(this.board, this.options.point2).add();
 
-    return new shape(this.board, "semicircle", [p1, p2]).add();
+    return new shape(this.board, "semicircle", [p1, p2, [p1, p2]]).add();
 
   };
 
@@ -6188,7 +6300,7 @@ BoardElement.prototype = (function() {
     for(i in this.options) {
       vertices.push(new point(this.board, this.options[i]).add());
     }
-
+    vertices.push(vertices);
     return new shape(this.board, "polygon", vertices).add();
   };
 
@@ -6251,38 +6363,7 @@ BoardElement.prototype = (function() {
 })();
 
 module.exports = BoardElement; 
-},{"./point":15,"./shape":16}],16:[function(require,module,exports){
-var Shape = function(board, shape, options) {
-  this.board   = board;
-  this.shape   = shape;
-  this.options = options;
-};
-
-Shape.prototype = (function() {
-  /* Private */
-  var createShapeLabel = function() {
-      return this.board.shapes.length + 1;
-  };
-  /* Public */
-  return {
-    Constructor: Shape,
-    add: function() {
-      var s    = this.board.create(this.shape,
-        this.options,
-        {
-          name: "Q" + createShapeLabel.call(this),
-          withLabel: true
-        }
-      );
-      this.board.shapes.push(s);
-      return s;
-    }
-  };
-})();
-
-
-module.exports = Shape;
-},{}],15:[function(require,module,exports){
+},{"./point":16,"./shape":17}],16:[function(require,module,exports){
 var Point = function(board, coords) {
   this.board  = board;
   this.coords = coords;
@@ -6323,5 +6404,38 @@ Point.prototype = (function() {
 })();
 
 module.exports = Point;
+},{}],17:[function(require,module,exports){
+var Shape = function(board, shape, options) {
+  this.board   = board;
+  this.shape   = shape;
+  this.options = options;
+};
+
+Shape.prototype = (function() {
+  /* Private */
+  var createShapeLabel = function() {
+      return this.board.shapes.length + 1;
+  };
+  /* Public */
+  return {
+    Constructor: Shape,
+    add: function() {
+      var points = this.options.pop(), 
+          s      = this.board.create(this.shape,
+        this.options,
+        {
+          name: "Q" + createShapeLabel.call(this),
+          withLabel: true
+        }
+      );
+      s.usrSetCoords = points;
+      this.board.shapes.push(s);
+      return s;
+    }
+  };
+})();
+
+
+module.exports = Shape;
 },{}]},{},[1])
 ;

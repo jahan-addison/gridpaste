@@ -65,7 +65,7 @@
               <div data-html="segment">
                 <div class="draw-segment">
                   <label for="point1">End Point 1 (x,y):</label><input type="text" name="point1" class="inside" value="0.0,0.0" />
-                  <br/><label for="point2">End Point 2 (x,y):</label><input type="text" name="point2" class="inside" value="0.0,0.0" />
+                  <label for="point2">End Point 2 (x,y):</label><input type="text" name="point2" class="inside" value="0.0,0.0" />
                   <div class="button draw">Draw to board</div>
                 </div>
               </div>
@@ -111,7 +111,14 @@
           <h2>Transform</h2>
           <section id="transform">
             <div class="col">
-              <div class="button">Rotation</div>
+              <div class="button rotation">Rotation</div>
+              <div data-html="rotation">
+                <div class="transform-rotate">
+                 <label for="figure">Figure (label):</label><input type="text" name="figure" class="inside" value="" />
+                  <label for="degrees">Degrees:</label><input type="text" name="degrees" class="inside" value="" />
+                  <div class="button transform">Transform on board</div>
+                </div>
+              </div>
               <div class="button">Reflection</div>
               <div class="button">Shear</div>
             </div>

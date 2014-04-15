@@ -21,6 +21,8 @@ $(function() {
     board.unsuspendUpdate();    
   })();
 
+  window.board = board;
+
   /* Subscribe to application */
   var App = require('./subscribe')(board);
 

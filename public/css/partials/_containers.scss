@@ -63,13 +63,17 @@ body {
 
 .slider {
 
-  div[class*="draw-"] {
+  div[class*="draw-"],
+  div[class*="transform-"] {
     margin-left:5%;
     width: intrinsic;  
     input, label {
       clear:both;
       display:block;
-    }  
+    }
+    input {
+      margin-bottom: 10px;
+    }
     @include clearfix();
     width: 192px;
   }
@@ -77,7 +81,7 @@ body {
     padding:8px;
   }
 
-  .button.draw {
+  .button.draw, .button.transform {
     margin-top:18px;
   }
 
