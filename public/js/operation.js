@@ -2,6 +2,7 @@
 
 var Operation = function(board) {
   var _commands = [];
+  this.commands = _commands;
   Object.defineProperty(this, "length", {
     get: function() { return _commands.length }
   });
@@ -12,7 +13,7 @@ var Operation = function(board) {
     _commands.push({
       arguments:   args,
       'command':   $command,
-      'toString':  $command.toString()
+      'toString':  $command.constructor.toString()
     });
   };
   

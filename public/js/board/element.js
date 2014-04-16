@@ -16,7 +16,7 @@ BoardElement.prototype = (function() {
 /*--
   Interface Element {
     public void   constructor(JSXGraph board, Object options)
-    public void   draw()
+    public object draw()
   }
 *--*/
 

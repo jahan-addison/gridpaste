@@ -24,6 +24,6 @@ $(function() {
   window.board = board;
 
   /* Subscribe to application */
-  var App = require('./subscribe')(board);
+  var App = window.App = require('./subscribe')(board);
 
 }); 

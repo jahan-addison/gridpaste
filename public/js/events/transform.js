@@ -28,10 +28,13 @@ var rotate = function(board, args) {
   delete args.figure;
   this.rotate = new transform(board, "rotate", args);
   this.remove = function() {
-    console.log(this.points);
     for (p in this.points) {
+      console.log(p);
       if (this.points.hasOwnProperty(p)) {
-        board.points[p].moveTo(this.points[p]);
+        console.log(this.points[p]);
+        // free it 
+        board.points[p].setPosition(JXG.COORDS_BY_USER, this.points[p]);
+        board.update();
       }
     }
   };
@@ -45,7 +48,7 @@ var rotate = function(board, args) {
         enumerable: true
       });
     });
-    this.rotateTransform = this.rotate.apply();
+    this.rotate.apply();
     return args;
   };
 };
