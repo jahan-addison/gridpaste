@@ -28,10 +28,10 @@ var rotate = function(board, args) {
   delete args.figure;
   this.rotate = new transform(board, "rotate", args);
   this.remove = function() {
+    console.log(this.points);
     for (p in this.points) {
       if (this.points.hasOwnProperty(p)) {
         board.points[p].moveTo(this.points[p]);
-        board.points[p].update();
       }
     }
   };
@@ -39,8 +39,8 @@ var rotate = function(board, args) {
     args.points.forEach(function(p) {
       Object.defineProperty(usrPoints, p.name, {
         value: [
-          p.coords.usrCoords[1],
-          p.coords.usrCoords[2]
+          board.points[p.name].coords.usrCoords[1],
+          board.points[p.name].coords.usrCoords[2]
         ],
         enumerable: true
       });

@@ -162,17 +162,6 @@ module.exports = function() {
     });
   });
 };
-},{}],8:[function(require,module,exports){
-module.exports = function(App) {
-  $(function() {
-    $('.button.undo').click(function() {
-      App.undoLastExecute();
-      if(App.length === 0) {
-        $(this).removeClass('visible');
-      }
-    });
-  });
-};
 },{}],9:[function(require,module,exports){
 // shim for using process in browser
 
@@ -5706,7 +5695,18 @@ process.chdir = function (dir) {
     }
 }.call(this));
 })(require("__browserify_process"),window)
-},{"__browserify_process":9}],4:[function(require,module,exports){
+},{"__browserify_process":9}],8:[function(require,module,exports){
+module.exports = function(App) {
+  $(function() {
+    $('.button.undo').click(function() {
+      App.undoLastExecute();
+      if(App.length === 0) {
+        $(this).removeClass('visible');
+      }
+    });
+  });
+};
+},{}],4:[function(require,module,exports){
 
 module.exports = {
   draw:      require('./draw'),
@@ -6019,10 +6019,10 @@ var rotate = function(board, args) {
   delete args.figure;
   this.rotate = new transform(board, "rotate", args);
   this.remove = function() {
+    console.log(this.points);
     for (p in this.points) {
       if (this.points.hasOwnProperty(p)) {
         board.points[p].moveTo(this.points[p]);
-        board.points[p].update();
       }
     }
   };
@@ -6030,11 +6030,13 @@ var rotate = function(board, args) {
     args.points.forEach(function(p) {
       Object.defineProperty(usrPoints, p.name, {
         value: [
-          p.coords.usrCoords[1],
-          p.coords.usrCoords[2]
+          board.points[p.name].coords.usrCoords[1],
+          board.points[p.name].coords.usrCoords[2]
         ],
         enumerable: true
       });
+      board.points[p.name].coords.usrCoords[1] = p.coords.usrCoords[1];
+      board.points[p.name].coords.usrCoords[2] = p.coords.usrCoords[2];
     });
     this.rotateTransform = this.rotate.apply();
     return args;
