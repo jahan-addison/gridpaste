@@ -34,12 +34,12 @@ BoardTransform.prototype = (function() {
   };
 
   RotateTransform.prototype.apply = function() {
-    var transform = board.create("transform", 
+    var transform = this.board.create("transform", 
       [degreeToRadian.call(this, this.options.degrees)],
       {type: "rotate"});
 
     transform.bindTo(this.options.points);
-    board.update();
+    this.board.update();
   };
 
 

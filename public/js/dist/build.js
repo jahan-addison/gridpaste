@@ -22,10 +22,8 @@ $(function() {
     board.unsuspendUpdate();    
   })();
 
-  window.board = board;
-
   /* Subscribe to application */
-  var App = window.App = require('./subscribe')(board);
+  var App = require('./subscribe')(board);
 
 }); 
 },{"./subscribe":2}],2:[function(require,module,exports){
@@ -160,17 +158,6 @@ module.exports = function() {
       points++;
       var more = '<label for="point'+ points + '">Point ' + points + ' (x,y):</label><input type="text" name="point'+ points +'" class="inside" value="0.0,0.0" />';
       $(this).before(more);
-    });
-  });
-};
-},{}],8:[function(require,module,exports){
-module.exports = function(App) {
-  $(function() {
-    $('.button.undo').click(function() {
-      App.undoLastExecute();
-      if(App.length === 0) {
-        $(this).removeClass('visible');
-      }
     });
   });
 };
@@ -5707,7 +5694,18 @@ process.chdir = function (dir) {
     }
 }.call(this));
 })(require("__browserify_process"),window)
-},{"__browserify_process":9}],4:[function(require,module,exports){
+},{"__browserify_process":9}],8:[function(require,module,exports){
+module.exports = function(App) {
+  $(function() {
+    $('.button.undo').click(function() {
+      App.undoLastExecute();
+      if(App.length === 0) {
+        $(this).removeClass('visible');
+      }
+    });
+  });
+};
+},{}],4:[function(require,module,exports){
 
 module.exports = {
   draw:      require('./draw'),
@@ -5717,7 +5715,7 @@ module.exports = {
 };
 
 
-},{"./draw":10,"./transform":11,"./zoom":12}],12:[function(require,module,exports){
+},{"./draw":10,"./zoom":11,"./transform":12}],11:[function(require,module,exports){
 /* Commands */
 
 /*--
@@ -5764,65 +5762,7 @@ module.exports = {
   zoomOut: zoomOut,
   zoom100: zoom100
 };
-},{}],11:[function(require,module,exports){
-var transform = require('../board/transform'),
-    coords    = require('../helper/coords')();
-
-/* Commands */
-
-/*--
-Interface Command {
-  public void   constructor(JSXGraph board, Object Arguments)
-  public void   remove()
-  public object execute()
-}
---*/
-
-var rotate = function(board, args) {
-  var args   = args || {
-    figure:  $('input[name="figure"]:last').val(),
-    degrees: parseInt($('input[name="degrees"]:last').val()),
-  },
-    usrPoints = this.points = {};  
-
-  args.points = [];
-
-  board.shapes.forEach(function(shape) {
-    if (shape.name == args.figure) {
-      args.points = shape.usrSetCoords;
-    }
-  });
-  delete args.figure;
-  this.rotate = new transform(board, "rotate", args);
-  this.remove = function() {
-    for (p in this.points) {
-      console.log(p);
-      if (this.points.hasOwnProperty(p)) {
-        console.log(this.points[p]);
-        board.points[p].setPosition(JXG.COORDS_BY_USER, this.points[p]);
-        board.update();
-      }
-    }
-  };
-  this.execute = function() {
-    args.points.forEach(function(p) {
-      Object.defineProperty(usrPoints, p.name, {
-        value: [
-          board.points[p.name].coords.usrCoords[1],
-          board.points[p.name].coords.usrCoords[2]
-        ],
-        enumerable: true
-      });
-    });
-    this.rotate.apply();
-    return args;
-  };
-};
-
-module.exports = {
-  rotate: rotate
-};
-},{"../board/transform":13,"../helper/coords":14}],10:[function(require,module,exports){
+},{}],10:[function(require,module,exports){
 var element = require('../board/element'),
     coords  = require('../helper/coords')();
 
@@ -5971,7 +5911,6 @@ var semicircle = function(board, args) {
   };
   this.semicircle    = new element(board, "semicircle", args);
   this.remove  = function() {
-    console.log(this.semicircleElement);
   };
   this.execute = function() {
     this.semicircleElement = this.semicircle.draw();
@@ -6047,7 +5986,78 @@ module.exports = {
   point: point,
   text: text
 };
-},{"../board/element":15,"../helper/coords":14}],13:[function(require,module,exports){
+},{"../helper/coords":13,"../board/element":14}],12:[function(require,module,exports){
+var transform = require('../board/transform'),
+    coords    = require('../helper/coords')();
+
+/* Commands */
+
+/*--
+Interface Command {
+  public void   constructor(JSXGraph board, Object Arguments)
+  public void   remove()
+  public object execute()
+}
+--*/
+
+var rotate = function(board, args) {
+  var args   = args || {
+    figure:  $('input[name="figure"]:last').val(),
+    degrees: parseInt($('input[name="degrees"]:last').val()),
+  },
+    usrPoints = this.points = {};  
+
+  args.points = [];
+
+  board.shapes.forEach(function(shape) {
+    if (shape.name == args.figure) {
+      args.points = shape.usrSetCoords;
+    }
+  });
+  delete args.figure;
+  this.rotate = new transform(board, "rotate", args);
+  this.remove = function() {
+    for (p in this.points) {
+      if (this.points.hasOwnProperty(p)) {
+        board.points[p].free();
+        board.points[p].setPosition(JXG.COORDS_BY_USER, this.points[p]);
+        board.update();
+      }
+    }
+  };
+  this.execute = function() {
+    args.points.forEach(function(p) {
+      Object.defineProperty(usrPoints, p.name, {
+        value: [
+          board.points[p.name].coords.usrCoords[1],
+          board.points[p.name].coords.usrCoords[2]
+        ],
+        enumerable: true
+      });
+    });
+    this.rotate.apply();
+    return args;
+  };
+};
+
+module.exports = {
+  rotate: rotate
+};
+},{"../board/transform":15,"../helper/coords":13}],13:[function(require,module,exports){
+module.exports = function() {
+  jQuery.fn.coord = function() {
+    if (this.val()) {
+      if (this.val().indexOf(',') !== -1) {
+        return this.val().split(',')
+          .map(function(e) {
+            return parseFloat(e);
+          });
+      }
+    }
+  };
+};
+
+},{}],15:[function(require,module,exports){
 /*
   BoardTransform Factory
   */
@@ -6084,12 +6094,12 @@ BoardTransform.prototype = (function() {
   };
 
   RotateTransform.prototype.apply = function() {
-    var transform = board.create("transform", 
+    var transform = this.board.create("transform", 
       [degreeToRadian.call(this, this.options.degrees)],
       {type: "rotate"});
 
     transform.bindTo(this.options.points);
-    board.update();
+    this.board.update();
   };
 
 
@@ -6102,20 +6112,6 @@ BoardTransform.prototype = (function() {
 
 module.exports = BoardTransform;
 },{}],14:[function(require,module,exports){
-module.exports = function() {
-  jQuery.fn.coord = function() {
-    if (this.val()) {
-      if (this.val().indexOf(',') !== -1) {
-        return this.val().split(',')
-          .map(function(e) {
-            return parseFloat(e);
-          });
-      }
-    }
-  };
-};
-
-},{}],15:[function(require,module,exports){
 var point = require('./point'),
     shape = require('./shape')
 

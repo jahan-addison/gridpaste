@@ -29,10 +29,8 @@ var rotate = function(board, args) {
   this.rotate = new transform(board, "rotate", args);
   this.remove = function() {
     for (p in this.points) {
-      console.log(p);
       if (this.points.hasOwnProperty(p)) {
-        console.log(this.points[p]);
-        // free it 
+        board.points[p].free();
         board.points[p].setPosition(JXG.COORDS_BY_USER, this.points[p]);
         board.update();
       }

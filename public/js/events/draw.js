@@ -146,7 +146,6 @@ var semicircle = function(board, args) {
   };
   this.semicircle    = new element(board, "semicircle", args);
   this.remove  = function() {
-    console.log(this.semicircleElement);
   };
   this.execute = function() {
     this.semicircleElement = this.semicircle.draw();
