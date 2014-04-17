@@ -16,12 +16,13 @@ $(function() {
     });
     board.points = {};
     board.shapes = [];
-    var axx      = board.create('axis',[[0,0],[1,0]]);
-    var axy      = board.create('axis',[[0,0],[0,1]]);
+    var axx      = board.axx = board.create('axis',[[0,0],[1,0]]);
+    var axy      = board.axy = board.create('axis',[[0,0],[0,1]]);
      
     board.unsuspendUpdate();    
   })();
 
+  window.board = board;
   /* Subscribe to application */
   var App = require('./subscribe')(board);
 
@@ -39,7 +40,7 @@ module.exports = function(board) {
     '.circle',   '.angle',   '.arc',
     '.ellipse',  '.segment', '.line',
      '.polygon', '.point',   '.text',
-     '.rotation'
+     '.rotation', '.reflection'
   ].join(','));
 
   var $querySource       = Rx.Observable.fromEvent($querySources, 'click');
@@ -158,6 +159,17 @@ module.exports = function() {
       points++;
       var more = '<label for="point'+ points + '">Point ' + points + ' (x,y):</label><input type="text" name="point'+ points +'" class="inside" value="0.0,0.0" />';
       $(this).before(more);
+    });
+  });
+};
+},{}],8:[function(require,module,exports){
+module.exports = function(App) {
+  $(function() {
+    $('.button.undo').click(function() {
+      App.undoLastExecute();
+      if(App.length === 0) {
+        $(this).removeClass('visible');
+      }
     });
   });
 };
@@ -5694,18 +5706,7 @@ process.chdir = function (dir) {
     }
 }.call(this));
 })(require("__browserify_process"),window)
-},{"__browserify_process":9}],8:[function(require,module,exports){
-module.exports = function(App) {
-  $(function() {
-    $('.button.undo').click(function() {
-      App.undoLastExecute();
-      if(App.length === 0) {
-        $(this).removeClass('visible');
-      }
-    });
-  });
-};
-},{}],4:[function(require,module,exports){
+},{"__browserify_process":9}],4:[function(require,module,exports){
 
 module.exports = {
   draw:      require('./draw'),
@@ -5715,7 +5716,7 @@ module.exports = {
 };
 
 
-},{"./draw":10,"./zoom":11,"./transform":12}],11:[function(require,module,exports){
+},{"./draw":10,"./transform":11,"./zoom":12}],12:[function(require,module,exports){
 /* Commands */
 
 /*--
@@ -5986,7 +5987,7 @@ module.exports = {
   point: point,
   text: text
 };
-},{"../helper/coords":13,"../board/element":14}],12:[function(require,module,exports){
+},{"../board/element":13,"../helper/coords":14}],11:[function(require,module,exports){
 var transform = require('../board/transform'),
     coords    = require('../helper/coords')();
 
@@ -6040,10 +6041,60 @@ var rotate = function(board, args) {
   };
 };
 
-module.exports = {
-  rotate: rotate
+var reflect = function(board, args) {
+  var args   = args || {
+    figure:  $('input[name="figure"]:last').val(),
+    line:    $('input[name="axis"]:last').val(),
+  },
+    usrPoints = this.points = {};  
+  this.line = args.line;
+  args.points = [];
+
+  console.log(args.line.toLowerCase() );
+
+  if (args.line.toLowerCase() == "x") {
+    args.line = board.axx;
+  } else {
+    args.line = board.axy;
+  }
+
+  board.shapes.forEach(function(shape) {
+    if (shape.name == args.figure) {
+      args.points = shape.usrSetCoords;
+    }
+  });
+  delete args.figure;
+
+  this.reflect = new transform(board, "reflect", args);
+  this.remove = function() {
+    for (p in this.points) {
+      if (this.points.hasOwnProperty(p)) {
+        board.points[p].free();
+        board.points[p].setPosition(JXG.COORDS_BY_USER, this.points[p]);
+        board.update();
+      }
+    }
+  };
+  this.execute = function() {
+    args.points.forEach(function(p) {
+      Object.defineProperty(usrPoints, p.name, {
+        value: [
+          board.points[p.name].coords.usrCoords[1],
+          board.points[p.name].coords.usrCoords[2]
+        ],
+        enumerable: true
+      });
+    });
+    this.reflect.apply();
+    return args;
+  };
 };
-},{"../board/transform":15,"../helper/coords":13}],13:[function(require,module,exports){
+
+module.exports = {
+  rotate:  rotate,
+  reflect: reflect
+};
+},{"../board/transform":15,"../helper/coords":14}],14:[function(require,module,exports){
 module.exports = function() {
   jQuery.fn.coord = function() {
     if (this.val()) {
@@ -6102,16 +6153,38 @@ BoardTransform.prototype = (function() {
     this.board.update();
   };
 
+  /*
+  Options: {
+    line:   Line line
+    points: [Point p1, Point p2, ...]
+  }
+  */
+
+  var ReflectTransform = function(board, options) {
+    this.options = options;
+    this.board   = board;
+  }
+
+  ReflectTransform.prototype.apply = function() {
+    var transform = this.board.create("transform", 
+      [this.options.line],
+      {type: "reflect"});
+
+    transform.bindTo(this.options.points);
+    this.board.update();
+  };
+
 
   return {
     Constructor: BoardTransform,
-    rotate:      RotateTransform
+    rotate:      RotateTransform,
+    reflect:     ReflectTransform
   };
 
 })();
 
 module.exports = BoardTransform;
-},{}],14:[function(require,module,exports){
+},{}],13:[function(require,module,exports){
 var point = require('./point'),
     shape = require('./shape')
 

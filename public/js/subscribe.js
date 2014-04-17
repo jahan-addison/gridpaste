@@ -10,7 +10,7 @@ module.exports = function(board) {
     '.circle',   '.angle',   '.arc',
     '.ellipse',  '.segment', '.line',
      '.polygon', '.point',   '.text',
-     '.rotation'
+     '.rotation', '.reflection'
   ].join(','));
 
   var $querySource       = Rx.Observable.fromEvent($querySources, 'click');
