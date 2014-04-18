@@ -79,7 +79,6 @@ BoardTransform.prototype = (function() {
     var transform = this.board.create("transform", 
       [degreeToRadian.call(this, this.options.degrees), 0],
       {type: "shear"});
-    console.log(degreeToRadian.call(this, this.options.degrees));
     transform.bindTo(this.options.points);
     this.board.update();
   };

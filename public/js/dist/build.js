@@ -23,7 +23,6 @@ $(function() {
   })();
 
   /* Subscribe to application */
-  window.board = board;
   var App = require('./subscribe')(board);
 
 }); 
@@ -6135,21 +6134,7 @@ module.exports = {
   reflect: reflect,
   shear:   shear
 };
-},{"../board/transform":15,"../helper/coords":14}],14:[function(require,module,exports){
-module.exports = function() {
-  jQuery.fn.coord = function() {
-    if (this.val()) {
-      if (this.val().indexOf(',') !== -1) {
-        return this.val().split(',')
-          .map(function(e) {
-            return parseFloat(e);
-          });
-      }
-    }
-  };
-};
-
-},{}],15:[function(require,module,exports){
+},{"../board/transform":15,"../helper/coords":14}],15:[function(require,module,exports){
 /*
   BoardTransform Factory
   */
@@ -6231,7 +6216,6 @@ BoardTransform.prototype = (function() {
     var transform = this.board.create("transform", 
       [degreeToRadian.call(this, this.options.degrees), 0],
       {type: "shear"});
-    console.log(degreeToRadian.call(this, this.options.degrees));
     transform.bindTo(this.options.points);
     this.board.update();
   };
@@ -6246,6 +6230,20 @@ BoardTransform.prototype = (function() {
 })();
 
 module.exports = BoardTransform;
+},{}],14:[function(require,module,exports){
+module.exports = function() {
+  jQuery.fn.coord = function() {
+    if (this.val()) {
+      if (this.val().indexOf(',') !== -1) {
+        return this.val().split(',')
+          .map(function(e) {
+            return parseFloat(e);
+          });
+      }
+    }
+  };
+};
+
 },{}],13:[function(require,module,exports){
 var point = require('./point'),
     shape = require('./shape')
