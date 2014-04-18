@@ -63,11 +63,32 @@ BoardTransform.prototype = (function() {
     this.board.update();
   };
 
+  /*
+  Options: {
+    degrees: signed int
+    points:  [Point p1, Point p2, ...]
+  }
+  */
+
+  var ShearTransform = function(board, options) {
+    this.options = options;
+    this.board   = board;
+  }
+
+  ShearTransform.prototype.apply = function() {
+    var transform = this.board.create("transform", 
+      [degreeToRadian.call(this, this.options.degrees), 0],
+      {type: "shear"});
+    console.log(degreeToRadian.call(this, this.options.degrees));
+    transform.bindTo(this.options.points);
+    this.board.update();
+  };
 
   return {
     Constructor: BoardTransform,
     rotate:      RotateTransform,
-    reflect:     ReflectTransform
+    reflect:     ReflectTransform,
+    shear:       ShearTransform
   };
 
 })();

@@ -98,7 +98,49 @@ var reflect = function(board, args) {
   };
 };
 
+var shear = function(board, args) {
+  var args   = args || {
+    figure:  $('input[name="figure"]:last').val(),
+    degrees: parseInt($('input[name="degrees"]:last').val()),
+  },
+    usrPoints = this.points = {};  
+
+  args.points = [];
+
+  board.shapes.forEach(function(shape) {
+    if (shape.name == args.figure) {
+      args.points = shape.usrSetCoords;
+    }
+  });
+  delete args.figure;
+  this.shear = new transform(board, "shear", args);
+  this.remove = function() {
+    for (p in this.points) {
+      if (this.points.hasOwnProperty(p)) {
+        board.points[p].free();
+        board.points[p].setPosition(JXG.COORDS_BY_USER, this.points[p]);
+        board.update();
+      }
+    }
+  };
+  this.execute = function() {
+    args.points.forEach(function(p) {
+      Object.defineProperty(usrPoints, p.name, {
+        value: [
+          board.points[p.name].coords.usrCoords[1],
+          board.points[p.name].coords.usrCoords[2]
+        ],
+        enumerable: true
+      });
+    });
+    this.shear.apply();
+    return args;
+  };
+};
+
+
 module.exports = {
   rotate:  rotate,
-  reflect: reflect
+  reflect: reflect,
+  shear:   shear
 };

@@ -84,14 +84,15 @@ var ellipse = function(board, args) {
     point2: $('input[name="point2"]:last').coord(),
     point3: $('input[name="point3"]:last').coord()
   };
+
   this.ellipse = new element(board, "ellipse", args);
   this.remove  = function() {
-    board.removeObject(this.ellipseElement);
-    board.shapes.pop();
     // curve points
-    board.removeObject(board.shapes.pop());
-    board.removeObject(board.shapes.pop());
-    board.removeObject(board.shapes.pop());
+    var curve = board.shapes.pop();
+    board.removeObject(curve.usrSetCoords[0]);
+    board.removeObject(curve.usrSetCoords[1]);
+    board.removeObject(curve.usrSetCoords[2]);
+    board.removeObject(this.ellipseElement);
   };
   this.execute = function() {
     this.ellipseElement = this.ellipse.draw()

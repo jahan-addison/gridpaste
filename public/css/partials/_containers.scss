@@ -178,9 +178,10 @@ h2 {
 
 #transform {
   @include clearfix();
-  .col:first-child {
-    .button {
-      padding:10px 8px;
+  .col {
+   .button {
+      padding: 10px 15px;
+      margin: 3px 6px;
     }
   }
 }

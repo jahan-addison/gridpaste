@@ -426,25 +426,26 @@ h2 {
   clear: both;
 }
 /* line 182, ../partials/_containers.scss */
-#transform .col:first-child .button {
-  padding: 10px 8px;
+#transform .col .button {
+  padding: 10px 15px;
+  margin: 3px 6px;
 }
 
-/* line 189, ../partials/_containers.scss */
+/* line 190, ../partials/_containers.scss */
 #bottom footer p {
   padding: 15px 8px;
   clear: both;
   width: 95%;
 }
 
-/* line 195, ../partials/_containers.scss */
+/* line 196, ../partials/_containers.scss */
 #bottom {
   border-top: rgba(202, 156, 78, 0.45) 1px dashed;
   width: 95%;
   margin-top: 20px;
   *zoom: 1;
 }
-/* line 198, ../partials/_containers.scss */
+/* line 199, ../partials/_containers.scss */
 #bottom > .col:first-child {
   margin-top: 15px;
 }
@@ -458,7 +459,7 @@ h2 {
   clear: both;
 }
 
-/* line 205, ../partials/_containers.scss */
+/* line 206, ../partials/_containers.scss */
 #left-bar {
   padding-left: 8px;
   width: 259px;
@@ -466,18 +467,18 @@ h2 {
   float: left;
   background: #3d3332;
 }
-/* line 206, ../partials/_containers.scss */
+/* line 207, ../partials/_containers.scss */
 #left-bar header img {
   width: 195px;
   height: 96px;
 }
-/* line 211, ../partials/_containers.scss */
+/* line 212, ../partials/_containers.scss */
 #left-bar header p {
   width: 95%;
   margin: 0 auto;
 }
 
-/* line 221, ../partials/_containers.scss */
+/* line 222, ../partials/_containers.scss */
 #auth {
   *zoom: 1;
   margin: 15px 5px;
@@ -492,21 +493,21 @@ h2 {
 #auth:after {
   clear: both;
 }
-/* line 225, ../partials/_containers.scss */
+/* line 226, ../partials/_containers.scss */
 #auth a {
   text-decoration: none;
 }
-/* line 227, ../partials/_containers.scss */
+/* line 228, ../partials/_containers.scss */
 #auth a:hover {
   color: #ca9c4e;
   text-decoration: underline;
 }
-/* line 232, ../partials/_containers.scss */
+/* line 233, ../partials/_containers.scss */
 #auth .col:first-child {
   padding-right: 35px;
 }
 
-/* line 237, ../partials/_containers.scss */
+/* line 238, ../partials/_containers.scss */
 .col {
   float: left;
   width: intrinsic;
@@ -523,7 +524,7 @@ h2 {
   clear: both;
 }
 
-/* line 244, ../partials/_containers.scss */
+/* line 245, ../partials/_containers.scss */
 #grid {
   width: calc(100% - 259px);
   height: 100%;

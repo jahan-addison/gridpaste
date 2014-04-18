@@ -22,8 +22,8 @@ $(function() {
     board.unsuspendUpdate();    
   })();
 
-  window.board = board;
   /* Subscribe to application */
+  window.board = board;
   var App = require('./subscribe')(board);
 
 }); 
@@ -40,7 +40,7 @@ module.exports = function(board) {
     '.circle',   '.angle',   '.arc',
     '.ellipse',  '.segment', '.line',
      '.polygon', '.point',   '.text',
-     '.rotation', '.reflection'
+     '.rotate',  '.reflect', '.shear'
   ].join(','));
 
   var $querySource       = Rx.Observable.fromEvent($querySources, 'click');
@@ -5850,14 +5850,15 @@ var ellipse = function(board, args) {
     point2: $('input[name="point2"]:last').coord(),
     point3: $('input[name="point3"]:last').coord()
   };
+
   this.ellipse = new element(board, "ellipse", args);
   this.remove  = function() {
-    board.removeObject(this.ellipseElement);
-    board.shapes.pop();
     // curve points
-    board.removeObject(board.shapes.pop());
-    board.removeObject(board.shapes.pop());
-    board.removeObject(board.shapes.pop());
+    var curve = board.shapes.pop();
+    board.removeObject(curve.usrSetCoords[0]);
+    board.removeObject(curve.usrSetCoords[1]);
+    board.removeObject(curve.usrSetCoords[2]);
+    board.removeObject(this.ellipseElement);
   };
   this.execute = function() {
     this.ellipseElement = this.ellipse.draw()
@@ -6050,8 +6051,6 @@ var reflect = function(board, args) {
   this.line = args.line;
   args.points = [];
 
-  console.log(args.line.toLowerCase() );
-
   if (args.line.toLowerCase() == "x") {
     args.line = board.axx;
   } else {
@@ -6090,9 +6089,51 @@ var reflect = function(board, args) {
   };
 };
 
+var shear = function(board, args) {
+  var args   = args || {
+    figure:  $('input[name="figure"]:last').val(),
+    degrees: parseInt($('input[name="degrees"]:last').val()),
+  },
+    usrPoints = this.points = {};  
+
+  args.points = [];
+
+  board.shapes.forEach(function(shape) {
+    if (shape.name == args.figure) {
+      args.points = shape.usrSetCoords;
+    }
+  });
+  delete args.figure;
+  this.shear = new transform(board, "shear", args);
+  this.remove = function() {
+    for (p in this.points) {
+      if (this.points.hasOwnProperty(p)) {
+        board.points[p].free();
+        board.points[p].setPosition(JXG.COORDS_BY_USER, this.points[p]);
+        board.update();
+      }
+    }
+  };
+  this.execute = function() {
+    args.points.forEach(function(p) {
+      Object.defineProperty(usrPoints, p.name, {
+        value: [
+          board.points[p.name].coords.usrCoords[1],
+          board.points[p.name].coords.usrCoords[2]
+        ],
+        enumerable: true
+      });
+    });
+    this.shear.apply();
+    return args;
+  };
+};
+
+
 module.exports = {
   rotate:  rotate,
-  reflect: reflect
+  reflect: reflect,
+  shear:   shear
 };
 },{"../board/transform":15,"../helper/coords":14}],14:[function(require,module,exports){
 module.exports = function() {
@@ -6174,11 +6215,32 @@ BoardTransform.prototype = (function() {
     this.board.update();
   };
 
+  /*
+  Options: {
+    degrees: signed int
+    points:  [Point p1, Point p2, ...]
+  }
+  */
+
+  var ShearTransform = function(board, options) {
+    this.options = options;
+    this.board   = board;
+  }
+
+  ShearTransform.prototype.apply = function() {
+    var transform = this.board.create("transform", 
+      [degreeToRadian.call(this, this.options.degrees), 0],
+      {type: "shear"});
+    console.log(degreeToRadian.call(this, this.options.degrees));
+    transform.bindTo(this.options.points);
+    this.board.update();
+  };
 
   return {
     Constructor: BoardTransform,
     rotate:      RotateTransform,
-    reflect:     ReflectTransform
+    reflect:     ReflectTransform,
+    shear:       ShearTransform
   };
 
 })();
@@ -6283,10 +6345,10 @@ BoardElement.prototype = (function() {
 
   ellipseElement.prototype.draw = function() {
     // curve points
-    var p1 = new shape(this.board, "point", this.options.point1).add();
-    var p2 = new shape(this.board, "point", this.options.point2).add();
-    var p3 = new shape(this.board, "point", this.options.point3).add();
-
+    var p1 = new point(this.board, this.options.point1).add(); 
+    var p2 = new point(this.board, this.options.point2).add();
+    var p3 = new point(this.board, this.options.point3).add();
+    
     return new shape(this.board, "ellipse", [p1, p2, p3, [p1, p2, p3]]).add();
 
   };
