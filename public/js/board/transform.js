@@ -83,11 +83,56 @@ BoardTransform.prototype = (function() {
     this.board.update();
   };
 
+  /*
+  Options: {
+    values:  [float, float]
+    points:  [Point p1, Point p2, ...]
+  }
+  */
+
+  var TranslateTransform = function(board, options) {
+    this.options = options;
+    this.board   = board;
+  }
+
+  TranslateTransform.prototype.apply = function() {
+    var transform = this.board.create("transform", 
+      this.options.values,
+      {type: "translate"});
+    transform.bindTo(this.options.points);
+    this.board.update();
+  };
+
+
+  /*
+  Options: {
+    values:  [float, float]
+    points:  [Point p1, Point p2, ...]
+  }
+  */
+
+  var ScaleTransform = function(board, options) {
+    this.options = options;
+    this.board   = board;
+  }
+
+  ScaleTransform.prototype.apply = function() {
+    var transform = this.board.create("transform", 
+      this.options.values.map(function(e) {
+        return e / 5;
+      }),
+      {type: "scale"});
+    transform.bindTo(this.options.points);
+    this.board.update();
+  };
+
   return {
     Constructor: BoardTransform,
     rotate:      RotateTransform,
     reflect:     ReflectTransform,
-    shear:       ShearTransform
+    shear:       ShearTransform,
+    translate:   TranslateTransform,
+    scale:       ScaleTransform
   };
 
 })();

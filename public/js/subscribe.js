@@ -7,10 +7,11 @@ var execute         = require('./operation'),
 module.exports = function(board) {
 
   var $querySources  = $([
-    '.circle',   '.angle',   '.arc',
-    '.ellipse',  '.segment', '.line',
-     '.polygon', '.point',   '.text',
-     '.rotate',  '.reflect', '.shear'
+    '.circle',   '  .angle',   '.arc',
+    '.ellipse',    '.segment', '.line',
+     '.polygon',   '.point',   '.text',
+     '.rotate',    '.reflect', '.shear',
+     '.translate', '.scale'
   ].join(','));
 
   var $querySource       = Rx.Observable.fromEvent($querySources, 'click');

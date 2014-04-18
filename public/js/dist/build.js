@@ -36,10 +36,11 @@ var execute         = require('./operation'),
 module.exports = function(board) {
 
   var $querySources  = $([
-    '.circle',   '.angle',   '.arc',
-    '.ellipse',  '.segment', '.line',
-     '.polygon', '.point',   '.text',
-     '.rotate',  '.reflect', '.shear'
+    '.circle',   '  .angle',   '.arc',
+    '.ellipse',    '.segment', '.line',
+     '.polygon',   '.point',   '.text',
+     '.rotate',    '.reflect', '.shear',
+     '.translate', '.scale'
   ].join(','));
 
   var $querySource       = Rx.Observable.fromEvent($querySources, 'click');
@@ -6128,13 +6129,108 @@ var shear = function(board, args) {
   };
 };
 
+var translate = function(board, args) {
+  var args   = args || {
+    figure:  $('input[name="figure"]:last').val(),
+    values:  $('input[name="values"]:last').coord(),
+  },
+    usrPoints = this.points = {};  
+
+  args.points = [];
+
+  board.shapes.forEach(function(shape) {
+    if (shape.name == args.figure) {
+      args.points = shape.usrSetCoords;
+    }
+  });
+  delete args.figure;
+  this.translate = new transform(board, "translate", args);
+  this.remove    = function() {
+    for (p in this.points) {
+      if (this.points.hasOwnProperty(p)) {
+        board.points[p].free();
+        board.points[p].setPosition(JXG.COORDS_BY_USER, this.points[p]);
+        board.update();
+      }
+    }
+  };
+  this.execute = function() {
+    args.points.forEach(function(p) {
+      Object.defineProperty(usrPoints, p.name, {
+        value: [
+          board.points[p.name].coords.usrCoords[1],
+          board.points[p.name].coords.usrCoords[2]
+        ],
+        enumerable: true
+      });
+    });
+    this.translate.apply();
+    return args;
+  };
+};
+
+var scale = function(board, args) {
+  var args   = args || {
+    figure:  $('input[name="figure"]:last').val(),
+    values:  $('input[name="values"]:last').coord(),
+  },
+    usrPoints = this.points = {};  
+
+  args.points = [];
+
+  board.shapes.forEach(function(shape) {
+    if (shape.name == args.figure) {
+      args.points = shape.usrSetCoords;
+    }
+  });
+  delete args.figure;
+  this.scale = new transform(board, "scale", args);
+  this.remove    = function() {
+    for (p in this.points) {
+      if (this.points.hasOwnProperty(p)) {
+        board.points[p].free();
+        board.points[p].setPosition(JXG.COORDS_BY_USER, this.points[p]);
+        board.update();
+      }
+    }
+  };
+  this.execute = function() {
+    args.points.forEach(function(p) {
+      Object.defineProperty(usrPoints, p.name, {
+        value: [
+          board.points[p.name].coords.usrCoords[1],
+          board.points[p.name].coords.usrCoords[2]
+        ],
+        enumerable: true
+      });
+    });
+    this.scale.apply();
+    return args;
+  };
+};
 
 module.exports = {
-  rotate:  rotate,
-  reflect: reflect,
-  shear:   shear
+  rotate:    rotate,
+  reflect:   reflect,
+  shear:     shear,
+  translate: translate,
+  scale:     scale
 };
-},{"../board/transform":15,"../helper/coords":14}],15:[function(require,module,exports){
+},{"../board/transform":15,"../helper/coords":14}],14:[function(require,module,exports){
+module.exports = function() {
+  jQuery.fn.coord = function() {
+    if (this.val()) {
+      if (this.val().indexOf(',') !== -1) {
+        return this.val().split(',')
+          .map(function(e) {
+            return parseFloat(e);
+          });
+      }
+    }
+  };
+};
+
+},{}],15:[function(require,module,exports){
 /*
   BoardTransform Factory
   */
@@ -6220,30 +6316,61 @@ BoardTransform.prototype = (function() {
     this.board.update();
   };
 
+  /*
+  Options: {
+    values:  [float, float]
+    points:  [Point p1, Point p2, ...]
+  }
+  */
+
+  var TranslateTransform = function(board, options) {
+    this.options = options;
+    this.board   = board;
+  }
+
+  TranslateTransform.prototype.apply = function() {
+    var transform = this.board.create("transform", 
+      this.options.values,
+      {type: "translate"});
+    transform.bindTo(this.options.points);
+    this.board.update();
+  };
+
+
+  /*
+  Options: {
+    values:  [float, float]
+    points:  [Point p1, Point p2, ...]
+  }
+  */
+
+  var ScaleTransform = function(board, options) {
+    this.options = options;
+    this.board   = board;
+  }
+
+  ScaleTransform.prototype.apply = function() {
+    var transform = this.board.create("transform", 
+      this.options.values.map(function(e) {
+        return e / 5;
+      }),
+      {type: "scale"});
+    transform.bindTo(this.options.points);
+    this.board.update();
+  };
+
   return {
     Constructor: BoardTransform,
     rotate:      RotateTransform,
     reflect:     ReflectTransform,
-    shear:       ShearTransform
+    shear:       ShearTransform,
+    translate:   TranslateTransform,
+    scale:       ScaleTransform
   };
 
 })();
 
 module.exports = BoardTransform;
-},{}],14:[function(require,module,exports){
-module.exports = function() {
-  jQuery.fn.coord = function() {
-    if (this.val()) {
-      if (this.val().indexOf(',') !== -1) {
-        return this.val().split(',')
-          .map(function(e) {
-            return parseFloat(e);
-          });
-      }
-    }
-  };
-};
-
 },{}],13:[function(require,module,exports){
 var point = require('./point'),
     shape = require('./shape')

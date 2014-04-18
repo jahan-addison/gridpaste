@@ -138,9 +138,90 @@ var shear = function(board, args) {
   };
 };
 
+var translate = function(board, args) {
+  var args   = args || {
+    figure:  $('input[name="figure"]:last').val(),
+    values:  $('input[name="values"]:last').coord(),
+  },
+    usrPoints = this.points = {};  
+
+  args.points = [];
+
+  board.shapes.forEach(function(shape) {
+    if (shape.name == args.figure) {
+      args.points = shape.usrSetCoords;
+    }
+  });
+  delete args.figure;
+  this.translate = new transform(board, "translate", args);
+  this.remove    = function() {
+    for (p in this.points) {
+      if (this.points.hasOwnProperty(p)) {
+        board.points[p].free();
+        board.points[p].setPosition(JXG.COORDS_BY_USER, this.points[p]);
+        board.update();
+      }
+    }
+  };
+  this.execute = function() {
+    args.points.forEach(function(p) {
+      Object.defineProperty(usrPoints, p.name, {
+        value: [
+          board.points[p.name].coords.usrCoords[1],
+          board.points[p.name].coords.usrCoords[2]
+        ],
+        enumerable: true
+      });
+    });
+    this.translate.apply();
+    return args;
+  };
+};
+
+var scale = function(board, args) {
+  var args   = args || {
+    figure:  $('input[name="figure"]:last').val(),
+    values:  $('input[name="values"]:last').coord(),
+  },
+    usrPoints = this.points = {};  
+
+  args.points = [];
+
+  board.shapes.forEach(function(shape) {
+    if (shape.name == args.figure) {
+      args.points = shape.usrSetCoords;
+    }
+  });
+  delete args.figure;
+  this.scale = new transform(board, "scale", args);
+  this.remove    = function() {
+    for (p in this.points) {
+      if (this.points.hasOwnProperty(p)) {
+        board.points[p].free();
+        board.points[p].setPosition(JXG.COORDS_BY_USER, this.points[p]);
+        board.update();
+      }
+    }
+  };
+  this.execute = function() {
+    args.points.forEach(function(p) {
+      Object.defineProperty(usrPoints, p.name, {
+        value: [
+          board.points[p.name].coords.usrCoords[1],
+          board.points[p.name].coords.usrCoords[2]
+        ],
+        enumerable: true
+      });
+    });
+    this.scale.apply();
+    return args;
+  };
+};
 
 module.exports = {
-  rotate:  rotate,
-  reflect: reflect,
-  shear:   shear
+  rotate:    rotate,
+  reflect:   reflect,
+  shear:     shear,
+  translate: translate,
+  scale:     scale
 };
