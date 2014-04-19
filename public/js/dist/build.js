@@ -98,34 +98,7 @@ module.exports = function(board) {
   return operationExec;
 };
 
-},{"./operation":3,"./events/run":4,"./helper/slider":5,"./helper/more":6,"../components/rxjs/rx.lite":7,"./helper/undo":8}],3:[function(require,module,exports){
-/* The Invoker */
-
-var Operation = function(board) {
-  var _commands = [];
-  this.commands = _commands;
-  Object.defineProperty(this, "length", {
-    get: function() { return _commands.length }
-  });
-  
-  this.storeAndExecute = function(command) {
-    var $command =  new command(board),
-        args     =  $command.execute();
-    _commands.push({
-      arguments:   args,
-      'command':   $command,
-      'toString':  $command.constructor.toString()
-    });
-  };
-  
-  this.undoLastExecute = function() {
-   var $command = _commands.pop();
-   $command.command.remove();
-  };
-};
-
-module.exports = Operation;
-},{}],5:[function(require,module,exports){
+},{"./operation":3,"./events/run":4,"./helper/slider":5,"./helper/more":6,"../components/rxjs/rx.lite":7,"./helper/undo":8}],5:[function(require,module,exports){
 module.exports = function(content, width, height, source, top) {
   $block = $('<div class="slider"> <div class="close-slider">x</div> </div>');
   $block.append(content)
@@ -159,17 +132,6 @@ module.exports = function() {
       points++;
       var more = '<label for="point'+ points + '">Point ' + points + ' (x,y):</label><input type="text" name="point'+ points +'" class="inside" value="0.0,0.0" />';
       $(this).before(more);
-    });
-  });
-};
-},{}],8:[function(require,module,exports){
-module.exports = function(App) {
-  $(function() {
-    $('.button.undo').click(function() {
-      App.undoLastExecute();
-      if(App.length === 0) {
-        $(this).removeClass('visible');
-      }
     });
   });
 };
@@ -5706,7 +5668,49 @@ process.chdir = function (dir) {
     }
 }.call(this));
 })(require("__browserify_process"),window)
-},{"__browserify_process":9}],4:[function(require,module,exports){
+},{"__browserify_process":9}],8:[function(require,module,exports){
+module.exports = function(App) {
+  $(function() {
+    $('.button.undo').click(function() {
+      App.undoLastExecute();
+      if(App.length === 0) {
+        $(this).removeClass('visible');
+      }
+    });
+  });
+};
+},{}],3:[function(require,module,exports){
+/* The Invoker */
+
+var Operation = function(board) {
+  var _commands = [];
+  this.commands = _commands;
+  this.board    = board;
+  Object.defineProperty(this, "length", {
+    get: function() { return this.commands.length }
+  });
+};
+
+Operation.prototype.storeAndExecute = function(command) {
+  var $command =  new command(this.board),
+      args     =  $command.execute();
+  this.commands.push({
+    arguments:   args,
+    'command':   $command,
+    'toString':  $command.constructor.toString()
+  });
+};
+
+Operation.prototype.undoLastExecute = function() {
+   var $command = this.commands.pop();
+   $command.command.remove();
+};
+
+/* Decorators */
+  require("./decorators/recording")(Operation);
+
+module.exports = Operation;
+},{"./decorators/recording":10}],4:[function(require,module,exports){
 
 module.exports = {
   draw:      require('./draw'),
@@ -5716,7 +5720,46 @@ module.exports = {
 };
 
 
-},{"./draw":10,"./transform":11,"./zoom":12}],12:[function(require,module,exports){
+},{"./draw":11,"./transform":12,"./zoom":13}],10:[function(require,module,exports){
+/*
+  OperationDecorator
+*/
+
+module.exports = function(Operation) {
+  var recording = false;
+  
+  var recorded  = [];
+
+  Object.defineProperty(Operation.prototype, "getRecorded", {
+    get: function() { return recorded; }
+  });
+
+  Operation.prototype.startRecording = function() {
+    recording = true;
+  };
+  Operation.prototype.stopRecording  = function() {
+    recording = false;
+  };
+
+  var execute = Operation.prototype.storeAndExecute;
+  // proxy
+  Operation.prototype.storeAndExecute = function() {
+    if (recording) {
+      recorded.push(arguments);
+    }
+    return execute.apply(this, arguments);
+  };
+
+  var remove = Operation.prototype.undoLastExecute;
+  // proxy
+  Operation.prototype.undoLastExecute = function() {
+    if (recording) {
+      recorded.pop();
+    }
+    return remove.apply(this, arguments);
+  };
+};
+},{}],13:[function(require,module,exports){
 /* Commands */
 
 /*--
@@ -5763,7 +5806,7 @@ module.exports = {
   zoomOut: zoomOut,
   zoom100: zoom100
 };
-},{}],10:[function(require,module,exports){
+},{}],11:[function(require,module,exports){
 var element = require('../board/element'),
     coords  = require('../helper/coords')();
 
@@ -5988,7 +6031,7 @@ module.exports = {
   point: point,
   text: text
 };
-},{"../board/element":13,"../helper/coords":14}],11:[function(require,module,exports){
+},{"../board/element":14,"../helper/coords":15}],12:[function(require,module,exports){
 var transform = require('../board/transform'),
     coords    = require('../helper/coords')();
 
@@ -6216,7 +6259,7 @@ module.exports = {
   translate: translate,
   scale:     scale
 };
-},{"../board/transform":15,"../helper/coords":14}],14:[function(require,module,exports){
+},{"../board/transform":16,"../helper/coords":15}],15:[function(require,module,exports){
 module.exports = function() {
   jQuery.fn.coord = function() {
     if (this.val()) {
@@ -6230,7 +6273,7 @@ module.exports = function() {
   };
 };
 
-},{}],15:[function(require,module,exports){
+},{}],16:[function(require,module,exports){
 /*
   BoardTransform Factory
   */
@@ -6371,7 +6414,7 @@ BoardTransform.prototype = (function() {
 })();
 
 module.exports = BoardTransform;
-},{}],13:[function(require,module,exports){
+},{}],14:[function(require,module,exports){
 var point = require('./point'),
     shape = require('./shape')
 
@@ -6622,7 +6665,7 @@ BoardElement.prototype = (function() {
 })();
 
 module.exports = BoardElement; 
-},{"./point":16,"./shape":17}],16:[function(require,module,exports){
+},{"./point":17,"./shape":18}],17:[function(require,module,exports){
 var Point = function(board, coords) {
   this.board  = board;
   this.coords = coords;
@@ -6663,7 +6706,7 @@ Point.prototype = (function() {
 })();
 
 module.exports = Point;
-},{}],17:[function(require,module,exports){
+},{}],18:[function(require,module,exports){
 var Shape = function(board, shape, options) {
   this.board   = board;
   this.shape   = shape;
