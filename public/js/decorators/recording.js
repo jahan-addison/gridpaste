@@ -23,7 +23,7 @@ module.exports = function(Operation) {
   Operation.prototype.storeAndExecute = function() {
     execute.apply(this, arguments);
     if (recording) {
-      recorded.push(this.commands[this.commands.length -1]);
+      recorded.push(this.commands[this.commands.length - 1]);
     }
   };
 
