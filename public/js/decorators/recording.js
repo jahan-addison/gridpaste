@@ -21,10 +21,10 @@ module.exports = function(Operation) {
   var execute = Operation.prototype.storeAndExecute;
   // proxy
   Operation.prototype.storeAndExecute = function() {
+    execute.apply(this, arguments);
     if (recording) {
-      recorded.push(arguments);
+      recorded.push(this.commands[this.commands.length -1]);
     }
-    return execute.apply(this, arguments);
   };
 
   var remove = Operation.prototype.undoLastExecute;

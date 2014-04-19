@@ -38,8 +38,12 @@ module.exports = function(board) {
     var target    = $(e.target).parent().attr('class').split('-');
     var targetOperation = target[0],
         targetCommand   = target[1];
-
-    operationExec.storeAndExecute(command[targetOperation][targetCommand]);
+    var $command  = {
+      'targetOperation': targetOperation,
+      'targetCommand':   targetCommand,
+      'command':         command[targetOperation][targetCommand]
+    };
+    operationExec.storeAndExecute($command);
     if (operationExec.length > 0) {
       $('.button.undo').addClass('visible');
     }

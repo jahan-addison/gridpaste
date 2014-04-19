@@ -23,7 +23,7 @@ $(function() {
   })();
 
   /* Subscribe to application */
-  var App = require('./subscribe')(board);
+  var App = window.App = require('./subscribe')(board);
 
 }); 
 },{"./subscribe":2}],2:[function(require,module,exports){
@@ -67,8 +67,12 @@ module.exports = function(board) {
     var target    = $(e.target).parent().attr('class').split('-');
     var targetOperation = target[0],
         targetCommand   = target[1];
-
-    operationExec.storeAndExecute(command[targetOperation][targetCommand]);
+    var $command  = {
+      'targetOperation': targetOperation,
+      'targetCommand':   targetCommand,
+      'command':         command[targetOperation][targetCommand]
+    };
+    operationExec.storeAndExecute($command);
     if (operationExec.length > 0) {
       $('.button.undo').addClass('visible');
     }
@@ -5686,18 +5690,19 @@ var Operation = function(board) {
   var _commands = [];
   this.commands = _commands;
   this.board    = board;
-  Object.defineProperty(this, "length", {
-    get: function() { return this.commands.length }
-  });
 };
 
+Object.defineProperty(Operation.prototype, "length", {
+  get: function() { return this.commands.length }
+});
+
 Operation.prototype.storeAndExecute = function(command) {
-  var $command =  new command(this.board),
+  var $command =  new command.command(this.board),
       args     =  $command.execute();
   this.commands.push({
     arguments:   args,
     'command':   $command,
-    'toString':  $command.constructor.toString()
+    'toString':  command.targetOperation + '.' + command.targetCommand
   });
 };
 
@@ -5744,10 +5749,10 @@ module.exports = function(Operation) {
   var execute = Operation.prototype.storeAndExecute;
   // proxy
   Operation.prototype.storeAndExecute = function() {
+    execute.apply(this, arguments);
     if (recording) {
-      recorded.push(arguments);
+      recorded.push(this.commands[this.commands.length -1]);
     }
-    return execute.apply(this, arguments);
   };
 
   var remove = Operation.prototype.undoLastExecute;
@@ -5759,6 +5764,7 @@ module.exports = function(Operation) {
     return remove.apply(this, arguments);
   };
 };
+
 },{}],13:[function(require,module,exports){
 /* Commands */
 
@@ -6051,8 +6057,14 @@ var rotate = function(board, args) {
     degrees: parseInt($('input[name="degrees"]:last').val()),
   },
     usrPoints = this.points = {};  
-
-  args.points = [];
+  this.orig_args = args;
+  if (typeof arguments[1] === 'undefined') {  
+     this.orig_args = {
+      figure:  $('input[name="figure"]:last').val(),
+      degrees: parseInt($('input[name="degrees"]:last').val()),
+    };
+  }
+  args.points    = [];
 
   board.shapes.forEach(function(shape) {
     if (shape.name == args.figure) {
@@ -6081,7 +6093,7 @@ var rotate = function(board, args) {
       });
     });
     this.rotate.apply();
-    return args;
+    return this.orig_args;
   };
 };
 
@@ -6091,6 +6103,13 @@ var reflect = function(board, args) {
     line:    $('input[name="axis"]:last').val(),
   },
     usrPoints = this.points = {};  
+  this.orig_args = args;
+  if (typeof arguments[1] === 'undefined') {  
+     this.orig_args = {
+      figure:  $('input[name="figure"]:last').val(),
+      line:    $('input[name="axis"]:last').val(),
+    };
+  }
   this.line = args.line;
   args.points = [];
 
@@ -6128,7 +6147,7 @@ var reflect = function(board, args) {
       });
     });
     this.reflect.apply();
-    return args;
+    return this.orig_args;
   };
 };
 
@@ -6138,7 +6157,13 @@ var shear = function(board, args) {
     degrees: parseInt($('input[name="degrees"]:last').val()),
   },
     usrPoints = this.points = {};  
-
+  this.orig_args = args;
+  if (typeof arguments[1] === 'undefined') {  
+     this.orig_args = {
+      figure:  $('input[name="figure"]:last').val(),
+      degrees: parseInt($('input[name="degrees"]:last').val()),
+    };
+  }
   args.points = [];
 
   board.shapes.forEach(function(shape) {
@@ -6168,7 +6193,7 @@ var shear = function(board, args) {
       });
     });
     this.shear.apply();
-    return args;
+    return this.orig_args;
   };
 };
 
@@ -6178,7 +6203,13 @@ var translate = function(board, args) {
     values:  $('input[name="values"]:last').coord(),
   },
     usrPoints = this.points = {};  
-
+  this.orig_args = args;
+  if (typeof arguments[1] === 'undefined') {  
+     this.orig_args = {
+      figure:  $('input[name="figure"]:last').val(),
+      values:  $('input[name="values"]:last').coord(),
+    };
+  }
   args.points = [];
 
   board.shapes.forEach(function(shape) {
@@ -6208,7 +6239,7 @@ var translate = function(board, args) {
       });
     });
     this.translate.apply();
-    return args;
+    return this.orig_args;
   };
 };
 
@@ -6218,7 +6249,13 @@ var scale = function(board, args) {
     values:  $('input[name="values"]:last').coord(),
   },
     usrPoints = this.points = {};  
-
+  this.orig_args = args;
+  if (typeof arguments[1] === 'undefined') {  
+     this.orig_args = {
+      figure:  $('input[name="figure"]:last').val(),
+      values:  $('input[name="values"]:last').coord(),
+    };
+  }
   args.points = [];
 
   board.shapes.forEach(function(shape) {
@@ -6248,7 +6285,7 @@ var scale = function(board, args) {
       });
     });
     this.scale.apply();
-    return args;
+    return this.orig_args;
   };
 };
 
