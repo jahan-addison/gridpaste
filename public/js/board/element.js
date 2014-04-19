@@ -1,22 +1,24 @@
+var point = require('./point'),
+    shape = require('./shape')
+
 /*
-  Element Factory
+  BoardElement Factory
   */
 
-var element = function(board, element, options) {
+var BoardElement = function(board, element, options) {
   this.element = element;
   this.options = options;
-
   return new this[element](board, options);
 }
 
-element.prototype = (function() {
+BoardElement.prototype = (function() {
 
 /*--
-  Interface element {
+  Interface Element {
     public void   constructor(JSXGraph board, Object options)
-    public void   draw()
+    public object draw()
   }
-*--/
+*--*/
 
   /*
   Options: {
@@ -30,11 +32,8 @@ element.prototype = (function() {
   };
 
   circleElement.prototype.draw = function() {
-    var p1      = this.board.create("point", 
-        [this.options.center[0], 
-        this.options.center[1]]
-    );
-    this.board.create("circle", [p1, this.options.radius]);
+    var p1 = new point(this.board, this.options.center).add();
+    return new shape(this.board, "circle", [p1, this.options.radius, [p1]]).add();
   };
 
   //-----------------------------------------------------------------------
@@ -52,21 +51,11 @@ element.prototype = (function() {
   };
 
   angleElement.prototype.draw = function() {
-    var p1 = this.board.create("point",
-      [this.options.point1[0],
-      this.options.point1[1]]
-    );
-    var p2 = this.board.create("point",
-      [this.options.point2[0],
-      this.options.point2[1]]
-    );
-    var p3 = this.board.create("point",
-      [this.options.point3[0],
-      this.options.point3[1]]
-    );
+    var p1 = new point(this.board, this.options.point1).add();
+    var p2 = new point(this.board, this.options.point2).add();
+    var p3 = new point(this.board, this.options.point3).add();
 
-    this.board.create("angle", [p1, p2, p3]);
-
+    return new shape(this.board, "angle", [p1, p2, p3, [p1, p2, p3]]).add();
   };
 
   //-----------------------------------------------------------------------
@@ -84,21 +73,11 @@ element.prototype = (function() {
   };
 
   arcElement.prototype.draw = function() {
-    var p1 = this.board.create("point",
-      [this.options.point1[0],
-      this.options.point1[1]]
-    );
-    var p2 = this.board.create("point",
-      [this.options.point2[0],
-      this.options.point2[1]]
-    );
-    var p3 = this.board.create("point",
-      [this.options.point3[0],
-      this.options.point3[1]]
-    );
+    var p1 = new point(this.board, this.options.point1).add(); 
+    var p2 = new point(this.board, this.options.point2).add();
+    var p3 = new point(this.board, this.options.point3).add();
 
-    this.board.create("arc", [p1, p2, p3]);
-
+    return new shape(this.board, "arc", [p1, p2, p3, [p1, p2, p3]]).add();
   };
 
   //-----------------------------------------------------------------------
@@ -116,20 +95,12 @@ element.prototype = (function() {
   };
 
   ellipseElement.prototype.draw = function() {
-    var p1 = this.board.create("point",
-      [this.options.point1[0],
-      this.options.point1[1]]
-    );
-    var p2 = this.board.create("point",
-      [this.options.point2[0],
-      this.options.point2[1]]
-    );
-    var p3 = this.board.create("point",
-      [this.options.point3[0],
-      this.options.point3[1]]
-    );
-
-    this.board.create("ellipse", [p1, p2, p3]);
+    // curve points
+    var p1 = new point(this.board, this.options.point1).add(); 
+    var p2 = new point(this.board, this.options.point2).add();
+    var p3 = new point(this.board, this.options.point3).add();
+    
+    return new shape(this.board, "ellipse", [p1, p2, p3, [p1, p2, p3]]).add();
 
   };
 
@@ -147,16 +118,10 @@ element.prototype = (function() {
   };
 
   segmentElement.prototype.draw = function() {
-    var p1 = this.board.create("point",
-      [this.options.point1[0],
-      this.options.point1[1]]
-    );
-    var p2 = this.board.create("point",
-      [this.options.point2[0],
-      this.options.point2[1]]
-    );
+    var p1 = new point(this.board, this.options.point1).add();
+    var p2 = new point(this.board, this.options.point2).add();
 
-    this.board.create("segment", [p1, p2]);
+    return new shape(this.board, "segment", [p1, p2, [p1, p2]]).add();
 
   };
 
@@ -174,51 +139,30 @@ element.prototype = (function() {
   };
 
   lineElement.prototype.draw = function() {
-    var p1 = this.board.create("point",
-      [this.options.point1[0],
-      this.options.point1[1]]
-    );
-    var p2 = this.board.create("point",
-      [this.options.point2[0],
-      this.options.point2[1]]
-    );
+    var p1 = new point(this.board, this.options.point1).add();
+    var p2 = new point(this.board, this.options.point2).add();
 
-    this.board.create("line", [p1, p2]);
-
+    return new shape(this.board, "line", [p1, p2, [p1, p2]]).add();
   };
 
   //-----------------------------------------------------------------------
 
   /*
   Options: {
-    line  1: [float, float],
+    point 1: [float, float],
     point 2: [float, float]
   }
   */
-  var parabolaElement = function(board, options) {
+  var semicircleElement = function(board, options) {
     this.options = options;
     this.board   = board;
   };
 
-  parabolaElement.prototype.draw = function() {
-    var p1 = this.board.create("point",
-      [this.options.point1[0],
-      this.options.point1[1]]
-    );
-    var p2 = this.board.create("point",
-      [this.options.point2[0],
-      this.options.point2[1]]
-    );
+  semicircleElement.prototype.draw = function() {
+    var p1 = new point(this.board, this.options.point1).add();  
+    var p2 = new point(this.board, this.options.point2).add();
 
-    var l1 = this.board.create("line",
-      [p1, p2]
-    );
-    var p3 = this.board.create("point",
-      [this.options.point3[0],
-      this.options.point3[1]]
-    );
-
-    this.board.create("parabola", [p3, l1]);
+    return new shape(this.board, "semicircle", [p1, p2, [p1, p2]]).add();
 
   };
 
@@ -239,13 +183,10 @@ element.prototype = (function() {
 
     var vertices = [];
     for(i in this.options) {
-      vertices.push(this.board.create("point",
-        [this.options[i][0], this.options[i][1]]
-      ));      
+      vertices.push(new point(this.board, this.options[i]).add());
     }
-
-    this.board.create("polygon", vertices);
-
+    vertices.push(vertices);
+    return new shape(this.board, "polygon", vertices).add();
   };
 
   //-----------------------------------------------------------------------
@@ -261,25 +202,49 @@ element.prototype = (function() {
   };
 
   pointElement.prototype.draw = function() {
-   this.board.create("point", 
-        [this.options.point[0], 
-        this.options.point[1]]
-    );
+   
+    return new point(this.board, this.options.point).add();
+   
+  };
+
+  //-----------------------------------------------------------------------
+
+  /*
+  Options: {
+    position: [float, float],
+    size:     int,
+    text:     string
+  }
+  */
+
+  var textElement = function(board, options) {
+    this.options = options;
+    this.board   = board;
+  };
+
+  textElement.prototype.draw = function() {
+    return this.board.create('text',
+      [this.options.position[0],
+        this.options.position[1],
+        this.options.text], {
+        fontSize: this.options.size
+      });
   };
 
   return {
-    Constructor: element,
+    Constructor: BoardElement,
     circle:      circleElement,
     angle:       angleElement,
     arc:         arcElement,
     ellipse:     ellipseElement,
     segment:     segmentElement,
     line:        lineElement,
-    parabola:    parabolaElement,
+    semicircle:  semicircleElement,
     polygon:     polygonElement,
-    point:       pointElement
+    point:       pointElement,
+    text:        textElement
   };
 
 })();
 
-module.exports = element; 
+module.exports = BoardElement; 

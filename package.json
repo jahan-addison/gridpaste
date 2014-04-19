@@ -1,6 +1,6 @@
 {
   "name": "gridpaste",
-  "version": "0.0.1",
+  "version": "0.0.2",
   "private": true,
   "scripts": {
     "start": "node app"
@@ -22,7 +22,8 @@
     "time-grunt": "~0.1.1",
     "load-grunt-tasks": "~0.2.0",
     "grunt-contrib-compass": "^0.7.2",
+    "grunt-browserify2": "~0.1.8",
     "browserify": "~3.38.0",
-    "grunt-browserify": "~2.0.1"
+    "browserify-shim": "~3.4.1"
   }
 }

@@ -1,6 +1,7 @@
 'use strict';
 
-var request = require('request');
+var request = require('request'),
+    shim    = require('browserify-shim');
 
 module.exports = function (grunt) {
   // show elapsed time at the end
@@ -8,7 +9,7 @@ module.exports = function (grunt) {
   // load all grunt tasks
   require('load-grunt-tasks')(grunt);
 
-  var reloadPort = 35729, files;
+  var reloadPort = 35728, files;
 
   grunt.initConfig({
     pkg: grunt.file.readJSON('package.json'),
@@ -20,19 +21,19 @@ module.exports = function (grunt) {
         }
       }
     },
-    browserify: {
-      libs: {
-        options: {
-          shim: {
-            jsxgraph: {
-              path: 'public/js/external/jsxgraph.js',
-              exports: 'JSXGraph'
-            }
-          }
-        },
-        src: ['public/js/main.js'],
-        dest: 'public/js/build.js'
-      },
+    browserify2: {
+      compile: {
+        entry: './public/js/main.js',
+        compile: './public/js/dist/build.js',
+        beforeHook: function(bundle) {
+          shim(bundle, {
+            RxJS: {
+              path: './public/components/rxjs/rx.lite,js',
+              exports: 'Rx'
+            },
+          });
+        }
+      }
     },
     develop: {
       server: {
@@ -47,12 +48,13 @@ module.exports = function (grunt) {
       server: {
         files: [
           'app.js',
-          'routes/*.js'
+          'routes/*.js',
+          'views/**/*.html'
         ],
         tasks: ['develop', 'delayed-livereload']
       },
       js: {
-        files: ['public/js/*.js'],
+        files: ['public/js/**/*.js', './Gruntfile.js'],
         options: {
           livereload: reloadPort
         }
@@ -65,8 +67,8 @@ module.exports = function (grunt) {
         }
       },
       browserify: {
-        files: ['public/js/*.js'],
-        tasks: ['browserify'],
+        files: ['public/js/**/*.js'],
+        tasks: ['browserify2:compile'],
         options: {
           livereload: reloadPort
         }
@@ -99,5 +101,5 @@ module.exports = function (grunt) {
     }, 500);
   });
 
-  grunt.registerTask('default', ['develop', 'compass', 'browserify', 'watch']);
+  grunt.registerTask('default', ['develop', 'compass', 'browserify2:compile', 'watch']);
 };
