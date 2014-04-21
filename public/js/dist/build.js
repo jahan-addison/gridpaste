@@ -23,7 +23,7 @@ $(function() {
   })();
 
   /* Subscribe to application */
-  var App = require('./subscribe')(board);
+  var App = window.App = require('./subscribe')(board);
 
 }); 
 },{"./subscribe":2}],2:[function(require,module,exports){
@@ -63,6 +63,7 @@ module.exports = function(board) {
 
   require('./helper/undo')  (operationExec); // attach event to UI undo button
   require('./helper/record')(operationExec); // attach event to UI record button
+  require('./helper/clear') (operationExec); // attach event to UI clear button
 
   var $operationSubscription = $operationSource.subscribe(function(e) {
     console.log("Executing operation");
@@ -108,7 +109,7 @@ module.exports = function(board) {
   return operationExec;
 };
 
-},{"./operation":3,"./events/run":4,"./helper/slider":5,"./helper/more":6,"../components/rxjs/rx.lite":7,"./helper/undo":8,"./helper/record":9}],5:[function(require,module,exports){
+},{"./operation":3,"./events/run":4,"./helper/slider":5,"./helper/more":6,"../components/rxjs/rx.lite":7,"./helper/undo":8,"./helper/record":9,"./helper/clear":10}],5:[function(require,module,exports){
 module.exports = function(content, width, height, source, top) {
   $block = $('<div class="slider"> <div class="close-slider">x</div> </div>');
   $block.append(content)
@@ -145,7 +146,38 @@ module.exports = function() {
     });
   });
 };
-},{}],10:[function(require,module,exports){
+},{}],8:[function(require,module,exports){
+module.exports = function(App) {
+  $(function() {
+    $('.button.undo').click(function() {
+      App.undoLastExecute();
+      if(App.length === 0) {
+        $(this).removeClass('visible');
+      }
+    });
+  });
+};
+},{}],9:[function(require,module,exports){
+module.exports = function(App) {
+  $(function() {
+    $('.start-record').click(function() {
+      App.startRecording();
+      $(this).html('Recording').addClass('dim');
+      $(this).unbind();
+    });
+    $('.end-record').click(function() {
+      App.stopRecording();
+      $(this)
+        .html('Finished')
+        .addClass('finished')
+        .prev()
+        .html('Start Record');
+      $(this).unbind();
+      Object.freeze(App); // we're done
+    });
+  });
+};
+},{}],11:[function(require,module,exports){
 // shim for using process in browser
 
 var process = module.exports = {};
@@ -5678,38 +5710,7 @@ process.chdir = function (dir) {
     }
 }.call(this));
 })(require("__browserify_process"),window)
-},{"__browserify_process":10}],8:[function(require,module,exports){
-module.exports = function(App) {
-  $(function() {
-    $('.button.undo').click(function() {
-      App.undoLastExecute();
-      if(App.length === 0) {
-        $(this).removeClass('visible');
-      }
-    });
-  });
-};
-},{}],9:[function(require,module,exports){
-module.exports = function(App) {
-  $(function() {
-    $('.start-record').click(function() {
-      App.startRecording();
-      $(this).html('Recording').addClass('dim');
-      $(this).unbind();
-    });
-    $('.end-record').click(function() {
-      App.stopRecording();
-      $(this)
-        .html('Finished')
-        .addClass('finished')
-        .prev()
-        .html('Start Record');
-      $(this).unbind();
-      Object.freeze(App); // we're done
-    });
-  });
-};
-},{}],3:[function(require,module,exports){
+},{"__browserify_process":11}],3:[function(require,module,exports){
 /* The Invoker */
 
 var Operation = function(board) {
@@ -5732,6 +5733,10 @@ Operation.prototype.storeAndExecute = function(command) {
   });
 };
 
+Operation.prototype.clearCommandList = function() {
+  this.commands = [];
+};
+
 Operation.prototype.undoLastExecute = function() {
    var $command = this.commands.pop();
    $command.command.remove();
@@ -5741,7 +5746,7 @@ Operation.prototype.undoLastExecute = function() {
   require("./decorators/recording")(Operation);
 
 module.exports = Operation;
-},{"./decorators/recording":11}],4:[function(require,module,exports){
+},{"./decorators/recording":12}],4:[function(require,module,exports){
 
 module.exports = {
   draw:      require('./draw'),
@@ -5751,7 +5756,36 @@ module.exports = {
 };
 
 
-},{"./draw":12,"./transform":13,"./zoom":14}],11:[function(require,module,exports){
+},{"./draw":13,"./transform":14,"./zoom":15}],10:[function(require,module,exports){
+var execute = require('../operation');
+
+module.exports = function(App) {
+  $(function() {
+    var board = App.board;
+    $('.button.clear').click(function() {
+      for(point in board.points) {
+        if (board.points.hasOwnProperty(point)) {
+          board.removeObject(board.points[point]);
+          delete board.points[point];
+        }
+      }
+      board.shapes.forEach(function(shape, i) {
+        board.removeObject(shape);
+        board.shapes.splice(i, 1);
+
+      });
+      board.update();
+
+      App.clearCommandList();
+
+      // Reset recording UI
+      require('./record')(App); // reattach record events   
+      $('.start-record').removeClass('dim').html('Start Record');
+      $('.end-record').removeClass('dim').html('End Record');
+    })
+  });
+};
+},{"../operation":3,"./record":9}],12:[function(require,module,exports){
 /*
   OperationDecorator
 */
@@ -5789,9 +5823,18 @@ module.exports = function(Operation) {
     }
     return remove.apply(this, arguments);
   };
+
+  var clear  = Operation.prototype.clearCommandList;
+  // proxy
+  Operation.prototype.clearCommandList = function() {
+    if (recording) {
+      recorded = [];
+    }
+    return clear.apply(this, arguments);
+  }; 
 };
 
-},{}],14:[function(require,module,exports){
+},{}],15:[function(require,module,exports){
 /* Commands */
 
 /*--
@@ -5847,7 +5890,7 @@ module.exports = {
   zoomOut: zoomOut,
   zoom100: zoom100
 };
-},{}],12:[function(require,module,exports){
+},{}],13:[function(require,module,exports){
 var element = require('../board/element'),
     coords  = require('../helper/coords')();
 
@@ -6072,7 +6115,7 @@ module.exports = {
   point: point,
   text: text
 };
-},{"../board/element":15,"../helper/coords":16}],13:[function(require,module,exports){
+},{"../board/element":16,"../helper/coords":17}],14:[function(require,module,exports){
 var transform = require('../board/transform'),
     coords    = require('../helper/coords')();
 
@@ -6331,7 +6374,7 @@ module.exports = {
   translate: translate,
   scale:     scale
 };
-},{"../board/transform":17,"../helper/coords":16}],16:[function(require,module,exports){
+},{"../board/transform":18,"../helper/coords":17}],17:[function(require,module,exports){
 module.exports = function() {
   jQuery.fn.coord = function() {
     if (this.val()) {
@@ -6345,7 +6388,7 @@ module.exports = function() {
   };
 };
 
-},{}],17:[function(require,module,exports){
+},{}],18:[function(require,module,exports){
 /*
   BoardTransform Factory
   */
@@ -6486,7 +6529,7 @@ BoardTransform.prototype = (function() {
 })();
 
 module.exports = BoardTransform;
-},{}],15:[function(require,module,exports){
+},{}],16:[function(require,module,exports){
 var point = require('./point'),
     shape = require('./shape')
 
@@ -6737,7 +6780,7 @@ BoardElement.prototype = (function() {
 })();
 
 module.exports = BoardElement; 
-},{"./point":18,"./shape":19}],18:[function(require,module,exports){
+},{"./point":19,"./shape":20}],19:[function(require,module,exports){
 var Point = function(board, coords) {
   this.board  = board;
   this.coords = coords;
@@ -6778,7 +6821,7 @@ Point.prototype = (function() {
 })();
 
 module.exports = Point;
-},{}],19:[function(require,module,exports){
+},{}],20:[function(require,module,exports){
 var Shape = function(board, shape, options) {
   this.board   = board;
   this.shape   = shape;

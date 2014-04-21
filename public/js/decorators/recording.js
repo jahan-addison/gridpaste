@@ -35,4 +35,13 @@ module.exports = function(Operation) {
     }
     return remove.apply(this, arguments);
   };
+
+  var clear  = Operation.prototype.clearCommandList;
+  // proxy
+  Operation.prototype.clearCommandList = function() {
+    if (recording) {
+      recorded = [];
+    }
+    return clear.apply(this, arguments);
+  }; 
 };

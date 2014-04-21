@@ -20,6 +20,10 @@ Operation.prototype.storeAndExecute = function(command) {
   });
 };
 
+Operation.prototype.clearCommandList = function() {
+  this.commands = [];
+};
+
 Operation.prototype.undoLastExecute = function() {
    var $command = this.commands.pop();
    $command.command.remove();
