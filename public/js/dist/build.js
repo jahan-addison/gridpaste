@@ -23,7 +23,7 @@ $(function() {
   })();
 
   /* Subscribe to application */
-  var App = window.App = require('./subscribe')(board);
+  var App = require('./subscribe')(board);
 
 }); 
 },{"./subscribe":2}],2:[function(require,module,exports){
@@ -60,7 +60,9 @@ module.exports = function(board) {
   );
 
   var operationExec          = new execute(board);
-  require('./helper/undo')(operationExec);  // attach event to undo button
+
+  require('./helper/undo')  (operationExec); // attach event to UI undo button
+  require('./helper/record')(operationExec); // attach event to UI record button
 
   var $operationSubscription = $operationSource.subscribe(function(e) {
     console.log("Executing operation");
@@ -91,8 +93,12 @@ module.exports = function(board) {
         targetCommand = target.hasClass('in') ? 'zoomIn' : 'zoomOut'; 
     if ((targetCommand == 'zoomIn'  && board.zoomX < 5.9) ||
         (targetCommand == 'zoomOut' && board.zoomX > 0.167)) {
-
-      operationExec.storeAndExecute(command['zoom'][targetCommand]);
+      var $command  = {
+        'targetOperation': 'zoom',
+        'targetCommand':   targetCommand,
+        'command':         command['zoom'][targetCommand]
+      };
+      operationExec.storeAndExecute($command);
       if (operationExec.length > 0) {
         $('.button.undo').addClass('visible');
       }   
@@ -102,7 +108,7 @@ module.exports = function(board) {
   return operationExec;
 };
 
-},{"./operation":3,"./events/run":4,"./helper/slider":5,"./helper/more":6,"../components/rxjs/rx.lite":7,"./helper/undo":8}],5:[function(require,module,exports){
+},{"./operation":3,"./events/run":4,"./helper/slider":5,"./helper/more":6,"../components/rxjs/rx.lite":7,"./helper/undo":8,"./helper/record":9}],5:[function(require,module,exports){
 module.exports = function(content, width, height, source, top) {
   $block = $('<div class="slider"> <div class="close-slider">x</div> </div>');
   $block.append(content)
@@ -139,7 +145,7 @@ module.exports = function() {
     });
   });
 };
-},{}],9:[function(require,module,exports){
+},{}],10:[function(require,module,exports){
 // shim for using process in browser
 
 var process = module.exports = {};
@@ -5672,7 +5678,7 @@ process.chdir = function (dir) {
     }
 }.call(this));
 })(require("__browserify_process"),window)
-},{"__browserify_process":9}],8:[function(require,module,exports){
+},{"__browserify_process":10}],8:[function(require,module,exports){
 module.exports = function(App) {
   $(function() {
     $('.button.undo').click(function() {
@@ -5680,6 +5686,26 @@ module.exports = function(App) {
       if(App.length === 0) {
         $(this).removeClass('visible');
       }
+    });
+  });
+};
+},{}],9:[function(require,module,exports){
+module.exports = function(App) {
+  $(function() {
+    $('.start-record').click(function() {
+      App.startRecording();
+      $(this).html('Recording').addClass('dim');
+      $(this).unbind();
+    });
+    $('.end-record').click(function() {
+      App.stopRecording();
+      $(this)
+        .html('Finished')
+        .addClass('finished')
+        .prev()
+        .html('Start Record');
+      $(this).unbind();
+      Object.freeze(App); // we're done
     });
   });
 };
@@ -5715,7 +5741,7 @@ Operation.prototype.undoLastExecute = function() {
   require("./decorators/recording")(Operation);
 
 module.exports = Operation;
-},{"./decorators/recording":10}],4:[function(require,module,exports){
+},{"./decorators/recording":11}],4:[function(require,module,exports){
 
 module.exports = {
   draw:      require('./draw'),
@@ -5725,7 +5751,7 @@ module.exports = {
 };
 
 
-},{"./draw":11,"./transform":12,"./zoom":13}],10:[function(require,module,exports){
+},{"./draw":12,"./transform":13,"./zoom":14}],11:[function(require,module,exports){
 /*
   OperationDecorator
 */
@@ -5751,7 +5777,7 @@ module.exports = function(Operation) {
   Operation.prototype.storeAndExecute = function() {
     execute.apply(this, arguments);
     if (recording) {
-      recorded.push(this.commands[this.commands.length -1]);
+      recorded.push(this.commands[this.commands.length - 1]);
     }
   };
 
@@ -5765,7 +5791,7 @@ module.exports = function(Operation) {
   };
 };
 
-},{}],13:[function(require,module,exports){
+},{}],14:[function(require,module,exports){
 /* Commands */
 
 /*--
@@ -5782,8 +5808,11 @@ var zoomIn = function(board, args) {
   };
   this.execute = function() {
     board.zoomIn();
+    return {
+      'X': board.zoomX,
+      'Y': board.zoomY
+    };
   }
-  return args;
 };
 
 var zoomOut = function(board, args) {
@@ -5792,8 +5821,11 @@ var zoomOut = function(board, args) {
   };
   this.execute = function() {
     board.zoomOut();
+    return {
+      'X': board.zoomX,
+      'Y': board.zoomY
+    };
   };
-  return args;
 };
 
 var zoom100 = function(board, args) {
@@ -5803,8 +5835,11 @@ var zoom100 = function(board, args) {
   };
   this.execute = function() {
     board.zoom100();
+    return {
+      'X': board.zoomX,
+      'Y': board.zoomY
+    };
   };
-  return args;
 };
 
 module.exports = {
@@ -5812,7 +5847,7 @@ module.exports = {
   zoomOut: zoomOut,
   zoom100: zoom100
 };
-},{}],11:[function(require,module,exports){
+},{}],12:[function(require,module,exports){
 var element = require('../board/element'),
     coords  = require('../helper/coords')();
 
@@ -6037,7 +6072,7 @@ module.exports = {
   point: point,
   text: text
 };
-},{"../board/element":14,"../helper/coords":15}],12:[function(require,module,exports){
+},{"../board/element":15,"../helper/coords":16}],13:[function(require,module,exports){
 var transform = require('../board/transform'),
     coords    = require('../helper/coords')();
 
@@ -6296,7 +6331,7 @@ module.exports = {
   translate: translate,
   scale:     scale
 };
-},{"../board/transform":16,"../helper/coords":15}],15:[function(require,module,exports){
+},{"../board/transform":17,"../helper/coords":16}],16:[function(require,module,exports){
 module.exports = function() {
   jQuery.fn.coord = function() {
     if (this.val()) {
@@ -6310,7 +6345,7 @@ module.exports = function() {
   };
 };
 
-},{}],16:[function(require,module,exports){
+},{}],17:[function(require,module,exports){
 /*
   BoardTransform Factory
   */
@@ -6451,7 +6486,7 @@ BoardTransform.prototype = (function() {
 })();
 
 module.exports = BoardTransform;
-},{}],14:[function(require,module,exports){
+},{}],15:[function(require,module,exports){
 var point = require('./point'),
     shape = require('./shape')
 
@@ -6702,7 +6737,7 @@ BoardElement.prototype = (function() {
 })();
 
 module.exports = BoardElement; 
-},{"./point":17,"./shape":18}],17:[function(require,module,exports){
+},{"./point":18,"./shape":19}],18:[function(require,module,exports){
 var Point = function(board, coords) {
   this.board  = board;
   this.coords = coords;
@@ -6743,7 +6778,7 @@ Point.prototype = (function() {
 })();
 
 module.exports = Point;
-},{}],18:[function(require,module,exports){
+},{}],19:[function(require,module,exports){
 var Shape = function(board, shape, options) {
   this.board   = board;
   this.shape   = shape;
