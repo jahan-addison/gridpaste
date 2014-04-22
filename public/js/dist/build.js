@@ -23,7 +23,7 @@ $(function() {
   })();
 
   /* Subscribe to application */
-  var App = window.App = require('./subscribe')(board);
+  var App  = require('./subscribe')(board);
 
 }); 
 },{"./subscribe":2}],2:[function(require,module,exports){
@@ -143,37 +143,6 @@ module.exports = function() {
       points++;
       var more = '<label for="point'+ points + '">Point ' + points + ' (x,y):</label><input type="text" name="point'+ points +'" class="inside" value="0.0,0.0" />';
       $(this).before(more);
-    });
-  });
-};
-},{}],8:[function(require,module,exports){
-module.exports = function(App) {
-  $(function() {
-    $('.button.undo').click(function() {
-      App.undoLastExecute();
-      if(App.length === 0) {
-        $(this).removeClass('visible');
-      }
-    });
-  });
-};
-},{}],9:[function(require,module,exports){
-module.exports = function(App) {
-  $(function() {
-    $('.start-record').click(function() {
-      App.startRecording();
-      $(this).html('Recording').addClass('dim');
-      $(this).unbind();
-    });
-    $('.end-record').click(function() {
-      App.stopRecording();
-      $(this)
-        .html('Finished')
-        .addClass('finished')
-        .prev()
-        .html('Start Record');
-      $(this).unbind();
-      Object.freeze(App); // we're done
     });
   });
 };
@@ -5710,7 +5679,42 @@ process.chdir = function (dir) {
     }
 }.call(this));
 })(require("__browserify_process"),window)
-},{"__browserify_process":11}],3:[function(require,module,exports){
+},{"__browserify_process":11}],8:[function(require,module,exports){
+module.exports = function(App) {
+  $(function() {
+    $('.button.undo').click(function() {
+      App.undoLastExecute();
+      if(App.length === 0) {
+        $(this).removeClass('visible');
+      }
+    });
+  });
+};
+},{}],9:[function(require,module,exports){
+module.exports = function(App) {
+  $(function() {
+    $('.start-record').click(function() {
+      App.startRecording();
+      $(this).html('Recording').addClass('dim');
+      $(this).unbind();
+    });
+    $('.end-record').click(function() {
+      App.stopRecording();
+      $(this)
+        .html('Finished')
+        .addClass('finished')
+        .prev()
+        .html('Start Record');
+      $(this).unbind();
+      Object.freeze(App); // we're done
+      $('.button').click(function() {
+        return false;
+      })
+      $('.clear').hide();
+    });
+  });
+};
+},{}],3:[function(require,module,exports){
 /* The Invoker */
 
 var Operation = function(board) {
@@ -5769,11 +5773,14 @@ module.exports = function(App) {
           delete board.points[point];
         }
       }
-      board.shapes.forEach(function(shape, i) {
-        board.removeObject(shape);
+      var size = board.shapes.length;
+      for (var i = 0; i < size; i++) {
+        board.removeObject(board.shapes[i]);
         board.shapes.splice(i, 1);
-
-      });
+      }
+      board.shapes.splice(0, 1);
+      $('.undo').removeClass('visible');
+      board.zoom100();
       board.update();
 
       App.clearCommandList();

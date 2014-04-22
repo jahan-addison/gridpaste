@@ -10,11 +10,14 @@ module.exports = function(App) {
           delete board.points[point];
         }
       }
-      board.shapes.forEach(function(shape, i) {
-        board.removeObject(shape);
+      var size = board.shapes.length;
+      for (var i = 0; i < size; i++) {
+        board.removeObject(board.shapes[i]);
         board.shapes.splice(i, 1);
-
-      });
+      }
+      board.shapes.splice(0, 1);
+      $('.undo').removeClass('visible');
+      board.zoom100();
       board.update();
 
       App.clearCommandList();
