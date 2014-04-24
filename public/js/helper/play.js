@@ -1,6 +1,5 @@
 var iterator = require('../iterate'),
-    command  = require('../events/run'),
-    Rx       = require('../../components/rxjs/rx.lite').Rx;
+    command  = require('../events/run');
 
 
 module.exports = function(App, board) {
@@ -39,7 +38,9 @@ module.exports = function(App, board) {
       $command.execute();
       if(!AppIterator.hasNext()) {
         clearInterval(play);
+        $('.play').unbind()
+          .addClass('dim');
       }
-    }, 1500);
+    }, 1100);
   });
 };

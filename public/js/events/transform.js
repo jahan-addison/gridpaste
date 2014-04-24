@@ -36,7 +36,7 @@ var rotate = function(board, args) {
   this.remove = function() {
     for (p in this.points) {
       if (this.points.hasOwnProperty(p)) {
-        board.points[p].free();
+        board.points[p].update();
         board.points[p].setPosition(JXG.COORDS_BY_USER, this.points[p]);
         board.update();
       }
@@ -90,7 +90,6 @@ var reflect = function(board, args) {
   this.remove = function() {
     for (p in this.points) {
       if (this.points.hasOwnProperty(p)) {
-        board.points[p].free();
         board.points[p].setPosition(JXG.COORDS_BY_USER, this.points[p]);
         board.update();
       }
@@ -136,7 +135,6 @@ var shear = function(board, args) {
   this.remove = function() {
     for (p in this.points) {
       if (this.points.hasOwnProperty(p)) {
-        board.points[p].free();
         board.points[p].setPosition(JXG.COORDS_BY_USER, this.points[p]);
         board.update();
       }
@@ -182,7 +180,6 @@ var translate = function(board, args) {
   this.remove    = function() {
     for (p in this.points) {
       if (this.points.hasOwnProperty(p)) {
-        board.points[p].free();
         board.points[p].setPosition(JXG.COORDS_BY_USER, this.points[p]);
         board.update();
       }
@@ -228,7 +225,6 @@ var scale = function(board, args) {
   this.remove    = function() {
     for (p in this.points) {
       if (this.points.hasOwnProperty(p)) {
-        board.points[p].free();
         board.points[p].setPosition(JXG.COORDS_BY_USER, this.points[p]);
         board.update();
       }

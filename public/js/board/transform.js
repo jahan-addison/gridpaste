@@ -38,7 +38,7 @@ BoardTransform.prototype = (function() {
       [degreeToRadian.call(this, this.options.degrees)],
       {type: "rotate"});
 
-    transform.bindTo(this.options.points);
+    transform.applyOnce(this.options.points);
     this.board.update();
   };
 
@@ -59,7 +59,7 @@ BoardTransform.prototype = (function() {
       [this.options.line],
       {type: "reflect"});
 
-    transform.bindTo(this.options.points);
+    transform.applyOnce(this.options.points);
     this.board.update();
   };
 
@@ -79,7 +79,7 @@ BoardTransform.prototype = (function() {
     var transform = this.board.create("transform", 
       [degreeToRadian.call(this, this.options.degrees), 0],
       {type: "shear"});
-    transform.bindTo(this.options.points);
+    transform.applyOnce(this.options.points);
     this.board.update();
   };
 
@@ -99,7 +99,7 @@ BoardTransform.prototype = (function() {
     var transform = this.board.create("transform", 
       this.options.values,
       {type: "translate"});
-    transform.bindTo(this.options.points);
+    transform.applyOnce(this.options.points);
     this.board.update();
   };
 
@@ -119,10 +119,11 @@ BoardTransform.prototype = (function() {
   ScaleTransform.prototype.apply = function() {
     var transform = this.board.create("transform", 
       this.options.values.map(function(e) {
-        return e / 5;
+        //return e / 5;
+        return e;
       }),
       {type: "scale"});
-    transform.bindTo(this.options.points);
+    transform.applyOnce(this.options.points);
     this.board.update();
   };
 
