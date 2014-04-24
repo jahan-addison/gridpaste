@@ -17,8 +17,14 @@ var rotate = function(board, args) {
     degrees: parseInt($('input[name="degrees"]:last').val()),
   },
     usrPoints = this.points = {};  
-
-  args.points = [];
+  this.orig_args = args;
+  if (typeof arguments[1] === 'undefined') {  
+     this.orig_args = {
+      figure:  $('input[name="figure"]:last').val(),
+      degrees: parseInt($('input[name="degrees"]:last').val()),
+    };
+  }
+  args.points    = [];
 
   board.shapes.forEach(function(shape) {
     if (shape.name == args.figure) {
@@ -47,7 +53,7 @@ var rotate = function(board, args) {
       });
     });
     this.rotate.apply();
-    return args;
+    return this.orig_args;
   };
 };
 
@@ -57,6 +63,13 @@ var reflect = function(board, args) {
     line:    $('input[name="axis"]:last').val(),
   },
     usrPoints = this.points = {};  
+  this.orig_args = args;
+  if (typeof arguments[1] === 'undefined') {  
+     this.orig_args = {
+      figure:  $('input[name="figure"]:last').val(),
+      line:    $('input[name="axis"]:last').val(),
+    };
+  }
   this.line = args.line;
   args.points = [];
 
@@ -94,7 +107,7 @@ var reflect = function(board, args) {
       });
     });
     this.reflect.apply();
-    return args;
+    return this.orig_args;
   };
 };
 
@@ -104,7 +117,13 @@ var shear = function(board, args) {
     degrees: parseInt($('input[name="degrees"]:last').val()),
   },
     usrPoints = this.points = {};  
-
+  this.orig_args = args;
+  if (typeof arguments[1] === 'undefined') {  
+     this.orig_args = {
+      figure:  $('input[name="figure"]:last').val(),
+      degrees: parseInt($('input[name="degrees"]:last').val()),
+    };
+  }
   args.points = [];
 
   board.shapes.forEach(function(shape) {
@@ -134,7 +153,7 @@ var shear = function(board, args) {
       });
     });
     this.shear.apply();
-    return args;
+    return this.orig_args;
   };
 };
 
@@ -144,7 +163,13 @@ var translate = function(board, args) {
     values:  $('input[name="values"]:last').coord(),
   },
     usrPoints = this.points = {};  
-
+  this.orig_args = args;
+  if (typeof arguments[1] === 'undefined') {  
+     this.orig_args = {
+      figure:  $('input[name="figure"]:last').val(),
+      values:  $('input[name="values"]:last').coord(),
+    };
+  }
   args.points = [];
 
   board.shapes.forEach(function(shape) {
@@ -174,7 +199,7 @@ var translate = function(board, args) {
       });
     });
     this.translate.apply();
-    return args;
+    return this.orig_args;
   };
 };
 
@@ -184,7 +209,13 @@ var scale = function(board, args) {
     values:  $('input[name="values"]:last').coord(),
   },
     usrPoints = this.points = {};  
-
+  this.orig_args = args;
+  if (typeof arguments[1] === 'undefined') {  
+     this.orig_args = {
+      figure:  $('input[name="figure"]:last').val(),
+      values:  $('input[name="values"]:last').coord(),
+    };
+  }
   args.points = [];
 
   board.shapes.forEach(function(shape) {
@@ -214,7 +245,7 @@ var scale = function(board, args) {
       });
     });
     this.scale.apply();
-    return args;
+    return this.orig_args;
   };
 };
 

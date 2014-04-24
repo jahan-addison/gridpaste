@@ -23,7 +23,7 @@ $(function() {
   })();
 
   /* Subscribe to application */
-  var App = require('./subscribe')(board);
+  var App  = require('./subscribe')(board);
 
 }); 
 },{"./subscribe":2}],2:[function(require,module,exports){
@@ -60,15 +60,22 @@ module.exports = function(board) {
   );
 
   var operationExec          = new execute(board);
-  require('./helper/undo')(operationExec);  // attach event to undo button
+
+  require('./helper/undo')  (operationExec); // attach event to UI undo button
+  require('./helper/record')(operationExec); // attach event to UI record button
+  require('./helper/clear') (operationExec); // attach event to UI clear button
 
   var $operationSubscription = $operationSource.subscribe(function(e) {
     console.log("Executing operation");
     var target    = $(e.target).parent().attr('class').split('-');
     var targetOperation = target[0],
         targetCommand   = target[1];
-
-    operationExec.storeAndExecute(command[targetOperation][targetCommand]);
+    var $command  = {
+      'targetOperation': targetOperation,
+      'targetCommand':   targetCommand,
+      'command':         command[targetOperation][targetCommand]
+    };
+    operationExec.storeAndExecute($command);
     if (operationExec.length > 0) {
       $('.button.undo').addClass('visible');
     }
@@ -87,8 +94,12 @@ module.exports = function(board) {
         targetCommand = target.hasClass('in') ? 'zoomIn' : 'zoomOut'; 
     if ((targetCommand == 'zoomIn'  && board.zoomX < 5.9) ||
         (targetCommand == 'zoomOut' && board.zoomX > 0.167)) {
-
-      operationExec.storeAndExecute(command['zoom'][targetCommand]);
+      var $command  = {
+        'targetOperation': 'zoom',
+        'targetCommand':   targetCommand,
+        'command':         command['zoom'][targetCommand]
+      };
+      operationExec.storeAndExecute($command);
       if (operationExec.length > 0) {
         $('.button.undo').addClass('visible');
       }   
@@ -98,34 +109,7 @@ module.exports = function(board) {
   return operationExec;
 };
 
-},{"./operation":3,"./events/run":4,"./helper/slider":5,"./helper/more":6,"../components/rxjs/rx.lite":7,"./helper/undo":8}],3:[function(require,module,exports){
-/* The Invoker */
-
-var Operation = function(board) {
-  var _commands = [];
-  this.commands = _commands;
-  Object.defineProperty(this, "length", {
-    get: function() { return _commands.length }
-  });
-  
-  this.storeAndExecute = function(command) {
-    var $command =  new command(board),
-        args     =  $command.execute();
-    _commands.push({
-      arguments:   args,
-      'command':   $command,
-      'toString':  $command.constructor.toString()
-    });
-  };
-  
-  this.undoLastExecute = function() {
-   var $command = _commands.pop();
-   $command.command.remove();
-  };
-};
-
-module.exports = Operation;
-},{}],5:[function(require,module,exports){
+},{"./operation":3,"./events/run":4,"./helper/slider":5,"./helper/more":6,"../components/rxjs/rx.lite":7,"./helper/undo":8,"./helper/record":9,"./helper/clear":10}],5:[function(require,module,exports){
 module.exports = function(content, width, height, source, top) {
   $block = $('<div class="slider"> <div class="close-slider">x</div> </div>');
   $block.append(content)
@@ -162,18 +146,7 @@ module.exports = function() {
     });
   });
 };
-},{}],8:[function(require,module,exports){
-module.exports = function(App) {
-  $(function() {
-    $('.button.undo').click(function() {
-      App.undoLastExecute();
-      if(App.length === 0) {
-        $(this).removeClass('visible');
-      }
-    });
-  });
-};
-},{}],9:[function(require,module,exports){
+},{}],11:[function(require,module,exports){
 // shim for using process in browser
 
 var process = module.exports = {};
@@ -5706,7 +5679,78 @@ process.chdir = function (dir) {
     }
 }.call(this));
 })(require("__browserify_process"),window)
-},{"__browserify_process":9}],4:[function(require,module,exports){
+},{"__browserify_process":11}],8:[function(require,module,exports){
+module.exports = function(App) {
+  $(function() {
+    $('.button.undo').click(function() {
+      App.undoLastExecute();
+      if(App.length === 0) {
+        $(this).removeClass('visible');
+      }
+    });
+  });
+};
+},{}],9:[function(require,module,exports){
+module.exports = function(App) {
+  $(function() {
+    $('.start-record').click(function() {
+      App.startRecording();
+      $(this).html('Recording').addClass('dim');
+      $(this).unbind();
+    });
+    $('.end-record').click(function() {
+      App.stopRecording();
+      $(this)
+        .html('Finished')
+        .addClass('finished')
+        .prev()
+        .html('Start Record');
+      $(this).unbind();
+      Object.freeze(App); // we're done
+      $('.button').click(function() {
+        return false;
+      })
+      $('.clear').hide();
+    });
+  });
+};
+},{}],3:[function(require,module,exports){
+/* The Invoker */
+
+var Operation = function(board) {
+  var _commands = [];
+  this.commands = _commands;
+  this.board    = board;
+};
+
+Object.defineProperty(Operation.prototype, "length", {
+  get: function() { return this.commands.length }
+});
+
+Operation.prototype.storeAndExecute = function(command) {
+  var $command =  new command.command(this.board),
+      args     =  $command.execute();
+  this.commands.push({
+    arguments:   args,
+    'command':   $command,
+    'toString':  command.targetOperation + '.' + command.targetCommand
+  });
+};
+
+Operation.prototype.clearCommandList = function() {
+  this.commands = [];
+};
+
+Operation.prototype.undoLastExecute = function() {
+   var $command = this.commands.pop();
+   $command.command.remove();
+};
+
+/* Decorators */
+  require("./decorators/recording")(Operation);
+
+module.exports = Operation;
+},{"./decorators/recording":12}],4:[function(require,module,exports){
 
 module.exports = {
   draw:      require('./draw'),
@@ -5716,7 +5760,88 @@ module.exports = {
 };
 
 
-},{"./draw":10,"./transform":11,"./zoom":12}],12:[function(require,module,exports){
+},{"./draw":13,"./transform":14,"./zoom":15}],10:[function(require,module,exports){
+var execute = require('../operation');
+
+module.exports = function(App) {
+  $(function() {
+    var board = App.board;
+    $('.button.clear').click(function() {
+      for(point in board.points) {
+        if (board.points.hasOwnProperty(point)) {
+          board.removeObject(board.points[point]);
+          delete board.points[point];
+        }
+      }
+      var size = board.shapes.length;
+      for (var i = 0; i < size; i++) {
+        board.removeObject(board.shapes[i]);
+        board.shapes.splice(i, 1);
+      }
+      board.shapes.splice(0, 1);
+      $('.undo').removeClass('visible');
+      board.zoom100();
+      board.update();
+
+      App.clearCommandList();
+
+      // Reset recording UI
+      require('./record')(App); // reattach record events   
+      $('.start-record').removeClass('dim').html('Start Record');
+      $('.end-record').removeClass('dim').html('End Record');
+    })
+  });
+};
+},{"../operation":3,"./record":9}],12:[function(require,module,exports){
+/*
+  OperationDecorator
+*/
+
+module.exports = function(Operation) {
+  var recording = false;
+  
+  var recorded  = [];
+
+  Object.defineProperty(Operation.prototype, "getRecorded", {
+    get: function() { return recorded; }
+  });
+
+  Operation.prototype.startRecording = function() {
+    recording = true;
+  };
+  Operation.prototype.stopRecording  = function() {
+    recording = false;
+  };
+
+  var execute = Operation.prototype.storeAndExecute;
+  // proxy
+  Operation.prototype.storeAndExecute = function() {
+    execute.apply(this, arguments);
+    if (recording) {
+      recorded.push(this.commands[this.commands.length - 1]);
+    }
+  };
+
+  var remove = Operation.prototype.undoLastExecute;
+  // proxy
+  Operation.prototype.undoLastExecute = function() {
+    if (recording) {
+      recorded.pop();
+    }
+    return remove.apply(this, arguments);
+  };
+
+  var clear  = Operation.prototype.clearCommandList;
+  // proxy
+  Operation.prototype.clearCommandList = function() {
+    if (recording) {
+      recorded = [];
+    }
+    return clear.apply(this, arguments);
+  }; 
+};
+
+},{}],15:[function(require,module,exports){
 /* Commands */
 
 /*--
@@ -5733,8 +5858,11 @@ var zoomIn = function(board, args) {
   };
   this.execute = function() {
     board.zoomIn();
+    return {
+      'X': board.zoomX,
+      'Y': board.zoomY
+    };
   }
-  return args;
 };
 
 var zoomOut = function(board, args) {
@@ -5743,8 +5871,11 @@ var zoomOut = function(board, args) {
   };
   this.execute = function() {
     board.zoomOut();
+    return {
+      'X': board.zoomX,
+      'Y': board.zoomY
+    };
   };
-  return args;
 };
 
 var zoom100 = function(board, args) {
@@ -5754,8 +5885,11 @@ var zoom100 = function(board, args) {
   };
   this.execute = function() {
     board.zoom100();
+    return {
+      'X': board.zoomX,
+      'Y': board.zoomY
+    };
   };
-  return args;
 };
 
 module.exports = {
@@ -5763,7 +5897,7 @@ module.exports = {
   zoomOut: zoomOut,
   zoom100: zoom100
 };
-},{}],10:[function(require,module,exports){
+},{}],13:[function(require,module,exports){
 var element = require('../board/element'),
     coords  = require('../helper/coords')();
 
@@ -5988,7 +6122,7 @@ module.exports = {
   point: point,
   text: text
 };
-},{"../board/element":13,"../helper/coords":14}],11:[function(require,module,exports){
+},{"../board/element":16,"../helper/coords":17}],14:[function(require,module,exports){
 var transform = require('../board/transform'),
     coords    = require('../helper/coords')();
 
@@ -6008,8 +6142,14 @@ var rotate = function(board, args) {
     degrees: parseInt($('input[name="degrees"]:last').val()),
   },
     usrPoints = this.points = {};  
-
-  args.points = [];
+  this.orig_args = args;
+  if (typeof arguments[1] === 'undefined') {  
+     this.orig_args = {
+      figure:  $('input[name="figure"]:last').val(),
+      degrees: parseInt($('input[name="degrees"]:last').val()),
+    };
+  }
+  args.points    = [];
 
   board.shapes.forEach(function(shape) {
     if (shape.name == args.figure) {
@@ -6038,7 +6178,7 @@ var rotate = function(board, args) {
       });
     });
     this.rotate.apply();
-    return args;
+    return this.orig_args;
   };
 };
 
@@ -6048,6 +6188,13 @@ var reflect = function(board, args) {
     line:    $('input[name="axis"]:last').val(),
   },
     usrPoints = this.points = {};  
+  this.orig_args = args;
+  if (typeof arguments[1] === 'undefined') {  
+     this.orig_args = {
+      figure:  $('input[name="figure"]:last').val(),
+      line:    $('input[name="axis"]:last').val(),
+    };
+  }
   this.line = args.line;
   args.points = [];
 
@@ -6085,7 +6232,7 @@ var reflect = function(board, args) {
       });
     });
     this.reflect.apply();
-    return args;
+    return this.orig_args;
   };
 };
 
@@ -6095,7 +6242,13 @@ var shear = function(board, args) {
     degrees: parseInt($('input[name="degrees"]:last').val()),
   },
     usrPoints = this.points = {};  
-
+  this.orig_args = args;
+  if (typeof arguments[1] === 'undefined') {  
+     this.orig_args = {
+      figure:  $('input[name="figure"]:last').val(),
+      degrees: parseInt($('input[name="degrees"]:last').val()),
+    };
+  }
   args.points = [];
 
   board.shapes.forEach(function(shape) {
@@ -6125,7 +6278,7 @@ var shear = function(board, args) {
       });
     });
     this.shear.apply();
-    return args;
+    return this.orig_args;
   };
 };
 
@@ -6135,7 +6288,13 @@ var translate = function(board, args) {
     values:  $('input[name="values"]:last').coord(),
   },
     usrPoints = this.points = {};  
-
+  this.orig_args = args;
+  if (typeof arguments[1] === 'undefined') {  
+     this.orig_args = {
+      figure:  $('input[name="figure"]:last').val(),
+      values:  $('input[name="values"]:last').coord(),
+    };
+  }
   args.points = [];
 
   board.shapes.forEach(function(shape) {
@@ -6165,7 +6324,7 @@ var translate = function(board, args) {
       });
     });
     this.translate.apply();
-    return args;
+    return this.orig_args;
   };
 };
 
@@ -6175,7 +6334,13 @@ var scale = function(board, args) {
     values:  $('input[name="values"]:last').coord(),
   },
     usrPoints = this.points = {};  
-
+  this.orig_args = args;
+  if (typeof arguments[1] === 'undefined') {  
+     this.orig_args = {
+      figure:  $('input[name="figure"]:last').val(),
+      values:  $('input[name="values"]:last').coord(),
+    };
+  }
   args.points = [];
 
   board.shapes.forEach(function(shape) {
@@ -6205,7 +6370,7 @@ var scale = function(board, args) {
       });
     });
     this.scale.apply();
-    return args;
+    return this.orig_args;
   };
 };
 
@@ -6216,7 +6381,7 @@ module.exports = {
   translate: translate,
   scale:     scale
 };
-},{"../board/transform":15,"../helper/coords":14}],14:[function(require,module,exports){
+},{"../board/transform":18,"../helper/coords":17}],17:[function(require,module,exports){
 module.exports = function() {
   jQuery.fn.coord = function() {
     if (this.val()) {
@@ -6230,7 +6395,7 @@ module.exports = function() {
   };
 };
 
-},{}],15:[function(require,module,exports){
+},{}],18:[function(require,module,exports){
 /*
   BoardTransform Factory
   */
@@ -6371,7 +6536,7 @@ BoardTransform.prototype = (function() {
 })();
 
 module.exports = BoardTransform;
-},{}],13:[function(require,module,exports){
+},{}],16:[function(require,module,exports){
 var point = require('./point'),
     shape = require('./shape')
 
@@ -6622,7 +6787,7 @@ BoardElement.prototype = (function() {
 })();
 
 module.exports = BoardElement; 
-},{"./point":16,"./shape":17}],16:[function(require,module,exports){
+},{"./point":19,"./shape":20}],19:[function(require,module,exports){
 var Point = function(board, coords) {
   this.board  = board;
   this.coords = coords;
@@ -6663,7 +6828,7 @@ Point.prototype = (function() {
 })();
 
 module.exports = Point;
-},{}],17:[function(require,module,exports){
+},{}],20:[function(require,module,exports){
 var Shape = function(board, shape, options) {
   this.board   = board;
   this.shape   = shape;

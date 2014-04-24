@@ -24,6 +24,16 @@ body {
   display:none
 }
 
+.dim {
+  @include opacity(0.5);
+  @include clearfix();
+  cursor:default !important;
+}
+
+.finished {
+  cursor:default !important;
+}
+
 .zoom {
   background: $pale-brown;
   width:46px;

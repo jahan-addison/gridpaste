@@ -31,15 +31,22 @@ module.exports = function(board) {
   );
 
   var operationExec          = new execute(board);
-  require('./helper/undo')(operationExec);  // attach event to undo button
+
+  require('./helper/undo')  (operationExec); // attach event to UI undo button
+  require('./helper/record')(operationExec); // attach event to UI record button
+  require('./helper/clear') (operationExec); // attach event to UI clear button
 
   var $operationSubscription = $operationSource.subscribe(function(e) {
     console.log("Executing operation");
     var target    = $(e.target).parent().attr('class').split('-');
     var targetOperation = target[0],
         targetCommand   = target[1];
-
-    operationExec.storeAndExecute(command[targetOperation][targetCommand]);
+    var $command  = {
+      'targetOperation': targetOperation,
+      'targetCommand':   targetCommand,
+      'command':         command[targetOperation][targetCommand]
+    };
+    operationExec.storeAndExecute($command);
     if (operationExec.length > 0) {
       $('.button.undo').addClass('visible');
     }
@@ -58,8 +65,12 @@ module.exports = function(board) {
         targetCommand = target.hasClass('in') ? 'zoomIn' : 'zoomOut'; 
     if ((targetCommand == 'zoomIn'  && board.zoomX < 5.9) ||
         (targetCommand == 'zoomOut' && board.zoomX > 0.167)) {
-
-      operationExec.storeAndExecute(command['zoom'][targetCommand]);
+      var $command  = {
+        'targetOperation': 'zoom',
+        'targetCommand':   targetCommand,
+        'command':         command['zoom'][targetCommand]
+      };
+      operationExec.storeAndExecute($command);
       if (operationExec.length > 0) {
         $('.button.undo').addClass('visible');
       }   

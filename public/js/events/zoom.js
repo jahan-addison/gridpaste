@@ -14,8 +14,11 @@ var zoomIn = function(board, args) {
   };
   this.execute = function() {
     board.zoomIn();
+    return {
+      'X': board.zoomX,
+      'Y': board.zoomY
+    };
   }
-  return args;
 };
 
 var zoomOut = function(board, args) {
@@ -24,8 +27,11 @@ var zoomOut = function(board, args) {
   };
   this.execute = function() {
     board.zoomOut();
+    return {
+      'X': board.zoomX,
+      'Y': board.zoomY
+    };
   };
-  return args;
 };
 
 var zoom100 = function(board, args) {
@@ -35,8 +41,11 @@ var zoom100 = function(board, args) {
   };
   this.execute = function() {
     board.zoom100();
+    return {
+      'X': board.zoomX,
+      'Y': board.zoomY
+    };
   };
-  return args;
 };
 
 module.exports = {
