@@ -202,6 +202,7 @@ var text = function(board, args) {
   this.text = new element(board, "text", args);
   this.remove = function() {
     board.removeObject(this.textElement);
+    board.shapes.pop();
   };
   this.execute = function() {
     this.textElement = this.text.draw();

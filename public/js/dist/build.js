@@ -23,7 +23,7 @@ $(function() {
   })();
 
   /* Subscribe to application */
-  var App = window.App = require('./subscribe')(board);
+  var App  = require('./subscribe')(board);
 
 }); 
 },{"./subscribe":2}],2:[function(require,module,exports){
@@ -64,7 +64,7 @@ module.exports = function(board) {
   require('./helper/undo')  (operationExec); // attach event to UI undo button
   require('./helper/record')(operationExec); // attach event to UI record button
   require('./helper/clear') (operationExec); // attach event to UI clear button
-
+  require('./helper/play')  (operationExec, board);
   var $operationSubscription = $operationSource.subscribe(function(e) {
     console.log("Executing operation");
     var target    = $(e.target).parent().attr('class').split('-');
@@ -109,7 +109,7 @@ module.exports = function(board) {
   return operationExec;
 };
 
-},{"./operation":3,"./events/run":4,"./helper/slider":5,"./helper/more":6,"../components/rxjs/rx.lite":7,"./helper/undo":8,"./helper/record":9,"./helper/clear":10}],5:[function(require,module,exports){
+},{"./operation":3,"./events/run":4,"./helper/slider":5,"./helper/more":6,"../components/rxjs/rx.lite":7,"./helper/undo":8,"./helper/record":9,"./helper/clear":10,"./helper/play":11}],5:[function(require,module,exports){
 module.exports = function(content, width, height, source, top) {
   $block = $('<div class="slider"> <div class="close-slider">x</div> </div>');
   $block.append(content)
@@ -146,7 +146,45 @@ module.exports = function() {
     });
   });
 };
-},{}],11:[function(require,module,exports){
+},{}],8:[function(require,module,exports){
+module.exports = function(App) {
+  $(function() {
+    $('.button.undo').click(function() {
+      App.undoLastExecute();
+      if(App.length === 0) {
+        $(this).removeClass('visible');
+      }
+    });
+  });
+};
+},{}],9:[function(require,module,exports){
+module.exports = function(App) {
+  $(function() {
+    $('.start-record').click(function() {
+      App.startRecording();
+      $(this).html('Recording').addClass('dim');
+      $(this).unbind();
+    });
+    $('.end-record').click(function() {
+      App.stopRecording();
+      $(this)
+        .html('Finished')
+        .addClass('finished')
+        .prev()
+        .html('Start Record');
+      $(this).unbind();
+      Object.freeze(App); // we're done
+      $('.undo').removeClass('visible');
+      $('.reset').show();
+      $('.reset').click(function() {
+        window.location.reload();
+      });
+      $('.clear').hide()
+        .prev().show();
+    });
+  });
+};
+},{}],12:[function(require,module,exports){
 // shim for using process in browser
 
 var process = module.exports = {};
@@ -5679,42 +5717,7 @@ process.chdir = function (dir) {
     }
 }.call(this));
 })(require("__browserify_process"),window)
-},{"__browserify_process":11}],8:[function(require,module,exports){
-module.exports = function(App) {
-  $(function() {
-    $('.button.undo').click(function() {
-      App.undoLastExecute();
-      if(App.length === 0) {
-        $(this).removeClass('visible');
-      }
-    });
-  });
-};
-},{}],9:[function(require,module,exports){
-module.exports = function(App) {
-  $(function() {
-    $('.start-record').click(function() {
-      App.startRecording();
-      $(this).html('Recording').addClass('dim');
-      $(this).unbind();
-    });
-    $('.end-record').click(function() {
-      App.stopRecording();
-      $(this)
-        .html('Finished')
-        .addClass('finished')
-        .prev()
-        .html('Start Record');
-      $(this).unbind();
-      Object.freeze(App); // we're done
-      $('.button').click(function() {
-        return false;
-      })
-      $('.clear').hide();
-    });
-  });
-};
-},{}],3:[function(require,module,exports){
+},{"__browserify_process":12}],3:[function(require,module,exports){
 /* The Invoker */
 
 var Operation = function(board) {
@@ -5750,7 +5753,7 @@ Operation.prototype.undoLastExecute = function() {
   require("./decorators/recording")(Operation);
 
 module.exports = Operation;
-},{"./decorators/recording":12}],4:[function(require,module,exports){
+},{"./decorators/recording":13}],4:[function(require,module,exports){
 
 module.exports = {
   draw:      require('./draw'),
@@ -5760,7 +5763,7 @@ module.exports = {
 };
 
 
-},{"./draw":13,"./transform":14,"./zoom":15}],10:[function(require,module,exports){
+},{"./draw":14,"./transform":15,"./zoom":16}],10:[function(require,module,exports){
 var execute = require('../operation');
 
 module.exports = function(App) {
@@ -5792,7 +5795,53 @@ module.exports = function(App) {
     })
   });
 };
-},{"../operation":3,"./record":9}],12:[function(require,module,exports){
+},{"../operation":3,"./record":9}],11:[function(require,module,exports){
+var iterator = require('../iterate'),
+    command  = require('../events/run'),
+    Rx       = require('../../components/rxjs/rx.lite').Rx;
+
+
+module.exports = function(App, board) {
+
+  var clear = function(board) {
+    for(point in board.points) {
+      if (board.points.hasOwnProperty(point)) {
+        board.removeObject(board.points[point]);
+        delete board.points[point];
+      }
+    }
+    var size = board.shapes.length;
+    for (var i = 0; i < size; i++) {
+      board.removeObject(board.shapes[i]);
+      board.shapes.splice(i, 1);
+    }
+    board.shapes.splice(0, 1);
+    $('.undo').removeClass('visible');
+    board.zoom100();
+    board.update();
+  };
+
+  $('.play').click(function() {
+    if (!Object.isFrozen(App)) {
+      return false;
+    }
+    clear(board);
+    var AppIterator = new iterator(App.getRecorded);
+    board.animate();
+    var play;
+    play = setInterval(function() {
+      var next         = AppIterator.next();
+      target           = next.toString.split('.');       
+      var $constructor = command[target[0]][target[1]];
+      var $command     = new $constructor(board, next.arguments);      
+      $command.execute();
+      if(!AppIterator.hasNext()) {
+        clearInterval(play);
+      }
+    }, 1500);
+  });
+};
+},{"../iterate":17,"../events/run":4,"../../components/rxjs/rx.lite":7}],13:[function(require,module,exports){
 /*
   OperationDecorator
 */
@@ -5841,7 +5890,7 @@ module.exports = function(Operation) {
   }; 
 };
 
-},{}],15:[function(require,module,exports){
+},{}],16:[function(require,module,exports){
 /* Commands */
 
 /*--
@@ -5897,7 +5946,32 @@ module.exports = {
   zoomOut: zoomOut,
   zoom100: zoom100
 };
-},{}],13:[function(require,module,exports){
+},{}],17:[function(require,module,exports){
+/* The Iterator */
+
+var Iterator = function(List) {
+  this.step = 0;
+  this.list = List;
+};
+
+Iterator.prototype.hasNext = function() {
+  return this.step < this.list.length;
+};
+
+Iterator.prototype.next    = function() {
+  return this.list[this.step++];
+};
+
+Iterator.prototype.hasPrev = function() {
+  return this.step > 0;
+};
+
+Iterator.prototype.prev    = function() {
+  return this.list[--this.step];
+};
+
+module.exports = Iterator;
+},{}],14:[function(require,module,exports){
 var element = require('../board/element'),
     coords  = require('../helper/coords')();
 
@@ -6102,6 +6176,7 @@ var text = function(board, args) {
   this.text = new element(board, "text", args);
   this.remove = function() {
     board.removeObject(this.textElement);
+    board.shapes.pop();
   };
   this.execute = function() {
     this.textElement = this.text.draw();
@@ -6122,7 +6197,7 @@ module.exports = {
   point: point,
   text: text
 };
-},{"../board/element":16,"../helper/coords":17}],14:[function(require,module,exports){
+},{"../board/element":18,"../helper/coords":19}],15:[function(require,module,exports){
 var transform = require('../board/transform'),
     coords    = require('../helper/coords')();
 
@@ -6381,7 +6456,7 @@ module.exports = {
   translate: translate,
   scale:     scale
 };
-},{"../board/transform":18,"../helper/coords":17}],17:[function(require,module,exports){
+},{"../board/transform":20,"../helper/coords":19}],19:[function(require,module,exports){
 module.exports = function() {
   jQuery.fn.coord = function() {
     if (this.val()) {
@@ -6395,7 +6470,7 @@ module.exports = function() {
   };
 };
 
-},{}],18:[function(require,module,exports){
+},{}],20:[function(require,module,exports){
 /*
   BoardTransform Factory
   */
@@ -6536,7 +6611,7 @@ BoardTransform.prototype = (function() {
 })();
 
 module.exports = BoardTransform;
-},{}],16:[function(require,module,exports){
+},{}],18:[function(require,module,exports){
 var point = require('./point'),
     shape = require('./shape')
 
@@ -6762,12 +6837,15 @@ BoardElement.prototype = (function() {
   };
 
   textElement.prototype.draw = function() {
-    return this.board.create('text',
+    return new shape(this.board, "text", 
       [this.options.position[0],
-        this.options.position[1],
-        this.options.text], {
+      this.options.position[1],
+      this.options.text,
+      [this.options.position[0],
+      this.options.position[1]]],
+      {
         fontSize: this.options.size
-      });
+      }).add();
   };
 
   return {
@@ -6787,7 +6865,7 @@ BoardElement.prototype = (function() {
 })();
 
 module.exports = BoardElement; 
-},{"./point":19,"./shape":20}],19:[function(require,module,exports){
+},{"./point":21,"./shape":22}],21:[function(require,module,exports){
 var Point = function(board, coords) {
   this.board  = board;
   this.coords = coords;
@@ -6828,30 +6906,27 @@ Point.prototype = (function() {
 })();
 
 module.exports = Point;
-},{}],20:[function(require,module,exports){
-var Shape = function(board, shape, options) {
+},{}],22:[function(require,module,exports){
+var Shape = function(board, shape, parents, options) {
   this.board   = board;
   this.shape   = shape;
-  this.options = options;
+  this.parents = parents;
+  this.options = options || {};
 };
 
 Shape.prototype = (function() {
   /* Private */
   var createShapeLabel = function() {
-      return this.board.shapes.length + 1;
+      return "Q" + (this.board.shapes.length + 1);
   };
   /* Public */
   return {
     Constructor: Shape,
     add: function() {
-      var points = this.options.pop(), 
-          s      = this.board.create(this.shape,
-        this.options,
-        {
-          name: "Q" + createShapeLabel.call(this),
-          withLabel: true
-        }
-      );
+      this.options.name      = this.options.name || createShapeLabel.call(this);
+      this.options.withLabel = true;
+      var points = this.parents.pop(), 
+          s      = this.board.create(this.shape, this.parents, this.options);
       s.usrSetCoords = points;
       this.board.shapes.push(s);
       return s;

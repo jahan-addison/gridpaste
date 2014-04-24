@@ -14,10 +14,13 @@ module.exports = function(App) {
         .html('Start Record');
       $(this).unbind();
       Object.freeze(App); // we're done
-      $('.button').click(function() {
-        return false;
-      })
-      $('.clear').hide();
+      $('.undo').removeClass('visible');
+      $('.reset').show();
+      $('.reset').click(function() {
+        window.location.reload();
+      });
+      $('.clear').hide()
+        .prev().show();
     });
   });
 };

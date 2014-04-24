@@ -35,7 +35,7 @@ module.exports = function(board) {
   require('./helper/undo')  (operationExec); // attach event to UI undo button
   require('./helper/record')(operationExec); // attach event to UI record button
   require('./helper/clear') (operationExec); // attach event to UI clear button
-
+  require('./helper/play')  (operationExec, board);
   var $operationSubscription = $operationSource.subscribe(function(e) {
     console.log("Executing operation");
     var target    = $(e.target).parent().attr('class').split('-');

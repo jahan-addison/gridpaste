@@ -223,12 +223,15 @@ BoardElement.prototype = (function() {
   };
 
   textElement.prototype.draw = function() {
-    return this.board.create('text',
+    return new shape(this.board, "text", 
       [this.options.position[0],
-        this.options.position[1],
-        this.options.text], {
+      this.options.position[1],
+      this.options.text,
+      [this.options.position[0],
+      this.options.position[1]]],
+      {
         fontSize: this.options.size
-      });
+      }).add();
   };
 
   return {
