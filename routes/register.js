@@ -1,15 +1,15 @@
-
 /*
- * Registration
+ * Register
  */
 
-var users = require('../services/userservice');
-var util = require('util');
+var db    = require('../environment/sequelize'),
+    util  = require('util'),
+    Users = db.Users; 
 
 exports.action = function(req, res) {
 	req.checkBody('username', 'Invalid username!').notEmpty().isAlphanumeric();
 	req.checkBody('password', 'Invalid password!').notEmpty();
-	req.checkBody('email', 'Invalid email!').notEmpty().isEmail();
+	req.checkBody('email',    'Invalid email!').notEmpty().isEmail();
 
 	var errors = req.validationErrors();
   	if (errors && errors.length > 0) {
@@ -19,17 +19,17 @@ exports.action = function(req, res) {
 
 	var username = req.body.username;
 	var password = req.body.password;
-	var email = req.body.email;
+	var email    = req.body.email;
 
-	users.usernameExists(req.db, username, function(exists) {
+	Users.usernameExists(username, function(exists) {
     	if (exists) {
       		res.send("Someone already has that username.")
     	} else {
-    		users.emailExists(req.db, email, function(exists) {
+    		Users.emailExists(email, function(exists) {
 		    	if (exists) {
 		      		res.send("Someone already has that email.")
 		    	} else {
-		    		users.register(req.db, username, password, email, function() {
+		    		Users.register(username, password, email, function() {
 				    	res.send("Registered Successfully!");
 				    });
 		    	}
