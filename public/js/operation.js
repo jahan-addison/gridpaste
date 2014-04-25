@@ -2,24 +2,34 @@
 
 var Operation = function(board) {
   var _commands = [];
-  Object.defineProperty(this, "length", {
-    get: function() { return _commands.length }
-  });
-  
-  this.storeAndExecute = function(command) {
-    var $command =  new command(board),
-        args     =  $command.execute();
-    _commands.push({
-      arguments:   args,
-      'command':   $command,
-      'toString':  $command.toString()
-    });
-  };
-  
-  this.undoLastExecute = function() {
-   var $command = _commands.pop();
-   $command.command.remove();
-  };
+  this.commands = _commands;
+  this.board    = board;
 };
+
+Object.defineProperty(Operation.prototype, "length", {
+  get: function() { return this.commands.length }
+});
+
+Operation.prototype.storeAndExecute = function(command) {
+  var $command =  new command.command(this.board),
+      args     =  $command.execute();
+  this.commands.push({
+    arguments:   args,
+    'command':   $command,
+    'toString':  command.targetOperation + '.' + command.targetCommand
+  });
+};
+
+Operation.prototype.clearCommandList = function() {
+  this.commands = [];
+};
+
+Operation.prototype.undoLastExecute = function() {
+   var $command = this.commands.pop();
+   $command.command.remove();
+};
+
+/* Decorators */
+  require("./decorators/recording")(Operation);
 
 module.exports = Operation;

@@ -15,13 +15,13 @@ $(function() {
     });
     board.points = {};
     board.shapes = [];
-    var axx      = board.create('axis',[[0,0],[1,0]]);
-    var axy      = board.create('axis',[[0,0],[0,1]]);
+    var axx      = board.axx = board.create('axis',[[0,0],[1,0]]);
+    var axy      = board.axy = board.create('axis',[[0,0],[0,1]]);
      
     board.unsuspendUpdate();    
   })();
 
   /* Subscribe to application */
-  var App = require('./subscribe')(board);
+  var App  = require('./subscribe')(board);
 
 }); 

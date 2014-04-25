@@ -65,7 +65,7 @@
               <div data-html="segment">
                 <div class="draw-segment">
                   <label for="point1">End Point 1 (x,y):</label><input type="text" name="point1" class="inside" value="0.0,0.0" />
-                  <br/><label for="point2">End Point 2 (x,y):</label><input type="text" name="point2" class="inside" value="0.0,0.0" />
+                  <label for="point2">End Point 2 (x,y):</label><input type="text" name="point2" class="inside" value="0.0,0.0" />
                   <div class="button draw">Draw to board</div>
                 </div>
               </div>
@@ -99,6 +99,15 @@
                   <div class="button draw">Draw to board</div>
                 </div>
               </div>
+              <div class="button text">Text</div>
+             <div data-html="text">
+                <div class="draw-text">
+                  <label for="point">Position (x,y):</label><input type="text" name="position" class="inside" value="0.0,0.0" />
+                  <label for="size">Size (pixels):</label><input type="text" name="size" class="inside" value="25" />
+                  <label for="text">Text:</label><input type="text" name="text" class="inside" value="" />
+                  <div class="button draw">Draw to board</div>
+                </div>
+              </div>
               <div class="button point">Point</div>
               <div data-html="point">
                 <div class="draw-point">
@@ -111,33 +120,62 @@
           <h2>Transform</h2>
           <section id="transform">
             <div class="col">
-              <div class="button">Rotation</div>
-              <div class="button">Reflection</div>
-              <div class="button">Shear</div>
+              <div class="button rotate">Rotate</div>
+              <div data-html="rotate">
+                <div class="transform-rotate">
+                 <label for="figure">Figure (label):</label><input type="text" name="figure" class="inside" value="" />
+                  <label for="degrees">Degrees:</label><input type="text" name="degrees" class="inside" value="" />
+                  <div class="button transform">Transform on board</div>
+                </div>
+              </div>
+              <div class="button reflect">Reflect</div>
+              <div data-html="rotate">
+                <div class="transform-reflect">
+                 <label for="figure">Figure (label):</label><input type="text" name="figure" class="inside" value="" />
+                  <label for="axis">Axis (X/Y):</label><input type="text" name="axis" class="inside" value="Y" />
+                  <div class="button transform">Transform on board</div>
+                </div>
+              </div>
+              <div class="button shear">Shear</div>
+              <div data-html="shear">
+                <div class="transform-shear">
+                 <label for="figure">Figure (label):</label><input type="text" name="figure" class="inside" value="" />
+                  <label for="degrees">Degrees:</label><input type="text" name="degrees" class="inside" value="" />
+                  <div class="button transform">Transform on board</div>
+                </div>
+              </div>
             </div>
             <div class="col">
-              <div class="button">Translation</div>
-              <div class="button">Scaling</div>
+              <div class="button translate">Translate</div>
+              <div data-html="translate">
+                <div class="transform-translate">
+                 <label for="figure">Figure (label):</label><input type="text" name="figure" class="inside" value="" />
+                  <label for="values">Values (x,y):</label><input type="text" name="values" class="inside" value="" />
+                  <div class="button transform">Transform on board</div>
+                </div>
+              </div>
+              <div class="button scale">Scale</div>
+             <div data-html="scale">
+                <div class="transform-scale">
+                 <label for="figure">Figure (label):</label><input type="text" name="figure" class="inside" value="" />
+                  <label for="values">Values (x,y):</label><input type="text" name="values" class="inside" value="" />
+                  <div class="button transform">Transform on board</div>
+                </div>
+              </div>
             </div>
           </section>
           <h2>Misc</h2>
           <section id="misc">
             <div class="col">
-              <div class="button text">Text</div>
-             <div data-html="text">
-                <div class="draw-text">
-                  <label for="point">Position (x,y):</label><input type="text" name="position" class="inside" value="0.0,0.0" />
-                  <label for="size">Size (pixels):</label><input type="text" name="size" class="inside" value="25" />
-                  <label for="text">Text:</label><input type="text" name="text" class="inside" value="" />
-                  <div class="button draw">Draw to board</div>
-                </div>
-              </div>
+              <div class="button play">Play</div>
+              <div class="button clear">Clear</div>
+              <div class="button reset">Reset</div>
             </div>
           </section>
           <section id="bottom">
             <div class="col">
-              <div class="button">Start Record</div>
-              <div class="button">End Record</div>
+              <div class="start-record button">Start Record</div>
+              <div class="end-record button">End Record</div>
             </div>
             <div class="col">
               <div class="button">Share</div>

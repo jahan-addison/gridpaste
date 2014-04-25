@@ -54,7 +54,7 @@ module.exports = function (grunt) {
         tasks: ['develop', 'delayed-livereload']
       },
       js: {
-        files: ['public/js/*.js', './Gruntfile.js'],
+        files: ['public/js/**/*.js', './Gruntfile.js'],
         options: {
           livereload: reloadPort
         }
@@ -67,7 +67,7 @@ module.exports = function (grunt) {
         }
       },
       browserify: {
-        files: ['public/js/*.js'],
+        files: ['public/js/**/*.js'],
         tasks: ['browserify2:compile'],
         options: {
           livereload: reloadPort

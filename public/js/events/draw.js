@@ -84,14 +84,15 @@ var ellipse = function(board, args) {
     point2: $('input[name="point2"]:last').coord(),
     point3: $('input[name="point3"]:last').coord()
   };
+
   this.ellipse = new element(board, "ellipse", args);
   this.remove  = function() {
-    board.removeObject(this.ellipseElement);
-    board.shapes.pop();
     // curve points
-    board.removeObject(board.shapes.pop());
-    board.removeObject(board.shapes.pop());
-    board.removeObject(board.shapes.pop());
+    var curve = board.shapes.pop();
+    board.removeObject(curve.usrSetCoords[0]);
+    board.removeObject(curve.usrSetCoords[1]);
+    board.removeObject(curve.usrSetCoords[2]);
+    board.removeObject(this.ellipseElement);
   };
   this.execute = function() {
     this.ellipseElement = this.ellipse.draw()
@@ -146,7 +147,6 @@ var semicircle = function(board, args) {
   };
   this.semicircle    = new element(board, "semicircle", args);
   this.remove  = function() {
-    console.log(this.semicircleElement);
   };
   this.execute = function() {
     this.semicircleElement = this.semicircle.draw();
@@ -202,6 +202,7 @@ var text = function(board, args) {
   this.text = new element(board, "text", args);
   this.remove = function() {
     board.removeObject(this.textElement);
+    board.shapes.pop();
   };
   this.execute = function() {
     this.textElement = this.text.draw();
