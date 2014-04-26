@@ -157,33 +157,6 @@ module.exports = function(App) {
     });
   });
 };
-},{}],9:[function(require,module,exports){
-module.exports = function(App) {
-  $(function() {
-    $('.start-record').click(function() {
-      App.startRecording();
-      $(this).html('Recording').addClass('dim');
-      $(this).unbind();
-    });
-    $('.end-record').click(function() {
-      App.stopRecording();
-      $(this)
-        .html('Finished')
-        .addClass('finished')
-        .prev()
-        .html('Start Record');
-      $(this).unbind();
-      Object.freeze(App); // we're done
-      $('.undo').removeClass('visible');
-      $('.reset').show();
-      $('.reset').click(function() {
-        window.location.reload();
-      });
-      $('.clear').hide()
-        .prev().show();
-    });
-  });
-};
 },{}],12:[function(require,module,exports){
 // shim for using process in browser
 
@@ -5717,7 +5690,34 @@ process.chdir = function (dir) {
     }
 }.call(this));
 })(require("__browserify_process"),window)
-},{"__browserify_process":12}],3:[function(require,module,exports){
+},{"__browserify_process":12}],9:[function(require,module,exports){
+module.exports = function(App) {
+  $(function() {
+    $('.start-record').click(function() {
+      App.startRecording();
+      $(this).html('Recording').addClass('dim');
+      $(this).unbind();
+    });
+    $('.end-record').click(function() {
+      App.stopRecording();
+      $(this)
+        .html('Finished')
+        .addClass('finished')
+        .prev()
+        .html('Start Record');
+      $(this).unbind();
+      Object.freeze(App); // we're done
+      $('.undo').removeClass('visible');
+      $('.reset').show();
+      $('.reset').click(function() {
+        window.location.reload();
+      });
+      $('.clear').hide()
+        .prev().show();
+    });
+  });
+};
+},{}],3:[function(require,module,exports){
 /* The Invoker */
 
 var Operation = function(board) {
@@ -6453,7 +6453,7 @@ module.exports = {
   translate: translate,
   scale:     scale
 };
-},{"../board/transform":20,"../helper/coords":19}],19:[function(require,module,exports){
+},{"../helper/coords":19,"../board/transform":20}],19:[function(require,module,exports){
 module.exports = function() {
   jQuery.fn.coord = function() {
     if (this.val()) {

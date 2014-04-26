@@ -2,7 +2,7 @@ var express   = require('express')
   , expressValidator = require('express-validator')
   , routes    = require('./routes')
   , user      = require('./routes/user')
-  , register  = require('./routes/register')
+  , paste     = require('./routes/paste')
   , http      = require('http')
   , swig      = require('swig')
   , path      = require('path')
@@ -32,9 +32,10 @@ if ('development' == app.get('env')) {
   app.use(express.errorHandler());
 }
 
-app.get('/', routes.index);
-app.get('/users', user.list);
-app.post('/register', register.action);
+app.get('/',          routes.index);
+app.get('/:id',       routes.show);
+app.post('/register', user.register);
+app.post('/paste',    paste.action)
 
 Sequelize
   .sequelize
