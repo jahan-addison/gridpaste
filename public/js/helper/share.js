@@ -15,7 +15,6 @@ module.exports = function(App) {
             title: $('input.title:last').val(),
             paste: $paste
           };
-          console.log(data);
           $('.close-slider').click();
           $.ajax({
             url: '/paste',

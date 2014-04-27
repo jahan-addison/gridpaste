@@ -139,19 +139,19 @@ module.exports = function(App, board) {
       board.removeObject(board.shapes[i]);
       board.shapes.splice(i, 1);
     }
+    board.removeObject(board.shapes[0]);
     board.shapes.splice(0, 1);
     $('.undo').removeClass('visible');
     board.zoom100();
     board.update();
   };
-  clear(board);
   if ($('#application').hasClass('paste')) {
+    clear(board);
     var AppIterator = new iterator($AppPaste);
     board.animate();
     var play;
     play = setInterval(function() {
       var next         = AppIterator.next();
-      console.log(next);
       target           = next.toString.split('.');       
       var $constructor = command[target[0]][target[1]];
       var $command     = new $constructor(board, next.arguments);      
@@ -162,6 +162,7 @@ module.exports = function(App, board) {
     }, 1100);
   } else {
     $('.play').click(function() {
+      clear(board);
       if (!Object.isFrozen(App)) {
         return false;
       }
@@ -6502,7 +6503,6 @@ module.exports = function(App) {
             title: $('input.title:last').val(),
             paste: $paste
           };
-          console.log(data);
           $('.close-slider').click();
           $.ajax({
             url: '/paste',
