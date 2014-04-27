@@ -17,22 +17,21 @@ var rotate = function(board, args) {
     degrees: parseInt($('input[name="degrees"]:last').val()),
   },
     usrPoints = this.points = {};  
-  this.orig_args = args;
-  if (typeof arguments[1] === 'undefined') {  
-     this.orig_args = {
-      figure:  $('input[name="figure"]:last').val(),
-      degrees: parseInt($('input[name="degrees"]:last').val()),
-    };
+  var transformArgs = {};
+  for (arg in args) {
+    if (args.hasOwnProperty(arg)) {
+      transformArgs[arg] = args[arg];
+    }
   }
-  args.points    = [];
+  transformArgs.points = [];
 
   board.shapes.forEach(function(shape) {
-    if (shape.name == args.figure) {
-      args.points = shape.usrSetCoords;
+    if (shape.name == transformArgs.figure) {
+      transformArgs.points = shape.usrSetCoords;
     }
   });
-  delete args.figure;
-  this.rotate = new transform(board, "rotate", args);
+  delete transformArgs.figure;
+  this.rotate = new transform(board, "rotate", transformArgs);
   this.remove = function() {
     for (p in this.points) {
       if (this.points.hasOwnProperty(p)) {
@@ -43,7 +42,7 @@ var rotate = function(board, args) {
     }
   };
   this.execute = function() {
-    args.points.forEach(function(p) {
+    transformArgs.points.forEach(function(p) {
       Object.defineProperty(usrPoints, p.name, {
         value: [
           board.points[p.name].coords.usrCoords[1],
@@ -53,7 +52,7 @@ var rotate = function(board, args) {
       });
     });
     this.rotate.apply();
-    return this.orig_args;
+    return args;
   };
 };
 
@@ -63,30 +62,28 @@ var reflect = function(board, args) {
     line:    $('input[name="axis"]:last').val(),
   },
     usrPoints = this.points = {};  
-  this.orig_args = args;
-  if (typeof arguments[1] === 'undefined') {  
-     this.orig_args = {
-      figure:  $('input[name="figure"]:last').val(),
-      line:    $('input[name="axis"]:last').val(),
-    };
+  var transformArgs = {};
+  for (arg in args) {
+    if (args.hasOwnProperty(arg)) {
+      transformArgs[arg] = args[arg];
+    }
   }
-  this.line = args.line;
-  args.points = [];
-
-  if (args.line.toLowerCase() == "x") {
-    args.line = board.axx;
+  this.line = transformArgs.line;
+  transformArgs.points = [];
+  if (transformArgs.line.toLowerCase() == "x") {
+    transformArgs.line = board.axx;
   } else {
-    args.line = board.axy;
+    transformArgs.line = board.axy;
   }
 
   board.shapes.forEach(function(shape) {
-    if (shape.name == args.figure) {
-      args.points = shape.usrSetCoords;
+    if (shape.name == transformArgs.figure) {
+      transformArgs.points = shape.usrSetCoords;
     }
   });
-  delete args.figure;
+  delete transformArgs.figure;
 
-  this.reflect = new transform(board, "reflect", args);
+  this.reflect = new transform(board, "reflect", transformArgs);
   this.remove = function() {
     for (p in this.points) {
       if (this.points.hasOwnProperty(p)) {
@@ -96,7 +93,7 @@ var reflect = function(board, args) {
     }
   };
   this.execute = function() {
-    args.points.forEach(function(p) {
+    transformArgs.points.forEach(function(p) {
       Object.defineProperty(usrPoints, p.name, {
         value: [
           board.points[p.name].coords.usrCoords[1],
@@ -106,7 +103,7 @@ var reflect = function(board, args) {
       });
     });
     this.reflect.apply();
-    return this.orig_args;
+    return args;
   };
 };
 
@@ -116,22 +113,21 @@ var shear = function(board, args) {
     degrees: parseInt($('input[name="degrees"]:last').val()),
   },
     usrPoints = this.points = {};  
-  this.orig_args = args;
-  if (typeof arguments[1] === 'undefined') {  
-     this.orig_args = {
-      figure:  $('input[name="figure"]:last').val(),
-      degrees: parseInt($('input[name="degrees"]:last').val()),
-    };
+  var transformArgs = {};
+  for (arg in args) {
+    if (args.hasOwnProperty(arg)) {
+      transformArgs[arg] = args[arg];
+    }
   }
-  args.points = [];
+  transformArgs.points = [];
 
   board.shapes.forEach(function(shape) {
-    if (shape.name == args.figure) {
-      args.points = shape.usrSetCoords;
+    if (shape.name == transformArgs.figure) {
+      transformArgs.points = shape.usrSetCoords;
     }
   });
-  delete args.figure;
-  this.shear = new transform(board, "shear", args);
+  delete transformArgs.figure;
+  this.shear = new transform(board, "shear", transformArgs);
   this.remove = function() {
     for (p in this.points) {
       if (this.points.hasOwnProperty(p)) {
@@ -141,7 +137,7 @@ var shear = function(board, args) {
     }
   };
   this.execute = function() {
-    args.points.forEach(function(p) {
+    transformArgs.points.forEach(function(p) {
       Object.defineProperty(usrPoints, p.name, {
         value: [
           board.points[p.name].coords.usrCoords[1],
@@ -151,7 +147,7 @@ var shear = function(board, args) {
       });
     });
     this.shear.apply();
-    return this.orig_args;
+    return args;
   };
 };
 
@@ -161,22 +157,21 @@ var translate = function(board, args) {
     values:  $('input[name="values"]:last').coord(),
   },
     usrPoints = this.points = {};  
-  this.orig_args = args;
-  if (typeof arguments[1] === 'undefined') {  
-     this.orig_args = {
-      figure:  $('input[name="figure"]:last').val(),
-      values:  $('input[name="values"]:last').coord(),
-    };
+  var transformArgs = {};
+  for (arg in args) {
+    if (args.hasOwnProperty(arg)) {
+      transformArgs[arg] = args[arg];
+    }
   }
-  args.points = [];
+  transformArgs.points = [];
 
   board.shapes.forEach(function(shape) {
-    if (shape.name == args.figure) {
-      args.points = shape.usrSetCoords;
+    if (shape.name == transformArgs.figure) {
+      transformArgs.points = shape.usrSetCoords;
     }
   });
-  delete args.figure;
-  this.translate = new transform(board, "translate", args);
+  delete transformArgs.figure;
+  this.translate = new transform(board, "translate", transformArgs);
   this.remove    = function() {
     for (p in this.points) {
       if (this.points.hasOwnProperty(p)) {
@@ -186,7 +181,7 @@ var translate = function(board, args) {
     }
   };
   this.execute = function() {
-    args.points.forEach(function(p) {
+    transformArgs.points.forEach(function(p) {
       Object.defineProperty(usrPoints, p.name, {
         value: [
           board.points[p.name].coords.usrCoords[1],
@@ -196,7 +191,7 @@ var translate = function(board, args) {
       });
     });
     this.translate.apply();
-    return this.orig_args;
+    return args;
   };
 };
 
@@ -206,22 +201,21 @@ var scale = function(board, args) {
     values:  $('input[name="values"]:last').coord(),
   },
     usrPoints = this.points = {};  
-  this.orig_args = args;
-  if (typeof arguments[1] === 'undefined') {  
-     this.orig_args = {
-      figure:  $('input[name="figure"]:last').val(),
-      values:  $('input[name="values"]:last').coord(),
-    };
+  var transformArgs = {};
+  for (arg in args) {
+    if (args.hasOwnProperty(arg)) {
+      transformArgs[arg] = args[arg];
+    }
   }
-  args.points = [];
+  transformArgs.points = [];
 
   board.shapes.forEach(function(shape) {
-    if (shape.name == args.figure) {
-      args.points = shape.usrSetCoords;
+    if (shape.name == transformArgs.figure) {
+      transformArgs.points = shape.usrSetCoords;
     }
   });
-  delete args.figure;
-  this.scale = new transform(board, "scale", args);
+  delete transformArgs.figure;
+  this.scale = new transform(board, "scale", transformArgs);
   this.remove    = function() {
     for (p in this.points) {
       if (this.points.hasOwnProperty(p)) {
@@ -241,7 +235,7 @@ var scale = function(board, args) {
       });
     });
     this.scale.apply();
-    return this.orig_args;
+    return args
   };
 };
 

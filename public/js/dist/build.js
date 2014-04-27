@@ -3,13 +3,15 @@ $(function() {
   'use strict';
   var board;
   (function() {
+    var $paste = $('#application').hasClass('paste');
+    var xx = $paste ? 120 : 100,
+        yy = $paste ? 60  : 55;   
     /* Board Options */
     JXG.Options.angle.orthoType = "root";
     JXG.Options.angle.radius    = 25;
     JXG.Options.elements.fixed  = true;
-    
-    board        = JXG.JSXGraph.initBoard('grid', {
-      boundingbox:     [-100,60,100,-60],
+    board  = JXG.JSXGraph.initBoard('grid', {
+      boundingbox:     [-xx,yy,xx,-yy],
       keepaspectratio: true,
       showCopyright:   false,
       showNavigation:  false 
@@ -21,16 +23,27 @@ $(function() {
      
     board.unsuspendUpdate();    
   })();
-
-  /* Subscribe to application */
-  var App  = require('./subscribe')(board);
-
+  if (!$('#application').hasClass('paste')) {
+    /* Subscribe to application */
+    var App  = require('./subscribe')(board);
+  } else {
+    /* Play Paste */
+    require('./helper/play')($AppPaste, board);
+    $('.play').click();
+    // Replay
+    $('.replay').click(function() {
+      require('./helper/play')($AppPaste, board);
+    });
+    // Start new
+    $('.new').click(function() {
+      window.location.href = '/';
+    });
+  }
 }); 
-},{"./subscribe":2}],2:[function(require,module,exports){
+},{"./subscribe":2,"./helper/play":3}],2:[function(require,module,exports){
 var execute         = require('./operation'),
     command         = require('./events/run'),
     slider          = require('./helper/slider'),
-    more            = require('./helper/more')(),
     Rx              = require('../components/rxjs/rx.lite').Rx;
 
 module.exports = function(board) {
@@ -61,10 +74,8 @@ module.exports = function(board) {
 
   var operationExec          = new execute(board);
 
-  require('./helper/undo')  (operationExec); // attach event to UI undo button
-  require('./helper/record')(operationExec); // attach event to UI record button
-  require('./helper/clear') (operationExec); // attach event to UI clear button
-  require('./helper/play')  (operationExec, board);
+  require('./helper/helpers')(operationExec, board); // varies UI helpers
+
   var $operationSubscription = $operationSource.subscribe(function(e) {
     console.log("Executing operation");
     var target    = $(e.target).parent().attr('class').split('-');
@@ -109,7 +120,70 @@ module.exports = function(board) {
   return operationExec;
 };
 
-},{"./operation":3,"./events/run":4,"./helper/slider":5,"./helper/more":6,"../components/rxjs/rx.lite":7,"./helper/undo":8,"./helper/record":9,"./helper/clear":10,"./helper/play":11}],5:[function(require,module,exports){
+},{"./operation":4,"./events/run":5,"./helper/slider":6,"../components/rxjs/rx.lite":7,"./helper/helpers":8}],3:[function(require,module,exports){
+var iterator = require('../iterate'),
+    command  = require('../events/run');
+
+
+module.exports = function(App, board) {
+
+  var clear = function(board) {
+    for(point in board.points) {
+      if (board.points.hasOwnProperty(point)) {
+        board.removeObject(board.points[point]);
+        delete board.points[point];
+      }
+    }
+    var size = board.shapes.length;
+    for (var i = 0; i < size; i++) {
+      board.removeObject(board.shapes[i]);
+      board.shapes.splice(i, 1);
+    }
+    board.shapes.splice(0, 1);
+    $('.undo').removeClass('visible');
+    board.zoom100();
+    board.update();
+  };
+  clear(board);
+  if ($('#application').hasClass('paste')) {
+    var AppIterator = new iterator($AppPaste);
+    board.animate();
+    var play;
+    play = setInterval(function() {
+      var next         = AppIterator.next();
+      console.log(next);
+      target           = next.toString.split('.');       
+      var $constructor = command[target[0]][target[1]];
+      var $command     = new $constructor(board, next.arguments);      
+      $command.execute();
+      if(!AppIterator.hasNext()) {
+        clearInterval(play);
+      }
+    }, 1100);
+  } else {
+    $('.play').click(function() {
+      if (!Object.isFrozen(App)) {
+        return false;
+      }
+      var AppIterator = new iterator(App.getRecorded);
+      board.animate();
+      var play;
+      play = setInterval(function() {
+        var next         = AppIterator.next();
+        target           = next.toString.split('.');       
+        var $constructor = command[target[0]][target[1]];
+        var $command     = new $constructor(board, next.arguments);      
+        $command.execute();
+        if(!AppIterator.hasNext()) {
+          clearInterval(play);
+          $('.play').unbind()
+            .addClass('dim');
+        }
+      }, 1100);
+    });
+  }
+};
+},{"../iterate":9,"../events/run":5}],6:[function(require,module,exports){
 module.exports = function(content, width, height, source, top) {
   $block = $('<div class="slider"> <div class="close-slider">x</div> </div>');
   $block.append(content)
@@ -135,18 +209,7 @@ module.exports = function(content, width, height, source, top) {
     });
   });
 };
-},{}],6:[function(require,module,exports){
-module.exports = function() {
-  $(function() {
-    var points = 3;
-    $('#application').on('click', '.more', function() {
-      points++;
-      var more = '<label for="point'+ points + '">Point ' + points + ' (x,y):</label><input type="text" name="point'+ points +'" class="inside" value="0.0,0.0" />';
-      $(this).before(more);
-    });
-  });
-};
-},{}],12:[function(require,module,exports){
+},{}],10:[function(require,module,exports){
 // shim for using process in browser
 
 var process = module.exports = {};
@@ -5679,45 +5742,32 @@ process.chdir = function (dir) {
     }
 }.call(this));
 })(require("__browserify_process"),window)
-},{"__browserify_process":12}],8:[function(require,module,exports){
-module.exports = function(App) {
-  $(function() {
-    $('.button.undo').click(function() {
-      App.undoLastExecute();
-      if(App.length === 0) {
-        $(this).removeClass('visible');
-      }
-    });
-  });
+},{"__browserify_process":10}],9:[function(require,module,exports){
+/* The Iterator */
+
+var Iterator = function(List) {
+  this.step = 0;
+  this.list = List;
 };
-},{}],9:[function(require,module,exports){
-module.exports = function(App) {
-  $(function() {
-    $('.start-record').click(function() {
-      App.startRecording();
-      $(this).html('Recording').addClass('dim');
-      $(this).unbind();
-    });
-    $('.end-record').click(function() {
-      App.stopRecording();
-      $(this)
-        .html('Finished')
-        .addClass('finished')
-        .prev()
-        .html('Start Record');
-      $(this).unbind();
-      Object.freeze(App); // we're done
-      $('.undo').removeClass('visible');
-      $('.reset').show();
-      $('.reset').click(function() {
-        window.location.reload();
-      });
-      $('.clear').hide()
-        .prev().show();
-    });
-  });
+
+Iterator.prototype.hasNext = function() {
+  return this.step < this.list.length;
 };
-},{}],3:[function(require,module,exports){
+
+Iterator.prototype.next    = function() {
+  return this.list[this.step++];
+};
+
+Iterator.prototype.hasPrev = function() {
+  return this.step > 0;
+};
+
+Iterator.prototype.prev    = function() {
+  return this.list[--this.step];
+};
+
+module.exports = Iterator;
+},{}],4:[function(require,module,exports){
 /* The Invoker */
 
 var Operation = function(board) {
@@ -5753,7 +5803,7 @@ Operation.prototype.undoLastExecute = function() {
   require("./decorators/recording")(Operation);
 
 module.exports = Operation;
-},{"./decorators/recording":13}],4:[function(require,module,exports){
+},{"./decorators/recording":11}],5:[function(require,module,exports){
 
 module.exports = {
   draw:      require('./draw'),
@@ -5763,86 +5813,17 @@ module.exports = {
 };
 
 
-},{"./draw":14,"./transform":15,"./zoom":16}],10:[function(require,module,exports){
-var execute = require('../operation');
-
-module.exports = function(App) {
-  $(function() {
-    var board = App.board;
-    $('.button.clear').click(function() {
-      for(point in board.points) {
-        if (board.points.hasOwnProperty(point)) {
-          board.removeObject(board.points[point]);
-          delete board.points[point];
-        }
-      }
-      var size = board.shapes.length;
-      for (var i = 0; i < size; i++) {
-        board.removeObject(board.shapes[i]);
-        board.shapes.splice(i, 1);
-      }
-      board.shapes.splice(0, 1);
-      $('.undo').removeClass('visible');
-      board.zoom100();
-      board.update();
-
-      App.clearCommandList();
-
-      // Reset recording UI
-      require('./record')(App); // reattach record events   
-      $('.start-record').removeClass('dim').html('Start Record');
-      $('.end-record').removeClass('dim').html('End Record');
-    })
-  });
-};
-},{"../operation":3,"./record":9}],11:[function(require,module,exports){
-var iterator = require('../iterate'),
-    command  = require('../events/run');
-
-
+},{"./draw":12,"./transform":13,"./zoom":14}],8:[function(require,module,exports){
 module.exports = function(App, board) {
-
-  var clear = function(board) {
-    for(point in board.points) {
-      if (board.points.hasOwnProperty(point)) {
-        board.removeObject(board.points[point]);
-        delete board.points[point];
-      }
-    }
-    var size = board.shapes.length;
-    for (var i = 0; i < size; i++) {
-      board.removeObject(board.shapes[i]);
-      board.shapes.splice(i, 1);
-    }
-    board.shapes.splice(0, 1);
-    $('.undo').removeClass('visible');
-    board.zoom100();
-    board.update();
-  };
-
-  $('.play').click(function() {
-    if (!Object.isFrozen(App)) {
-      return false;
-    }
-    clear(board);
-    var AppIterator = new iterator(App.getRecorded);
-    board.animate();
-    var play;
-    play = setInterval(function() {
-      var next         = AppIterator.next();
-      target           = next.toString.split('.');       
-      var $constructor = command[target[0]][target[1]];
-      var $command     = new $constructor(board, next.arguments);      
-      $command.execute();
-      if(!AppIterator.hasNext()) {
-        clearInterval(play);
-        $('.play').unbind()
-          .addClass('dim');
-      }
-    }, 1100);
-  });
+  require('./more')  ();           // attach event to "more" button for polygon construction
+  require('./undo')  (App);        // attach event to undo button
+  require('./record')(App);        // attach event to record button
+  require('./clear') (App);        // attach event to clear button
+  require('./play')  (App, board); // attach event to UI play button after recording
+  require('./share') (App)         // attach event to share button
 };
-},{"../iterate":17,"../events/run":4}],13:[function(require,module,exports){
+
+},{"./more":15,"./undo":16,"./record":17,"./clear":18,"./play":3,"./share":19}],11:[function(require,module,exports){
 /*
   OperationDecorator
 */
@@ -5891,7 +5872,7 @@ module.exports = function(Operation) {
   }; 
 };
 
-},{}],16:[function(require,module,exports){
+},{}],14:[function(require,module,exports){
 /* Commands */
 
 /*--
@@ -5947,32 +5928,56 @@ module.exports = {
   zoomOut: zoomOut,
   zoom100: zoom100
 };
+},{}],15:[function(require,module,exports){
+module.exports = function() {
+  $(function() {
+    var points = 3;
+    $('#application').on('click', '.more', function() {
+      points++;
+      var more = '<label for="point'+ points + '">Point ' + points + ' (x,y):</label><input type="text" name="point'+ points +'" class="inside" value="0.0,0.0" />';
+      $(this).before(more);
+    });
+  });
+};
+},{}],16:[function(require,module,exports){
+module.exports = function(App) {
+  $(function() {
+    $('.button.undo').click(function() {
+      App.undoLastExecute();
+      if(App.length === 0) {
+        $(this).removeClass('visible');
+      }
+    });
+  });
+};
 },{}],17:[function(require,module,exports){
-/* The Iterator */
-
-var Iterator = function(List) {
-  this.step = 0;
-  this.list = List;
+module.exports = function(App) {
+  $(function() {
+    $('.start-record').click(function() {
+      App.startRecording();
+      $(this).html('Recording').addClass('dim');
+      $(this).unbind();
+    });
+    $('.end-record').click(function() {
+      App.stopRecording();
+      $(this)
+        .html('Finished')
+        .addClass('finished')
+        .prev()
+        .html('Start Record');
+      $(this).unbind();
+      Object.freeze(App); // we're done
+      $('.undo').removeClass('visible');
+      $('.reset').show();
+      $('.reset').click(function() {
+        window.location.reload();
+      });
+      $('.clear').hide()
+        .prev().show();
+    });
+  });
 };
-
-Iterator.prototype.hasNext = function() {
-  return this.step < this.list.length;
-};
-
-Iterator.prototype.next    = function() {
-  return this.list[this.step++];
-};
-
-Iterator.prototype.hasPrev = function() {
-  return this.step > 0;
-};
-
-Iterator.prototype.prev    = function() {
-  return this.list[--this.step];
-};
-
-module.exports = Iterator;
-},{}],14:[function(require,module,exports){
+},{}],12:[function(require,module,exports){
 var element = require('../board/element'),
     coords  = require('../helper/coords')();
 
@@ -6198,7 +6203,7 @@ module.exports = {
   point: point,
   text: text
 };
-},{"../helper/coords":18,"../board/element":19}],15:[function(require,module,exports){
+},{"../board/element":20,"../helper/coords":21}],13:[function(require,module,exports){
 var transform = require('../board/transform'),
     coords    = require('../helper/coords')();
 
@@ -6218,22 +6223,21 @@ var rotate = function(board, args) {
     degrees: parseInt($('input[name="degrees"]:last').val()),
   },
     usrPoints = this.points = {};  
-  this.orig_args = args;
-  if (typeof arguments[1] === 'undefined') {  
-     this.orig_args = {
-      figure:  $('input[name="figure"]:last').val(),
-      degrees: parseInt($('input[name="degrees"]:last').val()),
-    };
+  var transformArgs = {};
+  for (arg in args) {
+    if (args.hasOwnProperty(arg)) {
+      transformArgs[arg] = args[arg];
+    }
   }
-  args.points    = [];
+  transformArgs.points = [];
 
   board.shapes.forEach(function(shape) {
-    if (shape.name == args.figure) {
-      args.points = shape.usrSetCoords;
+    if (shape.name == transformArgs.figure) {
+      transformArgs.points = shape.usrSetCoords;
     }
   });
-  delete args.figure;
-  this.rotate = new transform(board, "rotate", args);
+  delete transformArgs.figure;
+  this.rotate = new transform(board, "rotate", transformArgs);
   this.remove = function() {
     for (p in this.points) {
       if (this.points.hasOwnProperty(p)) {
@@ -6244,7 +6248,7 @@ var rotate = function(board, args) {
     }
   };
   this.execute = function() {
-    args.points.forEach(function(p) {
+    transformArgs.points.forEach(function(p) {
       Object.defineProperty(usrPoints, p.name, {
         value: [
           board.points[p.name].coords.usrCoords[1],
@@ -6254,7 +6258,7 @@ var rotate = function(board, args) {
       });
     });
     this.rotate.apply();
-    return this.orig_args;
+    return args;
   };
 };
 
@@ -6264,30 +6268,28 @@ var reflect = function(board, args) {
     line:    $('input[name="axis"]:last').val(),
   },
     usrPoints = this.points = {};  
-  this.orig_args = args;
-  if (typeof arguments[1] === 'undefined') {  
-     this.orig_args = {
-      figure:  $('input[name="figure"]:last').val(),
-      line:    $('input[name="axis"]:last').val(),
-    };
+  var transformArgs = {};
+  for (arg in args) {
+    if (args.hasOwnProperty(arg)) {
+      transformArgs[arg] = args[arg];
+    }
   }
-  this.line = args.line;
-  args.points = [];
-
-  if (args.line.toLowerCase() == "x") {
-    args.line = board.axx;
+  this.line = transformArgs.line;
+  transformArgs.points = [];
+  if (transformArgs.line.toLowerCase() == "x") {
+    transformArgs.line = board.axx;
   } else {
-    args.line = board.axy;
+    transformArgs.line = board.axy;
   }
 
   board.shapes.forEach(function(shape) {
-    if (shape.name == args.figure) {
-      args.points = shape.usrSetCoords;
+    if (shape.name == transformArgs.figure) {
+      transformArgs.points = shape.usrSetCoords;
     }
   });
-  delete args.figure;
+  delete transformArgs.figure;
 
-  this.reflect = new transform(board, "reflect", args);
+  this.reflect = new transform(board, "reflect", transformArgs);
   this.remove = function() {
     for (p in this.points) {
       if (this.points.hasOwnProperty(p)) {
@@ -6297,7 +6299,7 @@ var reflect = function(board, args) {
     }
   };
   this.execute = function() {
-    args.points.forEach(function(p) {
+    transformArgs.points.forEach(function(p) {
       Object.defineProperty(usrPoints, p.name, {
         value: [
           board.points[p.name].coords.usrCoords[1],
@@ -6307,7 +6309,7 @@ var reflect = function(board, args) {
       });
     });
     this.reflect.apply();
-    return this.orig_args;
+    return args;
   };
 };
 
@@ -6317,22 +6319,21 @@ var shear = function(board, args) {
     degrees: parseInt($('input[name="degrees"]:last').val()),
   },
     usrPoints = this.points = {};  
-  this.orig_args = args;
-  if (typeof arguments[1] === 'undefined') {  
-     this.orig_args = {
-      figure:  $('input[name="figure"]:last').val(),
-      degrees: parseInt($('input[name="degrees"]:last').val()),
-    };
+  var transformArgs = {};
+  for (arg in args) {
+    if (args.hasOwnProperty(arg)) {
+      transformArgs[arg] = args[arg];
+    }
   }
-  args.points = [];
+  transformArgs.points = [];
 
   board.shapes.forEach(function(shape) {
-    if (shape.name == args.figure) {
-      args.points = shape.usrSetCoords;
+    if (shape.name == transformArgs.figure) {
+      transformArgs.points = shape.usrSetCoords;
     }
   });
-  delete args.figure;
-  this.shear = new transform(board, "shear", args);
+  delete transformArgs.figure;
+  this.shear = new transform(board, "shear", transformArgs);
   this.remove = function() {
     for (p in this.points) {
       if (this.points.hasOwnProperty(p)) {
@@ -6342,7 +6343,7 @@ var shear = function(board, args) {
     }
   };
   this.execute = function() {
-    args.points.forEach(function(p) {
+    transformArgs.points.forEach(function(p) {
       Object.defineProperty(usrPoints, p.name, {
         value: [
           board.points[p.name].coords.usrCoords[1],
@@ -6352,7 +6353,7 @@ var shear = function(board, args) {
       });
     });
     this.shear.apply();
-    return this.orig_args;
+    return args;
   };
 };
 
@@ -6362,22 +6363,21 @@ var translate = function(board, args) {
     values:  $('input[name="values"]:last').coord(),
   },
     usrPoints = this.points = {};  
-  this.orig_args = args;
-  if (typeof arguments[1] === 'undefined') {  
-     this.orig_args = {
-      figure:  $('input[name="figure"]:last').val(),
-      values:  $('input[name="values"]:last').coord(),
-    };
+  var transformArgs = {};
+  for (arg in args) {
+    if (args.hasOwnProperty(arg)) {
+      transformArgs[arg] = args[arg];
+    }
   }
-  args.points = [];
+  transformArgs.points = [];
 
   board.shapes.forEach(function(shape) {
-    if (shape.name == args.figure) {
-      args.points = shape.usrSetCoords;
+    if (shape.name == transformArgs.figure) {
+      transformArgs.points = shape.usrSetCoords;
     }
   });
-  delete args.figure;
-  this.translate = new transform(board, "translate", args);
+  delete transformArgs.figure;
+  this.translate = new transform(board, "translate", transformArgs);
   this.remove    = function() {
     for (p in this.points) {
       if (this.points.hasOwnProperty(p)) {
@@ -6387,7 +6387,7 @@ var translate = function(board, args) {
     }
   };
   this.execute = function() {
-    args.points.forEach(function(p) {
+    transformArgs.points.forEach(function(p) {
       Object.defineProperty(usrPoints, p.name, {
         value: [
           board.points[p.name].coords.usrCoords[1],
@@ -6397,7 +6397,7 @@ var translate = function(board, args) {
       });
     });
     this.translate.apply();
-    return this.orig_args;
+    return args;
   };
 };
 
@@ -6407,22 +6407,21 @@ var scale = function(board, args) {
     values:  $('input[name="values"]:last').coord(),
   },
     usrPoints = this.points = {};  
-  this.orig_args = args;
-  if (typeof arguments[1] === 'undefined') {  
-     this.orig_args = {
-      figure:  $('input[name="figure"]:last').val(),
-      values:  $('input[name="values"]:last').coord(),
-    };
+  var transformArgs = {};
+  for (arg in args) {
+    if (args.hasOwnProperty(arg)) {
+      transformArgs[arg] = args[arg];
+    }
   }
-  args.points = [];
+  transformArgs.points = [];
 
   board.shapes.forEach(function(shape) {
-    if (shape.name == args.figure) {
-      args.points = shape.usrSetCoords;
+    if (shape.name == transformArgs.figure) {
+      transformArgs.points = shape.usrSetCoords;
     }
   });
-  delete args.figure;
-  this.scale = new transform(board, "scale", args);
+  delete transformArgs.figure;
+  this.scale = new transform(board, "scale", transformArgs);
   this.remove    = function() {
     for (p in this.points) {
       if (this.points.hasOwnProperty(p)) {
@@ -6442,7 +6441,7 @@ var scale = function(board, args) {
       });
     });
     this.scale.apply();
-    return this.orig_args;
+    return args
   };
 };
 
@@ -6453,7 +6452,79 @@ module.exports = {
   translate: translate,
   scale:     scale
 };
-},{"../board/transform":20,"../helper/coords":18}],18:[function(require,module,exports){
+},{"../board/transform":22,"../helper/coords":21}],18:[function(require,module,exports){
+var execute = require('../operation');
+
+module.exports = function(App) {
+  $(function() {
+    var board = App.board;
+    $('.button.clear').click(function() {
+      for(point in board.points) {
+        if (board.points.hasOwnProperty(point)) {
+          board.removeObject(board.points[point]);
+          delete board.points[point];
+        }
+      }
+      var size = board.shapes.length;
+      for (var i = 0; i < size; i++) {
+        board.removeObject(board.shapes[i]);
+        board.shapes.splice(i, 1);
+      }
+      board.shapes.splice(0, 1);
+      $('.undo').removeClass('visible');
+      board.zoom100();
+      board.update();
+
+      App.clearCommandList();
+
+      // Reset recording UI
+      require('./record')(App); // reattach record events   
+      $('.start-record').removeClass('dim').html('Start Record');
+      $('.end-record').removeClass('dim').html('End Record');
+    })
+  });
+};
+},{"../operation":4,"./record":17}],19:[function(require,module,exports){
+var slider = require('./slider');
+
+module.exports = function(App) {
+  $(function() {
+    $('.share').click(function() {
+      if (Object.isFrozen(App)) {
+        var done;
+        slider($(this).next().html(), 230, 'auto', '#application', $('#transform')); 
+        $('#application').on('click', '.submit', function() {
+          var $paste = App.getRecorded.map(function(e) {
+            delete e.command; // we no longer need constructors
+            return e;
+          });
+          var data   = {
+            title: $('input.title:last').val(),
+            paste: $paste
+          };
+          console.log(data);
+          $('.close-slider').click();
+          $.ajax({
+            url: '/paste',
+            type: 'POST',
+            data: JSON.stringify(data),
+            contentType: "application/json",
+            complete: function(token) {
+              var $html = ['<div class="misc-done">',
+                '<label for="url">The URL!</label><input type="text" name="url" class="inside url" value="',
+                document.location.href + token.responseJSON.token,
+                '" />',
+                '</div>'
+              ].join('');
+              slider($html, 250, 'auto', '#application', $('#transform'));
+            }
+          });
+        });
+      }
+    })
+  });
+}
+},{"./slider":6}],21:[function(require,module,exports){
 module.exports = function() {
   jQuery.fn.coord = function() {
     if (this.val()) {
@@ -6467,7 +6538,7 @@ module.exports = function() {
   };
 };
 
-},{}],20:[function(require,module,exports){
+},{}],22:[function(require,module,exports){
 /*
   BoardTransform Factory
   */
@@ -6609,7 +6680,7 @@ BoardTransform.prototype = (function() {
 })();
 
 module.exports = BoardTransform;
-},{}],19:[function(require,module,exports){
+},{}],20:[function(require,module,exports){
 var point = require('./point'),
     shape = require('./shape')
 
@@ -6863,7 +6934,7 @@ BoardElement.prototype = (function() {
 })();
 
 module.exports = BoardElement; 
-},{"./point":21,"./shape":22}],21:[function(require,module,exports){
+},{"./point":23,"./shape":24}],23:[function(require,module,exports){
 var Point = function(board, coords) {
   this.board  = board;
   this.coords = coords;
@@ -6904,7 +6975,7 @@ Point.prototype = (function() {
 })();
 
 module.exports = Point;
-},{}],22:[function(require,module,exports){
+},{}],24:[function(require,module,exports){
 var Shape = function(board, shape, parents, options) {
   this.board   = board;
   this.shape   = shape;

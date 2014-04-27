@@ -6,7 +6,7 @@ var PastesSchema = new Schema({
   title:    String,
   user:     {type: String, default: 'anonymous'},
   paste:    [{
-    arguments: [String],
+    arguments: Schema.Types.Mixed,
     toString:  String
   }]
 });

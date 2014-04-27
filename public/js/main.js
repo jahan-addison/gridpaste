@@ -2,13 +2,15 @@ $(function() {
   'use strict';
   var board;
   (function() {
+    var $paste = $('#application').hasClass('paste');
+    var xx = $paste ? 120 : 100,
+        yy = $paste ? 60  : 55;   
     /* Board Options */
     JXG.Options.angle.orthoType = "root";
     JXG.Options.angle.radius    = 25;
     JXG.Options.elements.fixed  = true;
-    
-    board        = JXG.JSXGraph.initBoard('grid', {
-      boundingbox:     [-100,60,100,-60],
+    board  = JXG.JSXGraph.initBoard('grid', {
+      boundingbox:     [-xx,yy,xx,-yy],
       keepaspectratio: true,
       showCopyright:   false,
       showNavigation:  false 
@@ -20,8 +22,20 @@ $(function() {
      
     board.unsuspendUpdate();    
   })();
-
-  /* Subscribe to application */
-  var App  = require('./subscribe')(board);
-
+  if (!$('#application').hasClass('paste')) {
+    /* Subscribe to application */
+    var App  = require('./subscribe')(board);
+  } else {
+    /* Play Paste */
+    require('./helper/play')($AppPaste, board);
+    $('.play').click();
+    // Replay
+    $('.replay').click(function() {
+      require('./helper/play')($AppPaste, board);
+    });
+    // Start new
+    $('.new').click(function() {
+      window.location.href = '/';
+    });
+  }
 }); 

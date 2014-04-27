@@ -1,7 +1,6 @@
 var execute         = require('./operation'),
     command         = require('./events/run'),
     slider          = require('./helper/slider'),
-    more            = require('./helper/more')(),
     Rx              = require('../components/rxjs/rx.lite').Rx;
 
 module.exports = function(board) {
@@ -32,10 +31,8 @@ module.exports = function(board) {
 
   var operationExec          = new execute(board);
 
-  require('./helper/undo')  (operationExec); // attach event to UI undo button
-  require('./helper/record')(operationExec); // attach event to UI record button
-  require('./helper/clear') (operationExec); // attach event to UI clear button
-  require('./helper/play')  (operationExec, board);
+  require('./helper/helpers')(operationExec, board); // varies UI helpers
+
   var $operationSubscription = $operationSource.subscribe(function(e) {
     console.log("Executing operation");
     var target    = $(e.target).parent().attr('class').split('-');

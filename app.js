@@ -35,7 +35,7 @@ if ('development' == app.get('env')) {
 app.get('/',          routes.index);
 app.get('/:id',       routes.show);
 app.post('/register', user.register);
-app.post('/paste',    paste.action)
+app.post('/paste',    paste.action);
 
 Sequelize
   .sequelize

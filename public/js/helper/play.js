@@ -21,26 +21,42 @@ module.exports = function(App, board) {
     board.zoom100();
     board.update();
   };
-
-  $('.play').click(function() {
-    if (!Object.isFrozen(App)) {
-      return false;
-    }
-    clear(board);
-    var AppIterator = new iterator(App.getRecorded);
+  clear(board);
+  if ($('#application').hasClass('paste')) {
+    var AppIterator = new iterator($AppPaste);
     board.animate();
     var play;
     play = setInterval(function() {
       var next         = AppIterator.next();
+      console.log(next);
       target           = next.toString.split('.');       
       var $constructor = command[target[0]][target[1]];
       var $command     = new $constructor(board, next.arguments);      
       $command.execute();
       if(!AppIterator.hasNext()) {
         clearInterval(play);
-        $('.play').unbind()
-          .addClass('dim');
       }
     }, 1100);
-  });
+  } else {
+    $('.play').click(function() {
+      if (!Object.isFrozen(App)) {
+        return false;
+      }
+      var AppIterator = new iterator(App.getRecorded);
+      board.animate();
+      var play;
+      play = setInterval(function() {
+        var next         = AppIterator.next();
+        target           = next.toString.split('.');       
+        var $constructor = command[target[0]][target[1]];
+        var $command     = new $constructor(board, next.arguments);      
+        $command.execute();
+        if(!AppIterator.hasNext()) {
+          clearInterval(play);
+          $('.play').unbind()
+            .addClass('dim');
+        }
+      }, 1100);
+    });
+  }
 };

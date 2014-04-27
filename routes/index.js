@@ -14,7 +14,13 @@ exports.index = function(req, res){
  var Paste = require ('../environment/pastes/pastes');
 
 exports.show = function(req, res) {
-  Paste.findOne({id: req.params.id}, function(error, paste) {
-    res.send(paste);
-      });
+  Paste.findOne({id: req.params.id}, {_id:0}, function(error, paste) {
+    if (!paste) {
+      // todo: better page
+      res.send(500, "Paste ID does not exist!");
+    } else {
+     res.render('show.html', { env: req.env, paste: paste });
+      //res.send(paste);
+    }
+  });
 };

@@ -208,6 +208,10 @@ h2 {
   width:95%;
 }
 
+#new {
+  @include clearfix();
+  margin-bottom:-7px;
+}
 #bottom {
   border-top: rgba($light-brown, .45) 1px dashed;
   width:95%;
@@ -218,8 +222,16 @@ h2 {
   @include clearfix();
 }
 
+.url {
+  width:200px;
+}
+
 #left-bar {
   header img {
+    .paste & {
+      width:140px;
+      height:80px;
+    }
     width:195px;
     height:96px;
   }
@@ -227,6 +239,9 @@ h2 {
   header p {
     width:95%;
     margin:0 auto;
+  }
+  .paste & {
+    width:160px;
   }
   width: 259px;
   height:100%;
@@ -258,6 +273,9 @@ h2 {
 }
 
 #grid {
+  .paste & {
+    width: calc(100% - 160px);    
+  }
   width: calc(100% - 259px);
   height:100%;
 }
