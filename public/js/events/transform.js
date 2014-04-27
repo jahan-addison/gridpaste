@@ -225,7 +225,7 @@ var scale = function(board, args) {
     }
   };
   this.execute = function() {
-    args.points.forEach(function(p) {
+    transformArgs.points.forEach(function(p) {
       Object.defineProperty(usrPoints, p.name, {
         value: [
           board.points[p.name].coords.usrCoords[1],
