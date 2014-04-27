@@ -39,7 +39,7 @@ app.post('/paste',    paste.action)
 
 Sequelize
   .sequelize
-  .sync({ force: true })
+  .sync({ force: false })
   .complete(function(err) {
     if (err) {
       throw err

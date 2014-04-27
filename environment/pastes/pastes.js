@@ -3,9 +3,10 @@ var mongoose = require('mongoose'),
 
 var PastesSchema = new Schema({
   id:       String,
-  user:     {type: String, default: 'Anon'},
+  title:    String,
+  user:     {type: String, default: 'anonymous'},
   paste:    [{
-    arguments: String,
+    arguments: [String],
     toString:  String
   }]
 });

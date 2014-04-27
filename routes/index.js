@@ -15,6 +15,6 @@ exports.index = function(req, res){
 
 exports.show = function(req, res) {
   Paste.findOne({id: req.params.id}, function(error, paste) {
-        res.render('index.html', {paste: paste.paste});
+    res.send(paste);
       });
 };

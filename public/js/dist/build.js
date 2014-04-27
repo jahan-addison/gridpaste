@@ -146,17 +146,6 @@ module.exports = function() {
     });
   });
 };
-},{}],8:[function(require,module,exports){
-module.exports = function(App) {
-  $(function() {
-    $('.button.undo').click(function() {
-      App.undoLastExecute();
-      if(App.length === 0) {
-        $(this).removeClass('visible');
-      }
-    });
-  });
-};
 },{}],12:[function(require,module,exports){
 // shim for using process in browser
 
@@ -5690,7 +5679,18 @@ process.chdir = function (dir) {
     }
 }.call(this));
 })(require("__browserify_process"),window)
-},{"__browserify_process":12}],9:[function(require,module,exports){
+},{"__browserify_process":12}],8:[function(require,module,exports){
+module.exports = function(App) {
+  $(function() {
+    $('.button.undo').click(function() {
+      App.undoLastExecute();
+      if(App.length === 0) {
+        $(this).removeClass('visible');
+      }
+    });
+  });
+};
+},{}],9:[function(require,module,exports){
 module.exports = function(App) {
   $(function() {
     $('.start-record').click(function() {
@@ -6198,7 +6198,7 @@ module.exports = {
   point: point,
   text: text
 };
-},{"../board/element":18,"../helper/coords":19}],15:[function(require,module,exports){
+},{"../helper/coords":18,"../board/element":19}],15:[function(require,module,exports){
 var transform = require('../board/transform'),
     coords    = require('../helper/coords')();
 
@@ -6453,7 +6453,7 @@ module.exports = {
   translate: translate,
   scale:     scale
 };
-},{"../helper/coords":19,"../board/transform":20}],19:[function(require,module,exports){
+},{"../board/transform":20,"../helper/coords":18}],18:[function(require,module,exports){
 module.exports = function() {
   jQuery.fn.coord = function() {
     if (this.val()) {
@@ -6609,7 +6609,7 @@ BoardTransform.prototype = (function() {
 })();
 
 module.exports = BoardTransform;
-},{}],18:[function(require,module,exports){
+},{}],19:[function(require,module,exports){
 var point = require('./point'),
     shape = require('./shape')
 
