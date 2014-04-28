@@ -85,14 +85,3 @@
     },
   }
  })();
-
-var lexer = new Lexer("curve ( 10.555 , 5 ) ");
-console.log(lexer.getNextToken());
-console.log(lexer.scanner);
-console.log(lexer.getNextToken());
-console.log(lexer.getNextToken());
-console.log(lexer.scanner);
-console.log(lexer.getNextToken());
-console.log(lexer.getNextToken());
-console.log(lexer.scanner);
-console.log(lexer.current_token);
