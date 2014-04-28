@@ -18,7 +18,9 @@
     T_CLOSE_PAREN: 6,
     T_COMMA:       7,
     T_IDENTIFIER:  8,
-    T_EOL:         9
+    T_EQUAL:       9,
+    T_LABEL:       10,
+    T_EOL:         11
   });
   var skipWhitespace = function() {
     while(/[\s\t\n]/.test(this.expr[this.pointer])) {
@@ -26,6 +28,8 @@
     }
   }
   return {
+    Constructor: Lexer,
+    // @todo: refactor with indexOf
     getNextToken: function() {
       skipWhitespace.call(this);
       this.scanner = undefined;
@@ -53,10 +57,23 @@
         this.pointer++;
         return this.current_token = tokens.T_COMMA;
       }
+      // T_EQUAL
+      if (/\=/.test(this.expr[this.pointer])) {
+        this.pointer++;
+        return this.current_token = tokens.T_EQUAL;
+      }
       // T_LETTER
       if (/[A-Z]/.test(this.expr[this.pointer])) {
+        var token;
         this.scanner = this.expr[this.pointer];
         this.pointer++;
+        if (/[0-9]/.test(this.expr[this.pointer])) {
+          // T_LABEL
+          while(/[0-9]/.test(this.expr[this.pointer])) {
+            this.scanner += this.expr[this.pointer];
+            this.pointer++;
+          }                  
+        }
         return this.current_token = tokens.T_LETTER;
       }
       // T_INTEGER
@@ -81,6 +98,7 @@
       if (this.pointer === this.expr.length) {
         return this.current_token = tokens.T_EOL;
       }
+      // T_UNKNOWN
       return this.current_token = tokens.T_UNKNOWN;
     },
   }
