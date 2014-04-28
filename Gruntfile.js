@@ -23,8 +23,8 @@ module.exports = function (grunt) {
     },
     browserify2: {
       compile: {
-        entry: './public/js/main.js',
-        compile: './public/js/dist/build.js',
+        entry: './public/app/main.js',
+        compile: './public/app/dist/build.js',
         beforeHook: function(bundle) {
           shim(bundle, {
             RxJS: {
@@ -54,7 +54,7 @@ module.exports = function (grunt) {
         tasks: ['develop', 'delayed-livereload']
       },
       js: {
-        files: ['public/js/**/*.js', './Gruntfile.js'],
+        files: ['public/app/**/*.js', './Gruntfile.js'],
         options: {
           livereload: reloadPort
         }
@@ -67,7 +67,7 @@ module.exports = function (grunt) {
         }
       },
       browserify: {
-        files: ['public/js/**/*.js'],
+        files: ['public/app/**/*.js'],
         tasks: ['browserify2:compile'],
         options: {
           livereload: reloadPort

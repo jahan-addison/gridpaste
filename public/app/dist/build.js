@@ -120,7 +120,7 @@ module.exports = function(board) {
   return operationExec;
 };
 
-},{"./operation":4,"./events/run":5,"../components/rxjs/rx.lite":6,"./helper/slider":7,"./helper/helpers":8}],3:[function(require,module,exports){
+},{"./operation":4,"./events/run":5,"./helper/slider":6,"../components/rxjs/rx.lite":7,"./helper/helpers":8}],3:[function(require,module,exports){
 var iterator = require('../iterate'),
     command  = require('../events/run');
 
@@ -184,7 +184,33 @@ module.exports = function(App, board) {
     });
   }
 };
-},{"../iterate":9,"../events/run":5}],10:[function(require,module,exports){
+},{"../iterate":9,"../events/run":5}],6:[function(require,module,exports){
+module.exports = function(content, width, height, source, top) {
+  $block = $('<div class="slider"> <div class="close-slider">x</div> </div>');
+  $block.append(content)
+    .appendTo(source || 'body')
+    .css({
+      width:  width  || 230,
+      height: height || 200,
+      position: 'absolute',
+      top: top.offset().top  || $('#elements').offset().top,
+      left: -width   || -230
+    })
+  $block.animate({
+    left: 0
+  }, 320);
+  $('.close-slider').click(function() {
+    $(this).parent()
+      .find('*')
+      .unbind('click');
+    $block.animate({
+      left: -width || -230
+    }, 320, function() {
+      $(this).remove();
+    });
+  });
+};
+},{}],10:[function(require,module,exports){
 // shim for using process in browser
 
 var process = module.exports = {};
@@ -239,7 +265,7 @@ process.chdir = function (dir) {
     throw new Error('process.chdir is not supported');
 };
 
-},{}],6:[function(require,module,exports){
+},{}],7:[function(require,module,exports){
 (function(process,global){// Copyright (c) Microsoft Open Technologies, Inc. All rights reserved. See License.txt in the project root for license information.
 
 ;(function (undefined) {
@@ -5717,33 +5743,7 @@ process.chdir = function (dir) {
     }
 }.call(this));
 })(require("__browserify_process"),window)
-},{"__browserify_process":10}],7:[function(require,module,exports){
-module.exports = function(content, width, height, source, top) {
-  $block = $('<div class="slider"> <div class="close-slider">x</div> </div>');
-  $block.append(content)
-    .appendTo(source || 'body')
-    .css({
-      width:  width  || 230,
-      height: height || 200,
-      position: 'absolute',
-      top: top.offset().top  || $('#elements').offset().top,
-      left: -width   || -230
-    })
-  $block.animate({
-    left: 0
-  }, 320);
-  $('.close-slider').click(function() {
-    $(this).parent()
-      .find('*')
-      .unbind('click');
-    $block.animate({
-      left: -width || -230
-    }, 320, function() {
-      $(this).remove();
-    });
-  });
-};
-},{}],9:[function(require,module,exports){
+},{"__browserify_process":10}],9:[function(require,module,exports){
 /* The Iterator */
 
 var Iterator = function(List) {
@@ -6432,7 +6432,7 @@ var scale = function(board, args) {
     }
   };
   this.execute = function() {
-    args.points.forEach(function(p) {
+    transformArgs.points.forEach(function(p) {
       Object.defineProperty(usrPoints, p.name, {
         value: [
           board.points[p.name].coords.usrCoords[1],
@@ -6524,7 +6524,7 @@ module.exports = function(App) {
     })
   });
 }
-},{"./slider":7}],21:[function(require,module,exports){
+},{"./slider":6}],21:[function(require,module,exports){
 module.exports = function() {
   jQuery.fn.coord = function() {
     if (this.val()) {
