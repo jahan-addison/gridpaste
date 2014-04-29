@@ -5,10 +5,17 @@
  var Lexer = function(expr) {
   this.current_token;
   this.expr    = expr;
-  this.pointer = 0;
-  this.scanner;
- };
- Lexer.prototype = (function() {
+  this._pointer = 0;
+  this._scanner;
+  Object.defineProperty(this, "scanner", {
+    get: function() { return this._scanner; }
+  });
+  Object.defineProperty(this, "pointer", {
+    get: function() { return this._pointer; }
+  });
+};
+
+Lexer.prototype = (function() {
   var tokens = Object.freeze({
     T_UNKNOWN:     1,
     T_INTEGER:     2,
@@ -23,83 +30,83 @@
     T_EOL:         11
   });
   var skipWhitespace = function() {
-    while(/[\s\t\n]/.test(this.expr[this.pointer])) {
-      this.pointer++;
+    while(/[\s\t\n]/.test(this.expr[this._pointer])) {
+      this._pointer++;
     }
   }
   return {
     Constructor: Lexer,
-    // @todo: refactor with indexOf
     getNextToken: function() {
       skipWhitespace.call(this);
-      this.scanner = undefined;
+      this._scanner = undefined;
+      // T_EOL
+      if (this._pointer >= this.expr.length) {
+        return this.current_token = tokens.T_EOL;
+      }
       // T_IDENTIFIER
-      if (/[a-z]/.test(this.expr[this.pointer])) {
-        this.scanner = '';
-        while(/[a-z]/.test(this.expr[this.pointer])) {
-          this.scanner += this.expr[this.pointer];
-          this.pointer++;
+      if (/[a-z]/.test(this.expr[this._pointer])) {
+        this._scanner = '';
+        while(/[a-z]/.test(this.expr[this._pointer])) {
+          this._scanner += this.expr[this._pointer];
+          this._pointer++;
         }
         return this.current_token = tokens.T_IDENTIFIER;
       }
       // T_OPEN_PAREN
-      if (/\(/.test(this.expr[this.pointer])) {
-        this.pointer++;
+      if (/\(/.test(this.expr[this._pointer])) {
+        this._pointer++;
         return this.current_token = tokens.T_OPEN_PAREN;
       }
       // T_CLOSE_PAREN
-      if (/\)/.test(this.expr[this.pointer])) {
-        this.pointer++;
+      if (/\)/.test(this.expr[this._pointer])) {
+        this._pointer++;
         return this.current_token = tokens.T_CLOSE_PAREN;
       }
       // T_COMMA
-      if (/,/.test(this.expr[this.pointer])) {
-        this.pointer++;
+      if (/,/.test(this.expr[this._pointer])) {
+        this._pointer++;
         return this.current_token = tokens.T_COMMA;
       }
       // T_EQUAL
-      if (/\=/.test(this.expr[this.pointer])) {
-        this.pointer++;
+      if (/\=/.test(this.expr[this._pointer])) {
+        this._pointer++;
         return this.current_token = tokens.T_EQUAL;
       }
       // T_LETTER
-      if (/[A-Z]/.test(this.expr[this.pointer])) {
+      if (/[A-Z]/.test(this.expr[this._pointer])) {
         var token;
-        this.scanner = this.expr[this.pointer];
-        this.pointer++;
-        if (/[0-9]/.test(this.expr[this.pointer])) {
+        this._scanner = this.expr[this._pointer];
+        this._pointer++;
+        if (/[0-9]/.test(this.expr[this._pointer])) {
           // T_LABEL
-          while(/[0-9]/.test(this.expr[this.pointer])) {
-            this.scanner += this.expr[this.pointer];
-            this.pointer++;
+          while(/[0-9]/.test(this.expr[this._pointer])) {
+            token = tokens.T_LABEL;
+            this._scanner += this.expr[this._pointer];
+            this._pointer++;
           }                  
         }
-        return this.current_token = tokens.T_LETTER;
+        return this.current_token = (token || tokens.T_LETTER);
       }
       // T_INTEGER
-      if (/[0-9]/.test(this.expr[this.pointer])) {
-        this.scanner = '';
+      if (/[0-9]/.test(this.expr[this._pointer])) {
+        this._scanner = '';
         var token;
-        while(/[0-9]/.test(this.expr[this.pointer])) {
-          this.scanner += this.expr[this.pointer];
-          this.pointer++;
+        while(/[0-9]/.test(this.expr[this._pointer])) {
+          this._scanner += this.expr[this._pointer];
+          this._pointer++;
             // T_FLOAT
-          if (this.expr[this.pointer] === '.') {
+          if (this.expr[this._pointer] === '.') {
             if (token) {
               return this.current_token = tokens.T_UNKNOWN;
             }
-            this.scanner       += this.expr[this.pointer++];
+            this._scanner       += this.expr[this._pointer++];
             this.current_token  = token = tokens.T_FLOAT;
           }
         }
         return this.current_token = (token || tokens.T_INTEGER);
       }
-      // T_EOL
-      if (this.pointer === this.expr.length) {
-        return this.current_token = tokens.T_EOL;
-      }
       // T_UNKNOWN
       return this.current_token = tokens.T_UNKNOWN;
     },
-  }
- })();
+  };
+})();

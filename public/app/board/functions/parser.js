@@ -2,12 +2,23 @@
  * Geometry Function Parser
  */
 
-var lexer = require('./lexer');
-
 var Parser = function(expr) {
-  this.llex       = new lexer(expr);
+  this.llex       = new Lexer(expr);
   this._arguments = [];
   this._identifier;
+  Object.defineProperty(this, "arguments", {
+    get: function() { return this._arguments; }
+  });
+  Object.defineProperty(this, "identifier", {
+    get: function() { return this._identifier; }
+  });
+  Object.defineProperty(this, "object", {
+    get: function() {return {
+        'identifier': this._identifier, 
+        'arguments':  this._arguments
+      };
+    }
+  });
 };
 
 Parser.prototype = (function() {
@@ -26,63 +37,67 @@ Parser.prototype = (function() {
   });
 
   var token_strings = Object.freeze({
-    tokens.T_UNKNOWN:     "T_UNKNOWN",
-    tokens.T_INTEGER:     "T_INTEGER",
-    tokens.T_FLOAT:       "T_FLOAT",
-    tokens.T_LETTER:      "T_LETTER",
-    tokens.T_OPEN_PAREN:  "T_OPEN_PAREN",
-    tokens.T_CLOSE_PAREN: "T_CLOSE_PAREN",
-    tokens.T_COMMA:       "T_COMMA",
-    tokens.T_IDENTIFIER:  "T_IDENTIFIER",
-    tokens.T_EQUAL:       "T_EQUAL",
-    tokens.T_LABEL:       "T_LABEL",
-    tokens.T_EOL:         "T_EOL"
+    1:     "T_UNKNOWN",
+    2:     "T_INTEGER",
+    3:       "T_FLOAT",
+    4:      "T_LETTER",
+    5:  "T_OPEN_PAREN",
+    6: "T_CLOSE_PAREN",
+    7:       "T_COMMA",
+    8:  "T_IDENTIFIER",
+    9:       "T_EQUAL",
+    10:      "T_LABEL",
+    11:        "T_EOL"
   });
 
-  var t_error(token, expected) {
+  var t_error = function(token, expected) {
+    if (expected instanceof Array) {
+      expected = expected[0];
+    }
     var msg = ["Unexpected token: ",
       token_strings[token],
       ", expected ",
       token_strings[expected]
     ].join('');
     throw new Error(msg);
-  }
+  };
 
   var accept  = function(t) {
     this.llex.getNextToken();
     if (t instanceof Array) {
-      var isIn = false;
+      var isIn = false, lex  = this.llex;
       t.forEach(function(e) {
-        if (e == this.llex.current_token) {
-          isIn = true;
+        if (e == lex.current_token) {
+          isIn  = true;
         }
       });
       if (!isIn) {
         t_error(this.llex.current_token, t);
+        return false;
       }
-    }
-    if (this.llex.current_token !== t) {
+    } else if (this.llex.current_token !== t) {
         t_error(this.llex.current_token, t);
+        return false;
     }
-    return true;
+    return this.llex.current_token;
   };
-
+    
   return {
     Constructor: Parser,
-    parse: function() {
-      accept.call(this, [T_LABEL, T_EQUAL]);
-      if (!this.llex.current_token == T_LABEL) {
-        accept.call(this, T_LABEL);
+    run: function() {
+      if (this.llex.expr[this.llex.pointer] == '=') {
+        accept.call(this, tokens.T_EQUAL);
       }
+      accept.call(this, tokens.T_IDENTIFIER);
       this._identifier = this.llex.scanner;
-      accept.call(this, T_OPEN_PAREN);
-      while(this.llex.current_token !== T_CLOSE_PAREN) {
-        accept.call(this, [T_LABEL, T_LETTER, T_INTEGER, T_FLOAT]);
-        this._arguments.push(this.llex.scanner);
-        accept.call(this, T_COMMA);                
-      }
-      accept.call(this, T_CLOSE_PAREN);
-    }
-  }
+      accept.call(this, tokens.T_OPEN_PAREN);
+      var token;
+      do {
+        token = accept.call(this, [tokens.T_LABEL, tokens.T_LETTER, tokens.T_INTEGER, tokens.T_FLOAT]);
+        this._arguments.push({argument: this.llex.scanner, type: token_strings[token]});
+      } while(accept.call(this, [tokens.T_COMMA, tokens.T_CLOSE_PAREN]) == tokens.T_COMMA);
 
+      accept.call(this, tokens.T_EOL);
+    }
+  };
 })();
