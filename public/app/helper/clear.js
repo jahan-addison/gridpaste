@@ -13,9 +13,8 @@ module.exports = function(App) {
       var size = board.shapes.length;
       for (var i = 0; i < size; i++) {
         board.removeObject(board.shapes[i]);
-        board.shapes.splice(i, 1);
       }
-      board.shapes.splice(0, 1);
+      board.shapes = [];
       $('.undo').removeClass('visible');
       board.zoom100();
       board.update();

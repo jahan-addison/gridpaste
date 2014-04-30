@@ -3,7 +3,12 @@ var iterator = require('../iterate'),
 
 
 module.exports = function(App, board) {
-
+  if (board.playing) {
+    return false;
+  }
+  if (typeof board.playing === 'undefined') {
+    board.playing = true;
+  }
   var clear = function(board) {
     for(point in board.points) {
       if (board.points.hasOwnProperty(point)) {
@@ -14,10 +19,8 @@ module.exports = function(App, board) {
     var size = board.shapes.length;
     for (var i = 0; i < size; i++) {
       board.removeObject(board.shapes[i]);
-      board.shapes.splice(i, 1);
     }
-    board.removeObject(board.shapes[0]);
-    board.shapes.splice(0, 1);
+    board.shapes = [];
     $('.undo').removeClass('visible');
     board.zoom100();
     board.update();
@@ -35,6 +38,7 @@ module.exports = function(App, board) {
       $command.execute();
       if(!AppIterator.hasNext()) {
         clearInterval(play);
+        board.playing = undefined;
       }
     }, 1100);
   } else {
@@ -54,6 +58,7 @@ module.exports = function(App, board) {
         $command.execute();
         if(!AppIterator.hasNext()) {
           clearInterval(play);
+          board.playing = undefined;
           $('.play').unbind()
             .addClass('dim');
         }
