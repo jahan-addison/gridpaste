@@ -21,7 +21,8 @@ Point.prototype = (function() {
   return {
     Constructor: Point,
     add: function() {
-      var point = getPointIfExists.call(this);
+      //var point = getPointIfExists.call(this);
+      var point = false;
       if (!point) {
         var p = this.board.create("point", this.coords);
         Object.defineProperty(this.board.points, p.name, 
