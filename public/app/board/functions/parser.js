@@ -1,3 +1,5 @@
+var Lexer = require('./lexer');
+
 /*
  * Geometry Function Parser
  */
@@ -37,17 +39,17 @@ Parser.prototype = (function() {
   });
 
   var token_strings = Object.freeze({
-    1:     "T_UNKNOWN",
-    2:     "T_INTEGER",
-    3:       "T_FLOAT",
-    4:      "T_LETTER",
-    5:  "T_OPEN_PAREN",
-    6: "T_CLOSE_PAREN",
-    7:       "T_COMMA",
-    8:  "T_IDENTIFIER",
-    9:       "T_EQUAL",
-    10:      "T_LABEL",
-    11:        "T_EOL"
+    1:   "T_UNKNOWN",
+    2:     "integer",
+    3:       "float",
+    4:      "letter",
+    5:           "(",
+    6:           ")",
+    7:           ",",
+    8:  "identifier",
+    9:           "=",
+    10:      "label",
+    11:        "EOL"
   });
 
   var t_error = function(token, expected) {
@@ -101,3 +103,5 @@ Parser.prototype = (function() {
     }
   };
 })();
+
+module.exports = Parser;

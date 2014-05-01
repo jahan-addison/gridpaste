@@ -46,7 +46,8 @@ Lexer.prototype = (function() {
       // T_IDENTIFIER
       if (/[a-z]/.test(this.expr[this._pointer])) {
         this._scanner = '';
-        while(/[a-z]/.test(this.expr[this._pointer])) {
+        while(/[a-z]/.test(this.expr[this._pointer]) &&
+          !(this._pointer >= this.expr.length)) {
           this._scanner += this.expr[this._pointer];
           this._pointer++;
         }
@@ -79,7 +80,8 @@ Lexer.prototype = (function() {
         this._pointer++;
         if (/[0-9]/.test(this.expr[this._pointer])) {
           // T_LABEL
-          while(/[0-9]/.test(this.expr[this._pointer])) {
+          while(/[0-9]/.test(this.expr[this._pointer]) &&
+          !(this._pointer >= this.expr.length)) {
             token = tokens.T_LABEL;
             this._scanner += this.expr[this._pointer];
             this._pointer++;
@@ -91,7 +93,8 @@ Lexer.prototype = (function() {
       if (/[0-9]/.test(this.expr[this._pointer])) {
         this._scanner = '';
         var token;
-        while(/[0-9]/.test(this.expr[this._pointer])) {
+        while(/[0-9]/.test(this.expr[this._pointer]) &&
+          !(this._pointer >= this.expr.length)) {
           this._scanner += this.expr[this._pointer];
           this._pointer++;
             // T_FLOAT
@@ -110,3 +113,5 @@ Lexer.prototype = (function() {
     },
   };
 })();
+
+module.exports = Lexer;

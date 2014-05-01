@@ -30,117 +30,62 @@ $(function() {
     /* Play Paste */
     require('./helper/play')($AppPaste, board);
     $('.play').click();
-    // Replay
+    // Replay button
     $('.replay').click(function() {
       require('./helper/play')($AppPaste, board);
     });
-    // Start new
+    // Start new button
     $('.new').click(function() {
       window.location.href = '/';
     });
   }
 }); 
 },{"./subscribe":2,"./helper/play":3}],2:[function(require,module,exports){
-var execute         = require('./operation'),
-    command         = require('./events/run'),
-    slider          = require('./helper/slider'),
-    Rx              = require('../components/rxjs/rx.lite').Rx;
+var execute    = require('./operation');
 
 module.exports = function(board) {
 
-  var $querySources  = $([
-    '.circle',   '  .angle',   '.arc',
-    '.ellipse',    '.segment', '.line',
-     '.polygon',   '.point',   '.text',
-     '.rotate',    '.reflect', '.shear',
-     '.translate', '.scale'
-  ].join(','));
+  // The application request object
+  var operationExec = new execute(board);
 
-  var $querySource       = Rx.Observable.fromEvent($querySources, 'click');
-  var $querySubscription = $querySource.subscribe(function(e) {
-    var target = $(e.target);
-    if (!$('.slider').length) {
-      console.log("Querying operation");
+  require('./helper/helpers')(operationExec); // various UI helpers
 
-      slider(target.next().html(), 230, 'auto', '#application', target.parent().parent()); 
-    }
-  }); 
 
-  var $operationSources      = '.button.draw, .button.transform';
-  var $operationSource       = Rx.Observable.fromEventPattern(
-    function addHandler(h) { $('#application').on('click', $operationSources, h) },  
-    function delHandler(h) { $('#application').off('click', $operationSources, h) }  
-  );
 
-  var operationExec          = new execute(board);
+  require('./subscriptions/board')    (operationExec); /* Board subscription */
 
-  require('./helper/helpers')(operationExec, board); // varies UI helpers
+  require('./subscriptions/function') (operationExec); /* Function subscription */
 
-  var $operationSubscription = $operationSource.subscribe(function(e) {
-    console.log("Executing operation");
-    var target    = $(e.target).parent().attr('class').split('-');
-    var targetOperation = target[0],
-        targetCommand   = target[1];
-    var $command  = {
-      'targetOperation': targetOperation,
-      'targetCommand':   targetCommand,
-      'command':         command[targetOperation][targetCommand]
-    };
-    operationExec.storeAndExecute($command);
-    if (operationExec.length > 0) {
-      $('.button.undo').addClass('visible');
-    }
-    $('.close-slider').click();
-  },
-    function(e) {
-      console.log("Error: %s", e.message);
-    }
-  ); 
+  require('./subscriptions/zoom')     (operationExec); /* Zoom subscription */
 
-  var $zoomSources      = $('.zoom.in, .zoom.out');
-  var $zoomSource       = Rx.Observable.fromEvent($zoomSources, "click");
-
-  var $zoomSubscription = $zoomSource.subscribe(function(e) {
-    var target          = $(e.target),
-        targetCommand = target.hasClass('in') ? 'zoomIn' : 'zoomOut'; 
-    if ((targetCommand == 'zoomIn'  && board.zoomX < 5.9) ||
-        (targetCommand == 'zoomOut' && board.zoomX > 0.167)) {
-      var $command  = {
-        'targetOperation': 'zoom',
-        'targetCommand':   targetCommand,
-        'command':         command['zoom'][targetCommand]
-      };
-      operationExec.storeAndExecute($command);
-      if (operationExec.length > 0) {
-        $('.button.undo').addClass('visible');
-      }   
-    } 
-  });
-
+  // return the request object to the front controller
   return operationExec;
 };
 
-},{"./operation":4,"./events/run":5,"./helper/slider":6,"../components/rxjs/rx.lite":7,"./helper/helpers":8}],3:[function(require,module,exports){
+},{"./operation":4,"./helper/helpers":5,"./subscriptions/board":6,"./subscriptions/function":7,"./subscriptions/zoom":8}],3:[function(require,module,exports){
 var iterator = require('../iterate'),
     command  = require('../events/run');
 
 
 module.exports = function(App, board) {
-
+  if (board.playing) {
+    return false;
+  }
+  if (typeof board.playing === 'undefined') {
+    board.playing = true;
+  }
   var clear = function(board) {
     for(point in board.points) {
       if (board.points.hasOwnProperty(point)) {
         board.removeObject(board.points[point]);
-        delete board.points[point];
       }
     }
+    board.points = {};
     var size = board.shapes.length;
     for (var i = 0; i < size; i++) {
       board.removeObject(board.shapes[i]);
-      board.shapes.splice(i, 1);
     }
-    board.removeObject(board.shapes[0]);
-    board.shapes.splice(0, 1);
+    board.shapes = [];
     $('.undo').removeClass('visible');
     board.zoom100();
     board.update();
@@ -158,6 +103,7 @@ module.exports = function(App, board) {
       $command.execute();
       if(!AppIterator.hasNext()) {
         clearInterval(play);
+        board.playing = undefined;
       }
     }, 1100);
   } else {
@@ -177,6 +123,7 @@ module.exports = function(App, board) {
         $command.execute();
         if(!AppIterator.hasNext()) {
           clearInterval(play);
+          board.playing = undefined;
           $('.play').unbind()
             .addClass('dim');
         }
@@ -184,7 +131,308 @@ module.exports = function(App, board) {
     });
   }
 };
-},{"../iterate":9,"../events/run":5}],6:[function(require,module,exports){
+},{"../iterate":9,"../events/run":10}],9:[function(require,module,exports){
+/* The Iterator */
+
+var Iterator = function(List) {
+  this.step = 0;
+  this.list = List;
+};
+
+Iterator.prototype.hasNext = function() {
+  return this.step < this.list.length;
+};
+
+Iterator.prototype.next    = function() {
+  return this.list[this.step++];
+};
+
+Iterator.prototype.hasPrev = function() {
+  return this.step > 0;
+};
+
+Iterator.prototype.prev    = function() {
+  return this.list[--this.step];
+};
+
+module.exports = Iterator;
+},{}],4:[function(require,module,exports){
+/* The Invoker */
+
+var Operation = function(board) {
+  var _commands = [];
+  this.commands = _commands;
+  this.board    = board;
+};
+
+Object.defineProperty(Operation.prototype, "length", {
+  get: function() { return this.commands.length }
+});
+
+Operation.prototype.storeAndExecute = function(command) {
+  var $command =  new command.command(this.board),
+      args     =  $command.execute();
+  this.commands.push({
+    arguments:   args,
+    'command':   $command,
+    'toString':  command.targetOperation + '.' + command.targetCommand
+  });
+};
+
+Operation.prototype.clearCommandList = function() {
+  this.commands = [];
+};
+
+Operation.prototype.undoLastExecute = function() {
+   var $command = this.commands.pop();
+   $command.command.remove();
+};
+
+/* Decorators */
+  require("./decorators/recording")(Operation);
+
+module.exports = Operation;
+},{"./decorators/recording":11}],5:[function(require,module,exports){
+module.exports = function(App) {
+  require('./more')  ();               // attach event to "more" button for polygon construction
+  require('./undo')  (App);            // attach event to undo button
+  require('./record')(App);            // attach event to record button
+  require('./clear') (App);            // attach event to clear button
+  require('./play')  (App, App.board); // attach event to UI play button after recording
+  require('./share') (App)             // attach event to share button
+};
+
+},{"./more":12,"./undo":13,"./record":14,"./clear":15,"./play":3,"./share":16}],6:[function(require,module,exports){
+var command    = require('../events/run'),
+    slider     = require('../helper/slider'),
+    Rx         = require('../../components/rxjs/rx.lite').Rx;
+
+module.exports = function(App) {
+  /**
+    Pre-queries
+   */
+
+  var $querySources  = $([
+    '.circle',   '  .angle',   '.arc',
+    '.ellipse',    '.segment', '.line',
+     '.polygon',   '.point',   '.text',
+     '.rotate',    '.reflect', '.shear',
+     '.translate', '.scale'
+  ].join(','));
+  // The query observer prepares the way for the following operations subscription
+  var $querySource       = Rx.Observable.fromEvent($querySources, 'click');
+  var $querySubscription = $querySource.subscribe(function(e) {
+    var target = $(e.target);
+    if (!$('.slider').length) {
+      slider(target.next().html(), 230, 'auto', '#application', target.parent().parent()); 
+    }
+  }); 
+  
+  /**
+    Board operations
+   */
+
+  var $operationSources      = '.button.draw, .button.transform';
+  var $operationSource       = Rx.Observable.fromEventPattern(
+    function addHandler(h) { $('#application').on('click', $operationSources, h) },  
+    function delHandler(h) { $('#application').off('click', $operationSources, h) }  
+  );
+
+  var $operationSubscription = $operationSource.subscribe(function(e) {
+    var target    = $(e.target).parent().attr('class').split('-');
+    var targetOperation = target[0],
+        targetCommand   = target[1];
+    // the request
+    var $command  = {
+      'targetOperation': targetOperation,
+      'targetCommand':   targetCommand,
+      'command':         command[targetOperation][targetCommand]
+    };
+    App.storeAndExecute($command);
+    if (App.length > 0) {
+      $('.button.undo').addClass('visible');
+    }
+    $('.close-slider').click();
+  },
+    function(e) {
+      console.log("Error: %s", e.message);
+    });
+};
+},{"../events/run":10,"../helper/slider":17,"../../components/rxjs/rx.lite":18}],7:[function(require,module,exports){
+var command    = require('../events/run'),
+    Parser     = require('../board/functions/parser'),
+    Rx         = require('../../components/rxjs/rx.lite').Rx;
+
+module.exports = function(App) {
+  var $sources = $('.function'),
+      $source  = Rx.Observable.fromEvent($sources, "keypress");
+
+  var $functionSubscription = $source.subscribe(function(e) {
+    if (e.keyCode == 13) {
+      var func = new Parser(e.target.value);
+      try {
+        func.run(); // generate parse tree
+      } catch(e) {
+        // syntax error
+        console.log(e.message);
+        alert("function syntax: " + e.message);
+        return false;
+      }
+      var targetOperation = 'func',
+          targetCommand   = func.identifier;
+      var $command        = {
+        'targetOperation': targetOperation,
+        'targetCommand':   targetCommand,
+        'command':         command[targetOperation][targetCommand]
+      };
+      App.storeAndExecute($command);
+     if (App.length > 0) {
+        $('.button.undo').addClass('visible');
+      }
+      $('.close-slider').click();
+    }
+  },
+  function(e) {
+    console.log("Error: %s", e.message);
+  });
+};
+},{"../events/run":10,"../board/functions/parser":19,"../../components/rxjs/rx.lite":18}],8:[function(require,module,exports){
+var command    = require('../events/run'),
+    Rx         = require('../../components/rxjs/rx.lite').Rx;
+
+module.exports = function(App) {
+  var $zoomSources      = $('.zoom.in, .zoom.out');
+  var $zoomSource       = Rx.Observable.fromEvent($zoomSources, "click");
+
+
+  var $zoomSubscription = $zoomSource.subscribe(function(e) {
+    var target          = $(e.target),
+        targetCommand = target.hasClass('in') ? 'zoomIn' : 'zoomOut'; 
+    if ((targetCommand == 'zoomIn'  && board.zoomX < 5.9) ||
+        (targetCommand == 'zoomOut' && board.zoomX > 0.167)) {
+      var $command  = {
+        'targetOperation': 'zoom',
+        'targetCommand':   targetCommand,
+        'command':         command['zoom'][targetCommand]
+      };
+      App.storeAndExecute($command);
+      if (App.length > 0) {
+        $('.button.undo').addClass('visible');
+      }   
+    } 
+  });
+
+}
+},{"../events/run":10,"../../components/rxjs/rx.lite":18}],10:[function(require,module,exports){
+
+module.exports = {
+  draw:      require('./draw'),
+  transform: require('./transform'),
+  zoom:      require('./zoom'),
+  func:      require('./function')
+  // drag: require('./drag')
+};
+
+
+},{"./draw":20,"./transform":21,"./zoom":22,"./function":23}],11:[function(require,module,exports){
+/*
+  OperationDecorator
+*/
+
+module.exports = function(Operation) {
+  var recording = false;
+  
+  var recorded  = [];
+
+  Object.defineProperty(Operation.prototype, "getRecorded", {
+    get: function() { return recorded; }
+  });
+
+  Operation.prototype.startRecording = function() {
+    recording = true;
+  };
+  Operation.prototype.stopRecording  = function() {
+    recording = false;
+  };
+
+  var execute = Operation.prototype.storeAndExecute;
+  // proxy
+  Operation.prototype.storeAndExecute = function() {
+    execute.apply(this, arguments);
+    if (recording) {
+      recorded.push(this.commands[this.commands.length - 1]);
+    }
+  };
+
+  var remove = Operation.prototype.undoLastExecute;
+  // proxy
+  Operation.prototype.undoLastExecute = function() {
+    if (recording) {
+      recorded.pop();
+    }
+    return remove.apply(this, arguments);
+  };
+
+  var clear  = Operation.prototype.clearCommandList;
+  // proxy
+  Operation.prototype.clearCommandList = function() {
+    if (recording) {
+      recorded = [];
+    }
+    return clear.apply(this, arguments);
+  }; 
+};
+
+},{}],12:[function(require,module,exports){
+module.exports = function() {
+  $(function() {
+    var points = 3;
+    $('#application').on('click', '.more', function() {
+      points++;
+      var more = '<label for="point'+ points + '">Point ' + points + ' (x,y):</label><input type="text" name="point'+ points +'" class="inside" value="0.0,0.0" />';
+      $(this).before(more);
+    });
+  });
+};
+},{}],13:[function(require,module,exports){
+module.exports = function(App) {
+  $(function() {
+    $('.button.undo').click(function() {
+      App.undoLastExecute();
+      if(App.length === 0) {
+        $(this).removeClass('visible');
+      }
+    });
+  });
+};
+},{}],14:[function(require,module,exports){
+module.exports = function(App) {
+  $(function() {
+    $('.start-record').click(function() {
+      App.startRecording();
+      $(this).html('Recording').addClass('dim');
+      $(this).unbind();
+    });
+    $('.end-record').click(function() {
+      App.stopRecording();
+      $(this)
+        .html('Finished')
+        .addClass('finished')
+        .prev()
+        .html('Start Record');
+      $(this).unbind();
+      Object.freeze(App); // we're done
+      $('.undo').removeClass('visible');
+      $('.reset').show();
+      $('.reset').click(function() {
+        window.location.reload();
+      });
+      $('.clear').hide()
+        .prev().show();
+    });
+  });
+};
+},{}],17:[function(require,module,exports){
 module.exports = function(content, width, height, source, top) {
   $block = $('<div class="slider"> <div class="close-slider">x</div> </div>');
   $block.append(content)
@@ -210,7 +458,7 @@ module.exports = function(content, width, height, source, top) {
     });
   });
 };
-},{}],10:[function(require,module,exports){
+},{}],24:[function(require,module,exports){
 // shim for using process in browser
 
 var process = module.exports = {};
@@ -265,7 +513,7 @@ process.chdir = function (dir) {
     throw new Error('process.chdir is not supported');
 };
 
-},{}],7:[function(require,module,exports){
+},{}],18:[function(require,module,exports){
 (function(process,global){// Copyright (c) Microsoft Open Technologies, Inc. All rights reserved. See License.txt in the project root for license information.
 
 ;(function (undefined) {
@@ -5743,137 +5991,7 @@ process.chdir = function (dir) {
     }
 }.call(this));
 })(require("__browserify_process"),window)
-},{"__browserify_process":10}],9:[function(require,module,exports){
-/* The Iterator */
-
-var Iterator = function(List) {
-  this.step = 0;
-  this.list = List;
-};
-
-Iterator.prototype.hasNext = function() {
-  return this.step < this.list.length;
-};
-
-Iterator.prototype.next    = function() {
-  return this.list[this.step++];
-};
-
-Iterator.prototype.hasPrev = function() {
-  return this.step > 0;
-};
-
-Iterator.prototype.prev    = function() {
-  return this.list[--this.step];
-};
-
-module.exports = Iterator;
-},{}],4:[function(require,module,exports){
-/* The Invoker */
-
-var Operation = function(board) {
-  var _commands = [];
-  this.commands = _commands;
-  this.board    = board;
-};
-
-Object.defineProperty(Operation.prototype, "length", {
-  get: function() { return this.commands.length }
-});
-
-Operation.prototype.storeAndExecute = function(command) {
-  var $command =  new command.command(this.board),
-      args     =  $command.execute();
-  this.commands.push({
-    arguments:   args,
-    'command':   $command,
-    'toString':  command.targetOperation + '.' + command.targetCommand
-  });
-};
-
-Operation.prototype.clearCommandList = function() {
-  this.commands = [];
-};
-
-Operation.prototype.undoLastExecute = function() {
-   var $command = this.commands.pop();
-   $command.command.remove();
-};
-
-/* Decorators */
-  require("./decorators/recording")(Operation);
-
-module.exports = Operation;
-},{"./decorators/recording":11}],5:[function(require,module,exports){
-
-module.exports = {
-  draw:      require('./draw'),
-  transform: require('./transform'),
-  zoom:      require('./zoom'),
-  // drag: require('./drag')
-};
-
-
-},{"./draw":12,"./transform":13,"./zoom":14}],8:[function(require,module,exports){
-module.exports = function(App, board) {
-  require('./more')  ();           // attach event to "more" button for polygon construction
-  require('./undo')  (App);        // attach event to undo button
-  require('./record')(App);        // attach event to record button
-  require('./clear') (App);        // attach event to clear button
-  require('./play')  (App, board); // attach event to UI play button after recording
-  require('./share') (App)         // attach event to share button
-};
-
-},{"./more":15,"./undo":16,"./record":17,"./clear":18,"./play":3,"./share":19}],11:[function(require,module,exports){
-/*
-  OperationDecorator
-*/
-
-module.exports = function(Operation) {
-  var recording = false;
-  
-  var recorded  = [];
-
-  Object.defineProperty(Operation.prototype, "getRecorded", {
-    get: function() { return recorded; }
-  });
-
-  Operation.prototype.startRecording = function() {
-    recording = true;
-  };
-  Operation.prototype.stopRecording  = function() {
-    recording = false;
-  };
-
-  var execute = Operation.prototype.storeAndExecute;
-  // proxy
-  Operation.prototype.storeAndExecute = function() {
-    execute.apply(this, arguments);
-    if (recording) {
-      recorded.push(this.commands[this.commands.length - 1]);
-    }
-  };
-
-  var remove = Operation.prototype.undoLastExecute;
-  // proxy
-  Operation.prototype.undoLastExecute = function() {
-    if (recording) {
-      recorded.pop();
-    }
-    return remove.apply(this, arguments);
-  };
-
-  var clear  = Operation.prototype.clearCommandList;
-  // proxy
-  Operation.prototype.clearCommandList = function() {
-    if (recording) {
-      recorded = [];
-    }
-    return clear.apply(this, arguments);
-  }; 
-};
-
-},{}],14:[function(require,module,exports){
+},{"__browserify_process":24}],22:[function(require,module,exports){
 /* Commands */
 
 /*--
@@ -5930,55 +6048,186 @@ module.exports = {
   zoom100: zoom100
 };
 },{}],15:[function(require,module,exports){
-module.exports = function() {
-  $(function() {
-    var points = 3;
-    $('#application').on('click', '.more', function() {
-      points++;
-      var more = '<label for="point'+ points + '">Point ' + points + ' (x,y):</label><input type="text" name="point'+ points +'" class="inside" value="0.0,0.0" />';
-      $(this).before(more);
-    });
-  });
-};
-},{}],16:[function(require,module,exports){
+var execute = require('../operation');
+
 module.exports = function(App) {
   $(function() {
-    $('.button.undo').click(function() {
-      App.undoLastExecute();
-      if(App.length === 0) {
-        $(this).removeClass('visible');
+    var board = App.board;
+    $('.button.clear').click(function() {
+      for(point in board.points) {
+        if (board.points.hasOwnProperty(point)) {
+          board.removeObject(board.points[point]);
+        }
       }
-    });
+      board.points = {};
+      var size = board.shapes.length;
+      for (var i = 0; i < size; i++) {
+        board.removeObject(board.shapes[i]);
+      }
+      board.shapes = [];
+      $('.function').val('');
+      $('.undo').removeClass('visible');
+      board.zoom100();
+      board.update();
+
+      App.clearCommandList();
+
+      // Reset recording UI
+      require('./record')(App); // reattach record events   
+      $('.start-record').removeClass('dim').html('Start Record');
+      $('.end-record').removeClass('dim').html('End Record');
+    })
   });
 };
-},{}],17:[function(require,module,exports){
+},{"../operation":4,"./record":14}],16:[function(require,module,exports){
+var slider = require('./slider');
+
 module.exports = function(App) {
   $(function() {
-    $('.start-record').click(function() {
-      App.startRecording();
-      $(this).html('Recording').addClass('dim');
-      $(this).unbind();
-    });
-    $('.end-record').click(function() {
-      App.stopRecording();
-      $(this)
-        .html('Finished')
-        .addClass('finished')
-        .prev()
-        .html('Start Record');
-      $(this).unbind();
-      Object.freeze(App); // we're done
-      $('.undo').removeClass('visible');
-      $('.reset').show();
-      $('.reset').click(function() {
-        window.location.reload();
-      });
-      $('.clear').hide()
-        .prev().show();
-    });
+    $('.share').click(function() {
+      if (Object.isFrozen(App)) {
+        var done;
+        slider($(this).next().html(), 230, 'auto', '#application', $('#transform')); 
+        $('#application').on('click', '.submit', function() {
+          var $paste = App.getRecorded.map(function(e) {
+            delete e.command; // we no longer need constructors
+            return e;
+          });
+          var data   = {
+            title: $('input.title:last').val(),
+            paste: $paste
+          };
+          $('.close-slider').click();
+          $.ajax({
+            url: '/paste',
+            type: 'POST',
+            data: JSON.stringify(data),
+            contentType: "application/json",
+            complete: function(token) {
+              var $html = ['<div class="misc-done">',
+                '<label for="url">The URL!</label><input type="text" name="url" class="inside url" value="',
+                document.location.href + token.responseJSON.token,
+                '" />',
+                '</div>'
+              ].join('');
+              slider($html, 250, 'auto', '#application', $('#transform'));
+            }
+          });
+        });
+      }
+    })
+  });
+}
+},{"./slider":17}],19:[function(require,module,exports){
+var Lexer = require('./lexer');
+
+/*
+ * Geometry Function Parser
+ */
+
+var Parser = function(expr) {
+  this.llex       = new Lexer(expr);
+  this._arguments = [];
+  this._identifier;
+  Object.defineProperty(this, "arguments", {
+    get: function() { return this._arguments; }
+  });
+  Object.defineProperty(this, "identifier", {
+    get: function() { return this._identifier; }
+  });
+  Object.defineProperty(this, "object", {
+    get: function() {return {
+        'identifier': this._identifier, 
+        'arguments':  this._arguments
+      };
+    }
   });
 };
-},{}],12:[function(require,module,exports){
+
+Parser.prototype = (function() {
+  var tokens = Object.freeze({
+    T_UNKNOWN:     1,
+    T_INTEGER:     2,
+    T_FLOAT:       3,
+    T_LETTER:      4,
+    T_OPEN_PAREN:  5,
+    T_CLOSE_PAREN: 6,
+    T_COMMA:       7,
+    T_IDENTIFIER:  8,
+    T_EQUAL:       9,
+    T_LABEL:       10,
+    T_EOL:         11
+  });
+
+  var token_strings = Object.freeze({
+    1:   "T_UNKNOWN",
+    2:     "integer",
+    3:       "float",
+    4:      "letter",
+    5:           "(",
+    6:           ")",
+    7:           ",",
+    8:  "identifier",
+    9:           "=",
+    10:      "label",
+    11:        "EOL"
+  });
+
+  var t_error = function(token, expected) {
+    if (expected instanceof Array) {
+      expected = expected[0];
+    }
+    var msg = ["Unexpected token: ",
+      token_strings[token],
+      ", expected ",
+      token_strings[expected]
+    ].join('');
+    throw new Error(msg);
+  };
+
+  var accept  = function(t) {
+    this.llex.getNextToken();
+    if (t instanceof Array) {
+      var isIn = false, lex  = this.llex;
+      t.forEach(function(e) {
+        if (e == lex.current_token) {
+          isIn  = true;
+        }
+      });
+      if (!isIn) {
+        t_error(this.llex.current_token, t);
+        return false;
+      }
+    } else if (this.llex.current_token !== t) {
+        t_error(this.llex.current_token, t);
+        return false;
+    }
+    return this.llex.current_token;
+  };
+    
+  return {
+    Constructor: Parser,
+    run: function() {
+      if (this.llex.expr[this.llex.pointer] == '=') {
+        accept.call(this, tokens.T_EQUAL);
+      }
+      accept.call(this, tokens.T_IDENTIFIER);
+      this._identifier = this.llex.scanner;
+      accept.call(this, tokens.T_OPEN_PAREN);
+      var token;
+      do {
+        token = accept.call(this, [tokens.T_LABEL, tokens.T_LETTER, tokens.T_INTEGER, tokens.T_FLOAT]);
+        this._arguments.push({argument: this.llex.scanner, type: token_strings[token]});
+      } while(accept.call(this, [tokens.T_COMMA, tokens.T_CLOSE_PAREN]) == tokens.T_COMMA);
+
+      accept.call(this, tokens.T_EOL);
+    }
+  };
+})();
+
+module.exports = Parser;
+
+},{"./lexer":25}],20:[function(require,module,exports){
 var element = require('../board/element'),
     coords  = require('../helper/coords')();
 
@@ -6204,7 +6453,7 @@ module.exports = {
   point: point,
   text: text
 };
-},{"../board/element":20,"../helper/coords":21}],13:[function(require,module,exports){
+},{"../board/element":26,"../helper/coords":27}],21:[function(require,module,exports){
 var transform = require('../board/transform'),
     coords    = require('../helper/coords')();
 
@@ -6453,78 +6702,185 @@ module.exports = {
   translate: translate,
   scale:     scale
 };
-},{"../board/transform":22,"../helper/coords":21}],18:[function(require,module,exports){
-var execute = require('../operation');
+},{"../board/transform":28,"../helper/coords":27}],23:[function(require,module,exports){
+var func    = require('../board/functions/functions'),
+    Parser  = require('../board/functions/parser'),
+    element = require('../board/element');  
 
-module.exports = function(App) {
-  $(function() {
-    var board = App.board;
-    $('.button.clear').click(function() {
-      for(point in board.points) {
-        if (board.points.hasOwnProperty(point)) {
-          board.removeObject(board.points[point]);
-          delete board.points[point];
-        }
-      }
-      var size = board.shapes.length;
-      for (var i = 0; i < size; i++) {
-        board.removeObject(board.shapes[i]);
-        board.shapes.splice(i, 1);
-      }
-      board.shapes.splice(0, 1);
-      $('.undo').removeClass('visible');
-      board.zoom100();
-      board.update();
+/* Commands */
 
-      App.clearCommandList();
+/*--
+Interface Command {
+  public void   constructor(JSXGraph board, Object Arguments)
+  public void   remove()
+  public object execute()
+}
+--*/
 
-      // Reset recording UI
-      require('./record')(App); // reattach record events   
-      $('.start-record').removeClass('dim').html('Start Record');
-      $('.end-record').removeClass('dim').html('End Record');
-    })
+var angle = function(board, args) {
+  var radiansToDegrees = function(rad) {
+    return ( 180 / Math.PI) * rad ;
+  };
+  if (typeof args === 'undefined') {
+    var parse = new Parser($('input.function').val());
+    parse.run();
+    if (parse.arguments.length != 3) {
+      throw new SyntaxError("requires 3 points")
+    }
+    var valid = parse.arguments.every(function(e) {
+      return e.type == "letter";
+    });
+    if (!valid) {
+      throw new SyntaxError("invalid argument types");
+    }
+    args = parse.arguments;
+  } else {
+    args = args.args;
+  } 
+  var realArgs = args.map(function(e) {
+        return board.points[e.argument];
+  });
+  this.func = new func(JXG, "angle", realArgs);
+  this.execute = function() {
+    var result  = this.func.run(),
+        radians = result.toPrecision(2),
+        deg     = radiansToDegrees(result).toPrecision(2);
+    this.textElement = new element(board, "text", {
+      position: [realArgs[1].coords.usrCoords[1],
+      realArgs[1].coords.usrCoords[2] - 2],
+      size: 25,
+      text: radians + "c, " + deg + "°"
+    }).draw();
+    return args;
+  };
+  this.remove = function() {
+      board.removeObject(this.textElement);
+      board.shapes.pop();
+  };
+};
+
+module.exports = {
+  angle: angle
+};
+},{"../board/functions/functions":29,"../board/functions/parser":19,"../board/element":26}],25:[function(require,module,exports){
+/*
+ * Geometry Function Tokenizer
+ */
+
+ var Lexer = function(expr) {
+  this.current_token;
+  this.expr    = expr;
+  this._pointer = 0;
+  this._scanner;
+  Object.defineProperty(this, "scanner", {
+    get: function() { return this._scanner; }
+  });
+  Object.defineProperty(this, "pointer", {
+    get: function() { return this._pointer; }
   });
 };
-},{"../operation":4,"./record":17}],19:[function(require,module,exports){
-var slider = require('./slider');
 
-module.exports = function(App) {
-  $(function() {
-    $('.share').click(function() {
-      if (Object.isFrozen(App)) {
-        var done;
-        slider($(this).next().html(), 230, 'auto', '#application', $('#transform')); 
-        $('#application').on('click', '.submit', function() {
-          var $paste = App.getRecorded.map(function(e) {
-            delete e.command; // we no longer need constructors
-            return e;
-          });
-          var data   = {
-            title: $('input.title:last').val(),
-            paste: $paste
-          };
-          $('.close-slider').click();
-          $.ajax({
-            url: '/paste',
-            type: 'POST',
-            data: JSON.stringify(data),
-            contentType: "application/json",
-            complete: function(token) {
-              var $html = ['<div class="misc-done">',
-                '<label for="url">The URL!</label><input type="text" name="url" class="inside url" value="',
-                document.location.href + token.responseJSON.token,
-                '" />',
-                '</div>'
-              ].join('');
-              slider($html, 250, 'auto', '#application', $('#transform'));
-            }
-          });
-        });
-      }
-    })
+Lexer.prototype = (function() {
+  var tokens = Object.freeze({
+    T_UNKNOWN:     1,
+    T_INTEGER:     2,
+    T_FLOAT:       3,
+    T_LETTER:      4,
+    T_OPEN_PAREN:  5,
+    T_CLOSE_PAREN: 6,
+    T_COMMA:       7,
+    T_IDENTIFIER:  8,
+    T_EQUAL:       9,
+    T_LABEL:       10,
+    T_EOL:         11
   });
-}
-},{"./slider":6}],21:[function(require,module,exports){
+  var skipWhitespace = function() {
+    while(/[\s\t\n]/.test(this.expr[this._pointer])) {
+      this._pointer++;
+    }
+  }
+  return {
+    Constructor: Lexer,
+    getNextToken: function() {
+      skipWhitespace.call(this);
+      this._scanner = undefined;
+      // T_EOL
+      if (this._pointer >= this.expr.length) {
+        return this.current_token = tokens.T_EOL;
+      }
+      // T_IDENTIFIER
+      if (/[a-z]/.test(this.expr[this._pointer])) {
+        this._scanner = '';
+        while(/[a-z]/.test(this.expr[this._pointer]) &&
+          !(this._pointer >= this.expr.length)) {
+          this._scanner += this.expr[this._pointer];
+          this._pointer++;
+        }
+        return this.current_token = tokens.T_IDENTIFIER;
+      }
+      // T_OPEN_PAREN
+      if (/\(/.test(this.expr[this._pointer])) {
+        this._pointer++;
+        return this.current_token = tokens.T_OPEN_PAREN;
+      }
+      // T_CLOSE_PAREN
+      if (/\)/.test(this.expr[this._pointer])) {
+        this._pointer++;
+        return this.current_token = tokens.T_CLOSE_PAREN;
+      }
+      // T_COMMA
+      if (/,/.test(this.expr[this._pointer])) {
+        this._pointer++;
+        return this.current_token = tokens.T_COMMA;
+      }
+      // T_EQUAL
+      if (/\=/.test(this.expr[this._pointer])) {
+        this._pointer++;
+        return this.current_token = tokens.T_EQUAL;
+      }
+      // T_LETTER
+      if (/[A-Z]/.test(this.expr[this._pointer])) {
+        var token;
+        this._scanner = this.expr[this._pointer];
+        this._pointer++;
+        if (/[0-9]/.test(this.expr[this._pointer])) {
+          // T_LABEL
+          while(/[0-9]/.test(this.expr[this._pointer]) &&
+          !(this._pointer >= this.expr.length)) {
+            token = tokens.T_LABEL;
+            this._scanner += this.expr[this._pointer];
+            this._pointer++;
+          }                  
+        }
+        return this.current_token = (token || tokens.T_LETTER);
+      }
+      // T_INTEGER
+      if (/[0-9]/.test(this.expr[this._pointer])) {
+        this._scanner = '';
+        var token;
+        while(/[0-9]/.test(this.expr[this._pointer]) &&
+          !(this._pointer >= this.expr.length)) {
+          this._scanner += this.expr[this._pointer];
+          this._pointer++;
+            // T_FLOAT
+          if (this.expr[this._pointer] === '.') {
+            if (token) {
+              return this.current_token = tokens.T_UNKNOWN;
+            }
+            this._scanner       += this.expr[this._pointer++];
+            this.current_token  = token = tokens.T_FLOAT;
+          }
+        }
+        return this.current_token = (token || tokens.T_INTEGER);
+      }
+      // T_UNKNOWN
+      return this.current_token = tokens.T_UNKNOWN;
+    },
+  };
+})();
+
+module.exports = Lexer;
+},{}],27:[function(require,module,exports){
 module.exports = function() {
   jQuery.fn.coord = function() {
     if (this.val()) {
@@ -6538,14 +6894,14 @@ module.exports = function() {
   };
 };
 
-},{}],22:[function(require,module,exports){
+},{}],28:[function(require,module,exports){
 /*
   BoardTransform Factory
   */
 
 var BoardTransform = function(board, transform, options) {
   this.board  = board;
-  this.otions = options;
+  this.options = options;
   return new this[transform](board, options);
 };
 
@@ -6680,7 +7036,50 @@ BoardTransform.prototype = (function() {
 })();
 
 module.exports = BoardTransform;
-},{}],20:[function(require,module,exports){
+},{}],29:[function(require,module,exports){
+/* GeometryFunction Factory */
+
+var GeometryFunction = function(JXG, func, options) {
+  return new this[func](JXG, options);
+};
+
+GeometryFunction.prototype = (function() {
+
+/*--
+  Interface Function {
+    public void   constructor(JXG, Object options)
+    public void   run()
+  }
+*--*/
+
+  /*
+  Options: {
+    point1: Point p1,
+    point2: Point p2,
+    point3: Point p3 (optional)
+  }
+  */
+  var AngleFunction = function(board, options) {
+    this.options = options;
+    this.board   = board;
+  };
+  AngleFunction.prototype.run = function() {
+    return JXG.Math.Geometry.rad(
+      this.options[0],
+      this.options[1],
+      this.options[2]
+    );
+  };
+
+  return {
+    Constructor: GeometryFunction,
+    angle:       AngleFunction
+  };
+
+})();
+
+module.exports = GeometryFunction;
+},{}],26:[function(require,module,exports){
 var point = require('./point'),
     shape = require('./shape')
 
@@ -6934,7 +7333,7 @@ BoardElement.prototype = (function() {
 })();
 
 module.exports = BoardElement; 
-},{"./point":23,"./shape":24}],23:[function(require,module,exports){
+},{"./point":30,"./shape":31}],30:[function(require,module,exports){
 var Point = function(board, coords) {
   this.board  = board;
   this.coords = coords;
@@ -6958,7 +7357,8 @@ Point.prototype = (function() {
   return {
     Constructor: Point,
     add: function() {
-      var point = getPointIfExists.call(this);
+      //var point = getPointIfExists.call(this);
+      var point = false;
       if (!point) {
         var p = this.board.create("point", this.coords);
         Object.defineProperty(this.board.points, p.name, 
@@ -6975,7 +7375,7 @@ Point.prototype = (function() {
 })();
 
 module.exports = Point;
-},{}],24:[function(require,module,exports){
+},{}],31:[function(require,module,exports){
 var Shape = function(board, shape, parents, options) {
   this.board   = board;
   this.shape   = shape;

@@ -29,11 +29,11 @@ $(function() {
     /* Play Paste */
     require('./helper/play')($AppPaste, board);
     $('.play').click();
-    // Replay
+    // Replay button
     $('.replay').click(function() {
       require('./helper/play')($AppPaste, board);
     });
-    // Start new
+    // Start new button
     $('.new').click(function() {
       window.location.href = '/';
     });

@@ -1,0 +1,59 @@
+var func    = require('../board/functions/functions'),
+    Parser  = require('../board/functions/parser'),
+    element = require('../board/element');  
+
+/* Commands */
+
+/*--
+Interface Command {
+  public void   constructor(JSXGraph board, Object Arguments)
+  public void   remove()
+  public object execute()
+}
+--*/
+
+var angle = function(board, args) {
+  var radiansToDegrees = function(rad) {
+    return ( 180 / Math.PI) * rad ;
+  };
+  if (typeof args === 'undefined') {
+    var parse = new Parser($('input.function').val());
+    parse.run();
+    if (parse.arguments.length != 3) {
+      throw new SyntaxError("requires 3 points")
+    }
+    var valid = parse.arguments.every(function(e) {
+      return e.type == "letter";
+    });
+    if (!valid) {
+      throw new SyntaxError("invalid argument types");
+    }
+    args = parse.arguments;
+  } else {
+    args = args.args;
+  } 
+  var realArgs = args.map(function(e) {
+        return board.points[e.argument];
+  });
+  this.func = new func(JXG, "angle", realArgs);
+  this.execute = function() {
+    var result  = this.func.run(),
+        radians = result.toPrecision(2),
+        deg     = radiansToDegrees(result).toPrecision(2);
+    this.textElement = new element(board, "text", {
+      position: [realArgs[1].coords.usrCoords[1],
+      realArgs[1].coords.usrCoords[2] - 2],
+      size: 25,
+      text: radians + "c, " + deg + "°"
+    }).draw();
+    return args;
+  };
+  this.remove = function() {
+      board.removeObject(this.textElement);
+      board.shapes.pop();
+  };
+};
+
+module.exports = {
+  angle: angle
+};

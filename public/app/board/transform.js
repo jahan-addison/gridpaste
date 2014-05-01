@@ -4,7 +4,7 @@
 
 var BoardTransform = function(board, transform, options) {
   this.board  = board;
-  this.otions = options;
+  this.options = options;
   return new this[transform](board, options);
 };
 

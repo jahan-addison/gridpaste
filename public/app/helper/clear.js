@@ -7,14 +7,15 @@ module.exports = function(App) {
       for(point in board.points) {
         if (board.points.hasOwnProperty(point)) {
           board.removeObject(board.points[point]);
-          delete board.points[point];
         }
       }
+      board.points = {};
       var size = board.shapes.length;
       for (var i = 0; i < size; i++) {
         board.removeObject(board.shapes[i]);
       }
       board.shapes = [];
+      $('.function').val('');
       $('.undo').removeClass('visible');
       board.zoom100();
       board.update();
