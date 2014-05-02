@@ -56,7 +56,7 @@ module.exports = function(board) {
 
   require('./subscriptions/function') (operationExec); /* Function subscription */
 
-  require('./subscriptions/zoom')     (operationExec); /* Zoom subscription */
+  require('./subscriptions/zoom')     (operationExec, board); /* Zoom subscription */
 
   // return the request object to the front controller
   return operationExec;
@@ -300,7 +300,7 @@ module.exports = function(App) {
 var command    = require('../events/run'),
     Rx         = require('../../components/rxjs/rx.lite').Rx;
 
-module.exports = function(App) {
+module.exports = function(App, board) {
   var $zoomSources      = $('.zoom.in, .zoom.out');
   var $zoomSource       = Rx.Observable.fromEvent($zoomSources, "click");
 

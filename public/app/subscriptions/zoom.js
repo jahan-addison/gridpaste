@@ -1,7 +1,7 @@
 var command    = require('../events/run'),
     Rx         = require('../../components/rxjs/rx.lite').Rx;
 
-module.exports = function(App) {
+module.exports = function(App, board) {
   var $zoomSources      = $('.zoom.in, .zoom.out');
   var $zoomSource       = Rx.Observable.fromEvent($zoomSources, "click");
 
