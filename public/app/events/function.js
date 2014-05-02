@@ -22,6 +22,7 @@ var angle = function(board, args) {
     if (parse.arguments.length != 3) {
       throw new SyntaxError("requires 3 points")
     }
+    var letters = '';
     var valid = parse.arguments.every(function(e) {
       return e.type == "letter";
     });
@@ -34,8 +35,10 @@ var angle = function(board, args) {
       args = args.args;
     }
   } 
-
-  var realArgs = (this.args || args).map(function(e) {
+  var letters  = args.map(function(e) {
+    return e.argument;
+  }).join(''),
+      realArgs = (this.args || args).map(function(e) {
         return board.points[e.argument];
   });
   this.func = new func(JXG, "angle", realArgs);
@@ -46,9 +49,10 @@ var angle = function(board, args) {
     this.textElement = new element(board, "text", {
       position: [realArgs[1].coords.usrCoords[1],
       realArgs[1].coords.usrCoords[2] - 2],
-      size: 25,
-      text: radians + "c, " + deg + "°"
+      size: 20,
+      text: "∠" + letters + ": " + parseFloat(deg) + "°"
     }).draw();
+    $('.function').val('');
     return args;
   };
   this.remove = function() {
