@@ -13,7 +13,7 @@ module.exports = function(board) {
 
   require('./subscriptions/function') (operationExec); /* Function subscription */
 
-  require('./subscriptions/zoom')     (operationExec); /* Zoom subscription */
+  require('./subscriptions/zoom')     (operationExec, board); /* Zoom subscription */
 
   // return the request object to the front controller
   return operationExec;
