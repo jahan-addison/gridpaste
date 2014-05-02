@@ -6733,11 +6733,14 @@ var angle = function(board, args) {
     if (!valid) {
       throw new SyntaxError("invalid argument types");
     }
-    args = parse.arguments;
+     var funcArgs = args = parse.arguments;
   } else {
-    args = args.args;
+    if (typeof args.args !== 'undefined') {
+      args = args.args;
+    }
   } 
-  var realArgs = args.map(function(e) {
+
+  var realArgs = (this.args || args).map(function(e) {
         return board.points[e.argument];
   });
   this.func = new func(JXG, "angle", realArgs);
