@@ -3,8 +3,8 @@ $(function() {
   var board;
   (function() {
     var $paste = $('#application').hasClass('paste');
-    var xx = $paste ? 120 : 100,
-        yy = $paste ? 60  : 55;   
+    var xx =  $(window).width()  / 17,
+        yy =  $(window).height() / 15.7;   
     /* Board Options */
     JXG.Options.angle.orthoType = "root";
     JXG.Options.angle.radius    = 25;
@@ -19,7 +19,10 @@ $(function() {
     board.shapes = [];
     var axx      = board.axx = board.create('axis',[[0,0],[1,0]]);
     var axy      = board.axy = board.create('axis',[[0,0],[0,1]]);
-     
+    /* Show coordinates at mouse */
+    if (!$paste) {
+      require('./helper/mouse')(board);
+    }
     board.unsuspendUpdate();    
   })();
   if (!$('#application').hasClass('paste')) {
