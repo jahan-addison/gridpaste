@@ -14,7 +14,7 @@ module.exports = function(App) {
       } catch(e) {
         // syntax error
         console.log(e.message);
-        alert("function syntax: " + e.message);
+        alert("Syntax: " + e.message);
         return false;
       }
       var targetOperation = 'func',
