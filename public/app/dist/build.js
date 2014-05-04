@@ -309,7 +309,7 @@ module.exports = function(App) {
       } catch(e) {
         // syntax error
         console.log(e.message);
-        alert("function syntax: " + e.message);
+        alert("Syntax: " + e.message);
         return false;
       }
       var targetOperation = 'func',
@@ -445,6 +445,7 @@ module.exports = function(App) {
 module.exports = function(App) {
   $(function() {
     $('.start-record').click(function() {
+      $('.clear').click();
       App.startRecording();
       $(this).html('Recording').addClass('dim');
       $(this).unbind();
@@ -6868,7 +6869,7 @@ module.exports = {
   angle: angle,
   area:  area
 };
-},{"../board/functions/functions":30,"../board/functions/parser":20,"../board/element":27}],26:[function(require,module,exports){
+},{"../board/functions/parser":20,"../board/functions/functions":30,"../board/element":27}],26:[function(require,module,exports){
 /*
  * Geometry Function Tokenizer
  */

@@ -1,6 +1,7 @@
 module.exports = function(App) {
   $(function() {
     $('.start-record').click(function() {
+      $('.clear').click();
       App.startRecording();
       $(this).html('Recording').addClass('dim');
       $(this).unbind();
