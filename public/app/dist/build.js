@@ -28,7 +28,7 @@ $(function() {
   })();
   if (!$('#application').hasClass('paste')) {
     /* Subscribe to application */
-    var App  = window.App = require('./subscribe')(board);
+    var App = require('./subscribe')(board);
   } else {
     /* Play Paste */
     require('./helper/play')($AppPaste, board);
