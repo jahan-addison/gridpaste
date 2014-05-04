@@ -25,6 +25,8 @@ module.exports = function(App) {
         'command':         command[targetOperation][targetCommand]
       };
       App.storeAndExecute($command);
+      
+      $('.function').val('');
      if (App.length > 0) {
         $('.button.undo').addClass('visible');
       }

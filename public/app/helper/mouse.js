@@ -20,7 +20,7 @@ module.exports = function(board) {
           return parseInt(e); 
         });
       board.usrAt = board.create("text", 
-        [coords[1] + 1, coords[2], 
+        [coords[1] + 1.2, coords[2] + .5, // away from cursor
         "(" + coords[1] + "," + coords[2] + ")"]
       );
     }, 1000);

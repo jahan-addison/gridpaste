@@ -28,7 +28,7 @@ $(function() {
   })();
   if (!$('#application').hasClass('paste')) {
     /* Subscribe to application */
-    var App  = require('./subscribe')(board);
+    var App  = window.App = require('./subscribe')(board);
   } else {
     /* Play Paste */
     require('./helper/play')($AppPaste, board);
@@ -66,7 +66,7 @@ module.exports = function(board) {
           return parseInt(e); 
         });
       board.usrAt = board.create("text", 
-        [coords[1] + 1, coords[2], 
+        [coords[1] + 1.2, coords[2] + .5, // away from cursor
         "(" + coords[1] + "," + coords[2] + ")"]
       );
     }, 1000);
@@ -84,7 +84,6 @@ module.exports = function(board) {
   var operationExec = new execute(board);
 
   require('./helper/helpers')(operationExec); // various UI helpers
-
 
 
   require('./subscriptions/board')    (operationExec); /* Board subscription */
@@ -321,6 +320,8 @@ module.exports = function(App) {
         'command':         command[targetOperation][targetCommand]
       };
       App.storeAndExecute($command);
+      
+      $('.function').val('');
      if (App.length > 0) {
         $('.button.undo').addClass('visible');
       }
@@ -6792,7 +6793,6 @@ var angle = function(board, args) {
       size: 20,
       text: "∠" + letters + ": " + parseFloat(deg) + "°"
     }).draw();
-    $('.function').val('');
     return args;
   };
   this.remove = function() {
@@ -6801,8 +6801,70 @@ var angle = function(board, args) {
   };
 };
 
+var area = function(board, args) {
+  if (typeof args === 'undefined') {
+    var parse = new Parser($('input.function').val());
+    parse.run();
+    if (parse.arguments.length != 1) {
+      throw new SyntaxError("requires 1 argument");
+    }
+    var valid = parse.arguments.every(function(e) {
+      return e.type == "label";
+    });
+    if (!valid) {
+      throw new SyntaxError("invalid argument type");
+    }
+     var funcArgs = args = parse.arguments;
+  } else {
+    if (typeof args.args !== 'undefined') {
+      args = args.args;
+    }
+  } 
+  var label  = args.map(function(e) {
+    return e.argument;
+  }).join(''),
+      realArgs = {},
+      shape;
+  board.shapes.forEach(function(e) {
+    if (e.name === label) {
+      shape = e;
+    }
+  });
+  if (typeof shape === 'undefined') {
+    throw new ReferenceError("structure " + label + " does not exist");
+  }
+  if (typeof shape.vertices === 'undefined') {
+    throw new ReferenceError("structure " + label + " is not a polygon");
+  }
+  realArgs.X        = [];
+  realArgs.Y        = [];
+  realArgs.vertices = 0;
+  var temp = shape.vertices.pop();
+  shape.vertices.forEach(function(vertex) {
+    realArgs.X.push(vertex.coords.usrCoords[1]);
+    realArgs.Y.push(vertex.coords.usrCoords[2]);
+    realArgs.vertices++;
+  });
+  shape.vertices.push(temp);
+  this.func = new func(JXG, "area", realArgs); 
+  this.execute = function() {
+    var result  = this.func.run();
+    this.textElement = new element(board, "text", {
+      position: [realArgs.X[0] + 1, realArgs.Y[0] + 1],
+      size: 18,
+      text: "Area: " + parseFloat(result)
+    }).draw();
+    return args;
+  };
+  this.remove = function() {
+      board.removeObject(this.textElement);
+      board.shapes.pop();
+  }; 
+};
+
 module.exports = {
-  angle: angle
+  angle: angle,
+  area:  area
 };
 },{"../board/functions/functions":30,"../board/functions/parser":20,"../board/element":27}],26:[function(require,module,exports){
 /*
@@ -7098,24 +7160,50 @@ GeometryFunction.prototype = (function() {
   Options: {
     point1: Point p1,
     point2: Point p2,
-    point3: Point p3 (optional)
+    point3: Point p3
   }
   */
-  var AngleFunction = function(board, options) {
+  var AngleFunction = function(JXG, options) {
     this.options = options;
-    this.board   = board;
+    this.JXG     = JXG;
   };
   AngleFunction.prototype.run = function() {
-    return JXG.Math.Geometry.rad(
+    return this.JXG.Math.Geometry.rad(
       this.options[0],
       this.options[1],
       this.options[2]
     );
   };
 
+  /* Options:
+    X:        [point1, point2, point3, ...],
+    Y:        [point1, point2, point3, ...],
+    vertices: unsigned integer,
+
+   */
+
+  /* http://alienryderflex.com/polygon_area/ */
+
+  var polygonAreaFunction = function(JXG, options) {
+    this.options = options;    
+  }
+
+  polygonAreaFunction.prototype.run = function() {
+    var area = 0,
+        j    = this.options.vertices-1,
+        i;
+    for (i = 0; i < this.options.vertices; i++) {
+      area = area + (this.options.X[j] + this.options.X[i]) * (this.options.Y[j] - this.options.Y[i]);
+      j    = i;
+    }
+
+    return Math.abs( area / 2 );
+  };
+
   return {
     Constructor: GeometryFunction,
-    angle:       AngleFunction
+    angle:       AngleFunction,
+    area:        polygonAreaFunction
   };
 
 })();

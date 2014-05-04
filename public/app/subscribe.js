@@ -8,7 +8,6 @@ module.exports = function(board) {
   require('./helper/helpers')(operationExec); // various UI helpers
 
 
-
   require('./subscriptions/board')    (operationExec); /* Board subscription */
 
   require('./subscriptions/function') (operationExec); /* Function subscription */
