@@ -39,7 +39,7 @@ Parser.prototype = (function() {
   });
 
   var token_strings = Object.freeze({
-    1:   "T_UNKNOWN",
+    1:     "unknown",
     2:     "integer",
     3:       "float",
     4:      "letter",
@@ -52,13 +52,15 @@ Parser.prototype = (function() {
     11:        "EOL"
   });
 
-  var t_error = function(token, expected) {
+  var t_error = function(llex, token, expected) {
     if (expected instanceof Array) {
       expected = expected[0];
     }
-    var msg = ["Unexpected token: ",
-      token_strings[token],
-      ", expected ",
+    var unexpected = (token_strings[token] == "unknown") ?
+      llex.scanner : token_strings[token];    
+    var msg = ["Unexpected token: '",
+      unexpected,
+      "', expected ",
       token_strings[expected]
     ].join('');
     throw new Error(msg);
@@ -74,11 +76,11 @@ Parser.prototype = (function() {
         }
       });
       if (!isIn) {
-        t_error(this.llex.current_token, t);
+        t_error(this.llex, this.llex.current_token, t);
         return false;
       }
     } else if (this.llex.current_token !== t) {
-        t_error(this.llex.current_token, t);
+        t_error(this.llex, this.llex.current_token, t);
         return false;
     }
     return this.llex.current_token;

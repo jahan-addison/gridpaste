@@ -100,6 +100,7 @@ Lexer.prototype = (function() {
             // T_FLOAT
           if (this.expr[this._pointer] === '.') {
             if (token) {
+              this._scanner             = this.expr[this._pointer];
               return this.current_token = tokens.T_UNKNOWN;
             }
             this._scanner       += this.expr[this._pointer++];
@@ -109,6 +110,7 @@ Lexer.prototype = (function() {
         return this.current_token = (token || tokens.T_INTEGER);
       }
       // T_UNKNOWN
+      this._scanner             = this.expr[this._pointer];
       return this.current_token = tokens.T_UNKNOWN;
     },
   };
