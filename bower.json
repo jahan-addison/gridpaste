@@ -7,9 +7,10 @@
     "components"
   ],
   "dependencies": {
-    "meyer-reset": "*"
+    "meyer-reset": "*",
+    "rxjs": "2.2.18"
   },
   "devDependencies": {
-    "rxjs": "2.2.18"
+    "jquery": "~2.1.1"
   }
 }
