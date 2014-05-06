@@ -151,7 +151,7 @@ describe("Geometry Function Tokenizer", function() {
         llex_test.getNextToken();
         expect(llex_test.scanner).to.equal('Z56');
       });      
-      it('should be begin single with uppercase letter', function() {
+      it('should begin with single uppercase letter', function() {
         llex_test = new Lexer("AB56");
         expect(llex_test.getNextToken()).to.not.equal(tokens.T_LABEL);
         llex_test = new Lexer("abc56");        
