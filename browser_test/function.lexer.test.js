@@ -159,7 +159,7 @@ describe("Geometry Function Tokenizer", function() {
       });
       it('should end with an integer', function() {
         llex_test = new Lexer("A56");
-        llex_test.getNextToken();
+        expect(llex_test.getNextToken()).to.equal(tokens.T_LABEL);
         expect(llex_test.scanner.split(/[A-Z]/g)[1]).to.equal('56');
       });
       it('should skip whitespace', function() {
