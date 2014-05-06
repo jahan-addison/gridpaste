@@ -19,7 +19,6 @@ module.exports = function(config) {
         'public/components/jquery/dist/jquery.min.js',
         'public/components/rxjs/rx.lite.js',
         'brwoser_test/fixtures/*.html',
-        'browser_test/*.js'
     ],
 
 
@@ -75,6 +74,6 @@ module.exports = function(config) {
 
     // Continuous Integration mode
     // if true, Karma captures browsers, runs the tests and exits
-    singleRun: true
+    singleRun: false
   });
 };
