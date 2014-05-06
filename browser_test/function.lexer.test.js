@@ -169,6 +169,8 @@ describe("Geometry Function Tokenizer", function() {
     });
     describe("T_EOL", function() {
       it('should return EOL', function() {
+        llex_test = new Lexer("");        
+        expect(llex_test.getNextToken()).to.equal(tokens.T_EOL);
         llex_test = new Lexer("A");
         llex_test.getNextToken(); // pass 'A'
         expect(llex_test.getNextToken()).to.equal(tokens.T_EOL);
