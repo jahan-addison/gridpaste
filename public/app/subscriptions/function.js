@@ -25,9 +25,9 @@ module.exports = function(App) {
         'command':         command[targetOperation][targetCommand]
       };
       App.storeAndExecute($command);
+      e.target.value = "";
       
-      $('.function').val('');
-     if (App.length > 0) {
+      if (App.length > 0) {
         $('.button.undo').addClass('visible');
       }
       $('.close-slider').click();

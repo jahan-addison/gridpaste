@@ -6,9 +6,11 @@ $(function() {
     var xx =  $(window).width()  / 17,
         yy =  $(window).height() / 15.7;   
     /* Board Options */
-    JXG.Options.angle.orthoType = "root";
-    JXG.Options.angle.radius    = 25;
-    JXG.Options.elements.fixed  = true;
+    JXG.Options.angle.orthoType     = "root";
+    JXG.Options.angle.radius        = 25;
+    JXG.Options.polygon.fillOpacity = 0.46;
+    JXG.Options.polygon.fillColor   = "#0ece16";
+    JXG.Options.elements.fixed      = true;
     board  = JXG.JSXGraph.initBoard('grid', {
       boundingbox:     [-xx,yy,xx,-yy],
       keepaspectratio: true,

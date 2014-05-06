@@ -109,7 +109,7 @@ var area = function(board, args) {
   this.execute = function() {
     var result  = this.func.run();
     this.textElement = new element(board, "text", {
-      position: [realArgs.X[0] + 1, realArgs.Y[0] + 1],
+      position: [realArgs.X[0] + 5, realArgs.Y[0] + 1],
       size: 18,
       text: "Area: " + parseFloat(result)
     }).draw();
