@@ -32,7 +32,8 @@ GeometryFunction.prototype = (function() {
     );
   };
 
-  /* Options:
+  /* 
+  Options:
     X:        [point1, point2, point3, ...],
     Y:        [point1, point2, point3, ...],
     vertices: unsigned integer,
@@ -57,10 +58,24 @@ GeometryFunction.prototype = (function() {
     return Math.abs( area / 2 );
   };
 
+  /* 
+  Options:
+    Radius: Float
+  */
+
+  var CircleAreaFunction = function(JXG, options) {
+    this.options = options;    
+  };
+
+  CircleAreaFunction.prototype.run = function() {
+    return Math.PI * Math.pow(this.options.radius, 2);    
+  };
+
   return {
-    Constructor: GeometryFunction,
-    angle:       AngleFunction,
-    area:        polygonAreaFunction
+    Constructor:  GeometryFunction,
+    angle:        AngleFunction,
+    polygon_area: polygonAreaFunction,
+    circle_area:  CircleAreaFunction
   };
 
 })();
