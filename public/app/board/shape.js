@@ -8,7 +8,7 @@ var Shape = function(board, shape, parents, options) {
 Shape.prototype = (function() {
   /* Private */
   var createShapeLabel = function() {
-      return "Q" + (this.board.shapes.length + 1);
+      return "A" + (this.board.shapes.length + 1);
   };
   /* Public */
   return {
@@ -16,7 +16,7 @@ Shape.prototype = (function() {
     add: function() {
       this.options.name      = this.options.name || createShapeLabel.call(this);
       this.options.withLabel = true;
-      var points = this.parents.pop(), 
+      var points = this.parents.pop(), // full list of points 
           s      = this.board.create(this.shape, this.parents, this.options);
       s.usrSetCoords = points;
       this.board.shapes.push(s);
