@@ -35,6 +35,11 @@ module.exports = function (grunt) {
         }
       }
     },
+    karma: {
+      unit: {
+        configFile: 'karma.conf.js'
+      }
+    },
     develop: {
       server: {
         file: 'app.js'
@@ -69,6 +74,13 @@ module.exports = function (grunt) {
       browserify: {
         files: ['public/app/**/*.js'],
         tasks: ['browserify2:compile'],
+        options: {
+          livereload: reloadPort
+        }
+      },
+      karma: {
+        files: ['public/app/**/*.js', 'browser_test/*.js'],
+        tasks: ['karma'],
         options: {
           livereload: reloadPort
         }
