@@ -150,27 +150,6 @@ BoardElement.prototype = (function() {
   /*
   Options: {
     point 1: [float, float],
-    point 2: [float, float]
-  }
-  */
-  var semicircleElement = function(board, options) {
-    this.options = options;
-    this.board   = board;
-  };
-
-  semicircleElement.prototype.draw = function() {
-    var p1 = new point(this.board, this.options.point1).add();  
-    var p2 = new point(this.board, this.options.point2).add();
-
-    return new shape(this.board, "semicircle", [p1, p2, [p1, p2]]).add();
-
-  };
-
-  //-----------------------------------------------------------------------
-
-  /*
-  Options: {
-    point 1: [float, float],
     ...
   }
   */
@@ -242,7 +221,6 @@ BoardElement.prototype = (function() {
     ellipse:     ellipseElement,
     segment:     segmentElement,
     line:        lineElement,
-    semicircle:  semicircleElement,
     polygon:     polygonElement,
     point:       pointElement,
     text:        textElement

@@ -7295,7 +7295,7 @@ GeometryFunction.prototype = (function() {
 
   /* 
   Options:
-    Radius: Float
+    radius: Float
   */
 
   var CircleAreaFunction = function(JXG, options) {
@@ -7304,6 +7304,50 @@ GeometryFunction.prototype = (function() {
 
   CircleAreaFunction.prototype.run = function() {
     return Math.PI * Math.pow(this.options.radius, 2);    
+  };
+
+  /* @TODO: */
+
+  /*
+  Options:
+    vertices1: [Point p1, Point p2, Point p3, ...],
+    vertices2: [Point p1, Point p2, Point p3, ...]
+  */
+
+  var PolygonCongruentFunction = function(JXG, options) {
+    this.options = options;
+  }
+
+  PolygonCongruentFunction.prototype.run = function() {
+
+  };
+
+  /*
+  Options:
+    line1: [[Point p1, Point p2], [Point p3, Point p4]],
+    line2: [[Point p1, Point p2], [Point p3, Point p4]],
+  */
+
+  var LineSegmentCongruentFunction = function(JXG, options) {
+    this.options = options;
+  }
+
+  LineSegmentCongruentFunction.prototype.run = function() {
+
+  };
+
+  /*
+  Options:
+    radius1: unsigned int
+    radius2: unsigned int
+  */
+
+  var CircleCongruentFunction = function(JXG, options) {
+    this.options = options;
+  }
+
+  CircleCongruentFunction.prototype.run = function() {
+
   };
 
   return {
