@@ -1,7 +1,7 @@
 var Func = require('../public/app/board/functions/functions');
 
 describe("GeometryFunction Factory", function() {
-  var brd, a, b, c, p;
+  var brd, a, b, c;
   before(function(done) {
     document.body.innerHTML = window.__html__['browser_test/fixtures/board.html'];
     brd = JXG.JSXGraph.initBoard('grid', {
@@ -11,14 +11,19 @@ describe("GeometryFunction Factory", function() {
       showNavigation:  false,
       axis:            true
       });
-     done();
+    done();
+    brd.shape = {};
+  });
+  afterEach(function(done) {
+    brd.removeObject(brd.shape);
+    done();
   });
   describe("AngleFunction", function() {
     before(function(done) {
-      a = brd.create('point', [-25, 25]);
-      b = brd.create('point', [-25, 0]);
-      c = brd.create('point', [0,   0]);
-      p = brd.create('polygon', [a, b, c], {hasInnerPoints: true});   
+      a         = brd.create('point', [-25, 25]);
+      b         = brd.create('point', [-25, 0]);
+      c         = brd.create('point', [0,   0]);
+      brd.shape = brd.create('polygon', [a, b, c], {hasInnerPoints: true});   
       done();
     });
     it("should compute length of angle", function() {
@@ -30,10 +35,10 @@ describe("GeometryFunction Factory", function() {
   describe("PolygonAreaFunction", function() {
     var X = [], Y = [];
     before(function(done) {
-      a = brd.create('point', [-25, 25]);
-      b = brd.create('point', [-25, 0]);
-      c = brd.create('point', [0,   0]);
-      p = brd.create('polygon', [a, b, c], {hasInnerPoints: true});   
+      a         = brd.create('point', [-25, 25]);
+      b         = brd.create('point', [-25, 0]);
+      c         = brd.create('point', [0,   0]);
+      brd.shape = brd.create('polygon', [a, b, c], {hasInnerPoints: true});   
       X.push(a.coords.usrCoords[1]);
       X.push(b.coords.usrCoords[1]);
       X.push(c.coords.usrCoords[1]);
@@ -53,13 +58,13 @@ describe("GeometryFunction Factory", function() {
   });
   describe("CircleAreaFunction", function() {
     before(function(done) {
-      c = brd.create('point', [0,   0]); 
-      p = brd.create("circle", [c, 25]);     
+      c         = brd.create('point', [0,   0]); 
+      brd.shape = brd.create("circle", [c, 25]);     
       done();
     });
     it("should compute area of a disc", function() {
       var area = new Func(JXG, "circle_area", {
-        radius: p.radius
+        radius: brd.shape.radius
       });
       expect(area.run().toFixed(1)).to.equal("1963.5");
     });
