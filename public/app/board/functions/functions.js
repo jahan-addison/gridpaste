@@ -30,7 +30,7 @@ GeometryFunction.prototype = (function() {
       this.options[1],
       this.options[2]
     );
-  };
+  }; 
 
   /* 
   Options:
@@ -60,7 +60,7 @@ GeometryFunction.prototype = (function() {
 
   /* 
   Options:
-    Radius: Float
+    radius: Float
   */
 
   var CircleAreaFunction = function(JXG, options) {

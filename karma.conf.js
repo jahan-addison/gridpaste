@@ -18,7 +18,7 @@ module.exports = function(config) {
         'public/app/external/jsxgraph.js',
         'public/components/jquery/dist/jquery.min.js',
         'public/components/rxjs/rx.lite.js',
-        'brwoser_test/fixtures/*.html',
+        'browser_test/fixtures/*.html',
     ],
 
 
@@ -30,7 +30,8 @@ module.exports = function(config) {
     // preprocess matching files before serving them to the browser
     // available preprocessors: https://npmjs.org/browse/keyword/karma-preprocessor
     preprocessors: {
-        "/**/*.browserify": "browserify"
+        "/**/*.browserify": "browserify",
+        'browser_test/fixtures/*.html': ['html2js']
     },
 
 

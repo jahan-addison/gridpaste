@@ -7265,7 +7265,7 @@ GeometryFunction.prototype = (function() {
       this.options[1],
       this.options[2]
     );
-  };
+  }; 
 
   /* 
   Options:
