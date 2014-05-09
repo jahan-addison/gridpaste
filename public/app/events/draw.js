@@ -140,20 +140,6 @@ var line = function(board, args) {
   };
 };
 
-var semicircle = function(board, args) {
-  var args = args || {
-    point1: $('input[name="point1"]:last').coord(),
-    point2: $('input[name="point2"]:last').coord(),
-  };
-  this.semicircle    = new element(board, "semicircle", args);
-  this.remove  = function() {
-  };
-  this.execute = function() {
-    this.semicircleElement = this.semicircle.draw();
-    return args;
-  };
-};
-
 var polygon = function(board, args) {
   var points   = 3,
       vertices = {};
@@ -218,7 +204,6 @@ module.exports = {
   ellipse: ellipse,
   segment: segment,
   line: line,
-  semicircle: semicircle,
   polygon: polygon,
   point: point,
   text: text

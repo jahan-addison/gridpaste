@@ -30,7 +30,7 @@ $(function() {
   })();
   if (!$('#application').hasClass('paste')) {
     /* Subscribe to application */
-    var App = require('./subscribe')(board);
+    var App = window.App = require('./subscribe')(board);
   } else {
     /* Play Paste */
     require('./helper/play')($AppPaste, board);
@@ -6411,20 +6411,6 @@ var line = function(board, args) {
   };
 };
 
-var semicircle = function(board, args) {
-  var args = args || {
-    point1: $('input[name="point1"]:last').coord(),
-    point2: $('input[name="point2"]:last').coord(),
-  };
-  this.semicircle    = new element(board, "semicircle", args);
-  this.remove  = function() {
-  };
-  this.execute = function() {
-    this.semicircleElement = this.semicircle.draw();
-    return args;
-  };
-};
-
 var polygon = function(board, args) {
   var points   = 3,
       vertices = {};
@@ -6489,7 +6475,6 @@ module.exports = {
   ellipse: ellipse,
   segment: segment,
   line: line,
-  semicircle: semicircle,
   polygon: polygon,
   point: point,
   text: text
@@ -7513,27 +7498,6 @@ BoardElement.prototype = (function() {
   /*
   Options: {
     point 1: [float, float],
-    point 2: [float, float]
-  }
-  */
-  var semicircleElement = function(board, options) {
-    this.options = options;
-    this.board   = board;
-  };
-
-  semicircleElement.prototype.draw = function() {
-    var p1 = new point(this.board, this.options.point1).add();  
-    var p2 = new point(this.board, this.options.point2).add();
-
-    return new shape(this.board, "semicircle", [p1, p2, [p1, p2]]).add();
-
-  };
-
-  //-----------------------------------------------------------------------
-
-  /*
-  Options: {
-    point 1: [float, float],
     ...
   }
   */
@@ -7605,7 +7569,6 @@ BoardElement.prototype = (function() {
     ellipse:     ellipseElement,
     segment:     segmentElement,
     line:        lineElement,
-    semicircle:  semicircleElement,
     polygon:     polygonElement,
     point:       pointElement,
     text:        textElement
@@ -7667,7 +7630,7 @@ var Shape = function(board, shape, parents, options) {
 Shape.prototype = (function() {
   /* Private */
   var createShapeLabel = function() {
-      return "Q" + (this.board.shapes.length + 1);
+      return "A" + (this.board.shapes.length + 1);
   };
   /* Public */
   return {
@@ -7675,7 +7638,7 @@ Shape.prototype = (function() {
     add: function() {
       this.options.name      = this.options.name || createShapeLabel.call(this);
       this.options.withLabel = true;
-      var points = this.parents.pop(), 
+      var points = this.parents.pop(), // full list of points 
           s      = this.board.create(this.shape, this.parents, this.options);
       s.usrSetCoords = points;
       this.board.shapes.push(s);
