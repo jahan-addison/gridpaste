@@ -13,14 +13,14 @@ module.exports = function(sequelize, datatypes) {
        //   Users.hasOne(models.Sessions);
        // },
         usernameExists: function(username, callback) {
-          Users.find({
+          return Users.count({
             where: { username: username }
           }).success(callback); 
         },
         emailExists: function(email, callback) {
-          Users.find({
+         return Users.count({
             where: { email: email }
-          }).success(callback); 
+          }).success(callback) ;
         },
         register: function(username, password, email, callback) {
           bcrypt.hash(password, null, null, function(err, hash){
