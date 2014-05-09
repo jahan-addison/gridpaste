@@ -50,7 +50,7 @@ describe("draw Command concrete", function() {
     });
     it("should use passed arguments if provided and draw an angle", function() {
       command = new draw.angle(brd, {
-        point1: [25,25], 
+        point1: [-25,25], 
         point2: [-25,0],
         point3: [0,0]});
       command.execute();
@@ -76,7 +76,7 @@ describe("draw Command concrete", function() {
     });
     it("should use passed arguments if provided and draw an arc", function() {
       command = new draw.arc(brd, {
-        point1: [25,25], 
+        point1: [-25,25], 
         point2: [-25,0],
         point3: [0,0]});
       command.execute();
@@ -102,7 +102,7 @@ describe("draw Command concrete", function() {
     });
     it("should use passed arguments if provided and draw an ellipse", function() {
       command = new draw.ellipse(brd, {
-        point1: [25,25], 
+        point1: [-25,25], 
         point2: [-25,0],
         point3: [0,0]});
       command.execute();
@@ -125,7 +125,7 @@ describe("draw Command concrete", function() {
     });
     it("should use passed arguments if provided and draw a segment", function() {
       command = new draw.segment(brd, {
-        point1: [25,25], 
+        point1: [-25,25], 
         point2: [-25,0]});
       command.execute();
       expect(brd.shapes.length).to.equal(1);
@@ -149,7 +149,7 @@ describe("draw Command concrete", function() {
     });
     it("should use passed arguments if provided and draw a line", function() {
       command = new draw.line(brd, {
-        point1: [25,25], 
+        point1: [-25,25], 
         point2: [-25,0]});
       command.execute();
       expect(brd.shapes.length).to.equal(1);
@@ -173,7 +173,7 @@ describe("draw Command concrete", function() {
     });
     it("should use passed arguments if provided and draw a polygon", function() {
       command = new draw.polygon(brd, {
-        point1: [25,25], 
+        point1: [-25,25], 
         point2: [-25,0],
         point3: [0,0]});
       command.execute();
@@ -198,7 +198,7 @@ describe("draw Command concrete", function() {
     });
     it("should use passed arguments if provided and draw a point", function() {
       command = new draw.point(brd, {
-        point: [25,25]});
+        point: [-25,25]});
       command.execute();
       brd.points.A.should.be.instanceof(JXG.Point);
     });
