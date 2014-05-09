@@ -35,9 +35,17 @@ module.exports = function (grunt) {
         }
       }
     },
+    mochaTest: {
+      test: {
+        options: {
+        },
+        src: ['test/**/*.js']
+      }
+    },
     karma: {
       unit: {
-        configFile: 'karma.conf.js'
+        configFile: 'karma.conf.js',
+        singleRun: true
       }
     },
     develop: {
@@ -111,6 +119,12 @@ module.exports = function (grunt) {
           done(reloaded);
         });
     }, 500);
+  });
+
+  grunt.registerTask('test', "Application wide test run", function() {
+    console.log("****************************************************************\nApplication spec");
+    grunt.task.run('mochaTest');
+    grunt.task.run('karma');
   });
 
   grunt.registerTask('default', ['develop', 'compass', 'browserify2:compile', 'watch']);

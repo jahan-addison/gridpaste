@@ -39,6 +39,7 @@
     "karma-opera-launcher": "~0.1.0",
     "karma-browserifast": "~0.6.0",
     "grunt-karma": "~0.8.3",
-    "karma-html2js-preprocessor": "~0.1.0"
+    "karma-html2js-preprocessor": "~0.1.0",
+    "grunt-mocha-test": "~0.10.2"
   }
 }
