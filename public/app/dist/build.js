@@ -6067,24 +6067,10 @@ var zoomOut = function(board, args) {
   };
 };
 
-var zoom100 = function(board, args) {
-  this.X = board.zoomX;
-  this.Y = board.zoomY;
-  this.remove = function() {
-  };
-  this.execute = function() {
-    board.zoom100();
-    return {
-      'X': board.zoomX,
-      'Y': board.zoomY
-    };
-  };
-};
 
 module.exports = {
   zoomIn: zoomIn,
-  zoomOut: zoomOut,
-  zoom100: zoom100
+  zoomOut: zoomOut
 };
 },{}],16:[function(require,module,exports){
 var execute = require('../operation');

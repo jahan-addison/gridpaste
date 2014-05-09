@@ -81,6 +81,9 @@ var area = function(board, args) {
       shape = e;
     }
   });
+  if (!shape) {
+    throw new ReferenceError("structure not found");
+  }
   // Polymorphic object construction
   if (shape.vertices) {
     return PolygonArea.apply(this, arguments);
