@@ -20,7 +20,6 @@ exports.show = function(req, res) {
       res.send(500, "Paste ID does not exist!");
     } else {
      res.render('show.html', { env: req.env, paste: paste });
-      //res.send(paste);
     }
   });
 };
