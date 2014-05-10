@@ -25,7 +25,7 @@ A live video tutorial is coming soon to demonstrate how to use the application e
 
 Contributing
 ===
-Currently, I'm interested in adding more relatively useful geometric functions to perform on structures. You can see what's available now [here](https://github.com/jahan-addison/gridpaste/blob/issue49/public/app/board/functions/functions.js). You may also add decorators for either an object in Gridpaste itself or an object in the JSXGraph library. Note that adding a Function object will mean you must also implement a Command object in order for it to be used in the application.
+Currently, I'm interested in adding more relatively useful geometric functions to perform on structures. You can see what's available now [here](https://github.com/jahan-addison/gridpaste/blob/master/public/app/board/functions/functions.jss). You may also add decorators for either an object in Gridpaste itself or an object in the JSXGraph library. Note that adding a Function object will mean you must also implement a Command object in order for it to be used in the application.
 
 The signature of the Command interface is as follows:
 ```
@@ -35,7 +35,7 @@ Interface Command {
   public object execute()
 }
 ```
-Examples of this can be seen [here](https://github.com/jahan-addison/gridpaste/tree/development/public/app/events).
+Examples of this can be seen [here](https://github.com/jahan-addison/gridpaste/tree/master/public/app/events).
 
 You must then add your unit-tests in `browser_test/function.functions.test.js` and `browser_test/command.function.test.js`, respectively.
 
