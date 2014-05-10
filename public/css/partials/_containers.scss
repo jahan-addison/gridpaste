@@ -233,6 +233,12 @@ h2 {
 .shear {
   padding: 10px 13px !important;
 }
+.new {
+  padding: 10px 21px;
+}
+.replay {
+  padding: 10px 15px;
+}
 
 #transform {
   @include clearfix();
