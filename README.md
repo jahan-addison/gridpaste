@@ -12,7 +12,7 @@ Gridpaste is an online mathematics tool to share computations, transformations, 
 
 Requirements
 ============
-    -- IE 10+
+    -- IE 9+
     -- Google Chrome
     -- Opera
     -- Mozilla Firefox

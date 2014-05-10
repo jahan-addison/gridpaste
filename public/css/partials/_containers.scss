@@ -195,6 +195,45 @@ h2 {
   }
 }
 
+.col .button:nth-child(n + 2) {
+  margin-left:3px !important
+}
+
+.ellipse {
+ padding: 10px 16px  !important;
+}
+.segment {
+  padding: 10px 10px !important;
+}
+.text {
+  position:relative;
+  left:3px;
+  padding: 10px 23px !important;
+}
+.line {
+  padding: 10px 16px !important;
+  margin-left: 6px   !important
+}
+.point {
+  position:relative;
+  left:7px;
+}
+.rotate {
+  padding: 10px 20px !important;
+}
+.translate {
+  padding: 10px 12px !important;
+}
+.reflect {
+  padding: 10px 11px !important;
+}
+.scale {
+  padding: 10px 16px !important;
+}
+.shear {
+  padding: 10px 13px !important;
+}
+
 #transform {
   @include clearfix();
   .col {
