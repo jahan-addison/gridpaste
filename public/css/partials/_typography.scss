@@ -33,7 +33,7 @@
   @extend %font-reset;
   color: $color;
   font-size: $size;
-  font-family: "fertigo-script",cursive;
+  font-family: "coquette",fantasy;
 }
 
 @mixin tablet-gotic-narrow($size:12pt, $color: $off-white) {

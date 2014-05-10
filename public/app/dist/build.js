@@ -30,7 +30,7 @@ $(function() {
   })();
   if (!$('#application').hasClass('paste')) {
     /* Subscribe to application */
-    var App = window.App = require('./subscribe')(board);
+    var App = require('./subscribe')(board);
   } else {
     /* Play Paste */
     require('./helper/play')($AppPaste, board);
@@ -6798,6 +6798,9 @@ var area = function(board, args) {
       shape = e;
     }
   });
+  if (!shape) {
+    throw new ReferenceError("structure not found");
+  }
   // Polymorphic object construction
   if (shape.vertices) {
     return PolygonArea.apply(this, arguments);
