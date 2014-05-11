@@ -30,6 +30,8 @@ $(function() {
   if (!$('#application').hasClass('paste')) {
     /* Subscribe to application */
     var App = require('./subscribe')(board);
+    // prevent 'dirty board'
+    require('./helper/dirty')(App);
   } else {
     /* Play Paste */
     require('./helper/play')($AppPaste, board);

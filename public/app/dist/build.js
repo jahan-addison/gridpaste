@@ -31,6 +31,8 @@ $(function() {
   if (!$('#application').hasClass('paste')) {
     /* Subscribe to application */
     var App = require('./subscribe')(board);
+    // prevent 'dirty board'
+    require('./helper/dirty')(App);
   } else {
     /* Play Paste */
     require('./helper/play')($AppPaste, board);
@@ -45,7 +47,7 @@ $(function() {
     });
   }
 }); 
-},{"./helper/mouse":2,"./subscribe":3,"./helper/play":4}],2:[function(require,module,exports){
+},{"./helper/mouse":2,"./subscribe":3,"./helper/dirty":4,"./helper/play":5}],2:[function(require,module,exports){
 module.exports = function(board) {
   var getMouseCoords = function(e, i) {
     var cPos = board.getCoordsTopLeftCorner(e, i),
@@ -77,6 +79,14 @@ module.exports = function(board) {
     clearTimeout(still);
   });
 };
+},{}],4:[function(require,module,exports){
+module.exports = function(App) {
+  $(window).on('beforeunload', function() {
+    if (App.length) {
+      return "You have an unsaved grid paste! Are you sure you want to leave?";
+    }
+  });
+};
 },{}],3:[function(require,module,exports){
 var execute    = require('./operation');
 
@@ -98,7 +108,7 @@ module.exports = function(board) {
   return operationExec;
 };
 
-},{"./operation":5,"./helper/helpers":6,"./subscriptions/board":7,"./subscriptions/function":8,"./subscriptions/zoom":9}],4:[function(require,module,exports){
+},{"./operation":6,"./helper/helpers":7,"./subscriptions/board":8,"./subscriptions/function":9,"./subscriptions/zoom":10}],5:[function(require,module,exports){
 var iterator = require('../iterate'),
     command  = require('../events/run');
 
@@ -167,7 +177,7 @@ module.exports = function(App, board) {
     });
   }
 };
-},{"../iterate":10,"../events/run":11}],10:[function(require,module,exports){
+},{"../iterate":11,"../events/run":12}],11:[function(require,module,exports){
 /* The Iterator */
 
 var Iterator = function(List) {
@@ -192,7 +202,7 @@ Iterator.prototype.prev    = function() {
 };
 
 module.exports = Iterator;
-},{}],5:[function(require,module,exports){
+},{}],6:[function(require,module,exports){
 /* The Invoker */
 
 var Operation = function(board) {
@@ -228,7 +238,7 @@ Operation.prototype.undoLastExecute = function() {
   require("./decorators/recording")(Operation);
 
 module.exports = Operation;
-},{"./decorators/recording":12}],6:[function(require,module,exports){
+},{"./decorators/recording":13}],7:[function(require,module,exports){
 module.exports = function(App) {
   require('./more')  ();               // attach event to "more" button for polygon construction
   require('./undo')  (App);            // attach event to undo button
@@ -238,7 +248,7 @@ module.exports = function(App) {
   require('./share') (App)             // attach event to share button
 };
 
-},{"./more":13,"./undo":14,"./record":15,"./clear":16,"./play":4,"./share":17}],7:[function(require,module,exports){
+},{"./more":14,"./undo":15,"./record":16,"./clear":17,"./play":5,"./share":18}],8:[function(require,module,exports){
 var command    = require('../events/run'),
     slider     = require('../helper/slider'),
     Rx         = require('../../components/rxjs/rx.lite').Rx;
@@ -298,7 +308,7 @@ module.exports = function(App) {
       console.log("Error: %s", e.message);
     });
 };
-},{"../events/run":11,"../helper/slider":18,"../../components/rxjs/rx.lite":19}],8:[function(require,module,exports){
+},{"../events/run":12,"../helper/slider":19,"../../components/rxjs/rx.lite":20}],9:[function(require,module,exports){
 var command    = require('../events/run'),
     Parser     = require('../board/functions/parser'),
     Rx         = require('../../components/rxjs/rx.lite').Rx;
@@ -341,7 +351,7 @@ module.exports = function(App) {
     console.log("Error: %s", e.message);
   });
 };
-},{"../events/run":11,"../board/functions/parser":20,"../../components/rxjs/rx.lite":19}],9:[function(require,module,exports){
+},{"../events/run":12,"../board/functions/parser":21,"../../components/rxjs/rx.lite":20}],10:[function(require,module,exports){
 var command    = require('../events/run'),
     Rx         = require('../../components/rxjs/rx.lite').Rx;
 
@@ -372,7 +382,7 @@ module.exports = function(App, board) {
   });
 
 }
-},{"../events/run":11,"../../components/rxjs/rx.lite":19}],11:[function(require,module,exports){
+},{"../events/run":12,"../../components/rxjs/rx.lite":20}],12:[function(require,module,exports){
 
 module.exports = {
   draw:      require('./draw'),
@@ -383,7 +393,7 @@ module.exports = {
 };
 
 
-},{"./draw":21,"./transform":22,"./zoom":23,"./function":24}],12:[function(require,module,exports){
+},{"./draw":22,"./transform":23,"./zoom":24,"./function":25}],13:[function(require,module,exports){
 /*
   OperationDecorator
 */
@@ -432,7 +442,7 @@ module.exports = function(Operation) {
   }; 
 };
 
-},{}],13:[function(require,module,exports){
+},{}],14:[function(require,module,exports){
 module.exports = function() {
   $(function() {
     var points = 3;
@@ -443,7 +453,7 @@ module.exports = function() {
     });
   });
 };
-},{}],14:[function(require,module,exports){
+},{}],15:[function(require,module,exports){
 module.exports = function(App) {
   $(function() {
     $('.button.undo').click(function() {
@@ -454,7 +464,7 @@ module.exports = function(App) {
     });
   });
 };
-},{}],15:[function(require,module,exports){
+},{}],16:[function(require,module,exports){
 module.exports = function(App) {
   $(function() {
     $('.start-record').click(function() {
@@ -483,7 +493,7 @@ module.exports = function(App) {
     });
   });
 };
-},{}],18:[function(require,module,exports){
+},{}],19:[function(require,module,exports){
 module.exports = function(content, width, height, source, top) {
   $block = $('<div class="slider"> <div class="close-slider">x</div> </div>');
   $block.append(content)
@@ -509,7 +519,7 @@ module.exports = function(content, width, height, source, top) {
     });
   });
 };
-},{}],25:[function(require,module,exports){
+},{}],26:[function(require,module,exports){
 // shim for using process in browser
 
 var process = module.exports = {};
@@ -564,7 +574,7 @@ process.chdir = function (dir) {
     throw new Error('process.chdir is not supported');
 };
 
-},{}],19:[function(require,module,exports){
+},{}],20:[function(require,module,exports){
 (function(process,global){// Copyright (c) Microsoft Open Technologies, Inc. All rights reserved. See License.txt in the project root for license information.
 
 ;(function (undefined) {
@@ -6042,7 +6052,7 @@ process.chdir = function (dir) {
     }
 }.call(this));
 })(require("__browserify_process"),window)
-},{"__browserify_process":25}],23:[function(require,module,exports){
+},{"__browserify_process":26}],24:[function(require,module,exports){
 /* Commands */
 
 /*--
@@ -6084,7 +6094,7 @@ module.exports = {
   zoomIn: zoomIn,
   zoomOut: zoomOut
 };
-},{}],16:[function(require,module,exports){
+},{}],17:[function(require,module,exports){
 var execute = require('../operation');
 
 module.exports = function(App) {
@@ -6116,7 +6126,7 @@ module.exports = function(App) {
     })
   });
 };
-},{"../operation":5,"./record":15}],17:[function(require,module,exports){
+},{"../operation":6,"./record":16}],18:[function(require,module,exports){
 var slider = require('./slider');
 
 module.exports = function(App) {
@@ -6155,7 +6165,7 @@ module.exports = function(App) {
     })
   });
 }
-},{"./slider":18}],20:[function(require,module,exports){
+},{"./slider":19}],21:[function(require,module,exports){
 var Lexer = require('./lexer');
 
 /*
@@ -6266,7 +6276,7 @@ Parser.prototype = (function() {
 
 module.exports = Parser;
 
-},{"./lexer":26}],21:[function(require,module,exports){
+},{"./lexer":27}],22:[function(require,module,exports){
 var element = require('../board/element'),
     coords  = require('../helper/coords')();
 
@@ -6477,7 +6487,7 @@ module.exports = {
   point: point,
   text: text
 };
-},{"../board/element":27,"../helper/coords":28}],22:[function(require,module,exports){
+},{"../board/element":28,"../helper/coords":29}],23:[function(require,module,exports){
 var transform = require('../board/transform'),
     coords    = require('../helper/coords')();
 
@@ -6726,7 +6736,7 @@ module.exports = {
   translate: translate,
   scale:     scale
 };
-},{"../board/transform":29,"../helper/coords":28}],24:[function(require,module,exports){
+},{"../board/transform":30,"../helper/coords":29}],25:[function(require,module,exports){
 var func    = require('../board/functions/functions'),
     Parser  = require('../board/functions/parser'),
     element = require('../board/element');  
@@ -6942,7 +6952,7 @@ module.exports = {
   angle: angle,
   area:  area
 };
-},{"../board/functions/functions":30,"../board/functions/parser":20,"../board/element":27}],26:[function(require,module,exports){
+},{"../board/functions/functions":31,"../board/functions/parser":21,"../board/element":28}],27:[function(require,module,exports){
 /*
  * Geometry Function Tokenizer
  */
@@ -7062,7 +7072,7 @@ Lexer.prototype = (function() {
 })();
 
 module.exports = Lexer;
-},{}],28:[function(require,module,exports){
+},{}],29:[function(require,module,exports){
 module.exports = function() {
   jQuery.fn.coord = function() {
     if (this.val()) {
@@ -7076,7 +7086,7 @@ module.exports = function() {
   };
 };
 
-},{}],29:[function(require,module,exports){
+},{}],30:[function(require,module,exports){
 /*
   BoardTransform Factory
   */
@@ -7218,7 +7228,7 @@ BoardTransform.prototype = (function() {
 })();
 
 module.exports = BoardTransform;
-},{}],30:[function(require,module,exports){
+},{}],31:[function(require,module,exports){
 /* GeometryFunction Factory */
 
 var GeometryFunction = function(JXG, func, options) {
@@ -7346,7 +7356,7 @@ GeometryFunction.prototype = (function() {
 })();
 
 module.exports = GeometryFunction;
-},{}],27:[function(require,module,exports){
+},{}],28:[function(require,module,exports){
 var point = require('./point'),
     shape = require('./shape')
 
@@ -7578,7 +7588,7 @@ BoardElement.prototype = (function() {
 })();
 
 module.exports = BoardElement; 
-},{"./point":31,"./shape":32}],31:[function(require,module,exports){
+},{"./point":32,"./shape":33}],32:[function(require,module,exports){
 var Point = function(board, coords) {
   this.board  = board;
   this.coords = coords;
@@ -7620,7 +7630,7 @@ Point.prototype = (function() {
 })();
 
 module.exports = Point;
-},{}],32:[function(require,module,exports){
+},{}],33:[function(require,module,exports){
 var Shape = function(board, shape, parents, options) {
   this.board   = board;
   this.shape   = shape;
