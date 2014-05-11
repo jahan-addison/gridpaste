@@ -8,7 +8,7 @@ module.exports = function(App) {
     });
     $('.end-record').click(function() {
       App.stopRecording();
-      $('#application').addClass('off'); // turn application off
+      $('#application').addClass('off'); // turn subscriptions off 
       $(this)
         .html('Finished')
         .addClass('finished')

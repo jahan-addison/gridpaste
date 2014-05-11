@@ -82,8 +82,10 @@ module.exports = function(board) {
 },{}],4:[function(require,module,exports){
 module.exports = function(App) {
   $(window).on('beforeunload', function() {
-    if (App.length) {
-      return "You have an unsaved grid paste! Are you sure you want to leave?";
+    if (!$('#application').hasClass('shared')) {
+      if (App.length) {
+        return "You have an unsaved grid paste! Are you sure you want to leave?";
+      }
     }
   });
 };
@@ -475,7 +477,7 @@ module.exports = function(App) {
     });
     $('.end-record').click(function() {
       App.stopRecording();
-      $('#application').addClass('off'); // turn application off
+      $('#application').addClass('off'); // turn subscriptions off 
       $(this)
         .html('Finished')
         .addClass('finished')
@@ -6130,10 +6132,15 @@ module.exports = function(App) {
 var slider = require('./slider');
 
 module.exports = function(App) {
+  var $html;
   $(function() {
     $('.share').click(function() {
       if (Object.isFrozen(App)) {
         var done;
+        if (typeof $html !== 'undefined') {
+          slider($html, 230, 'auto', '#application', $('#transform'));           
+          return;
+        }
         slider($(this).next().html(), 230, 'auto', '#application', $('#transform')); 
         $('#application').on('click', '.submit', function() {
           var $paste = App.getRecorded.map(function(e) {
@@ -6151,12 +6158,13 @@ module.exports = function(App) {
             data: JSON.stringify(data),
             contentType: "application/json",
             complete: function(token) {
-              var $html = ['<div class="misc-done">',
+              $html = ['<div class="misc-done">',
                 '<label for="url">The URL!</label><input type="text" name="url" class="inside url" value="',
                 document.location.href + token.responseJSON.token,
                 '" />',
                 '</div>'
               ].join('');
+              $('#application').addClass('shared');
               slider($html, 250, 'auto', '#application', $('#transform'));
             }
           });
