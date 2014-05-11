@@ -257,6 +257,10 @@ module.exports = function(App) {
   ].join(','));
   // The query observer prepares the way for the following operations subscription
   var $querySource       = Rx.Observable.fromEvent($querySources, 'click');
+  // Filter queries when the application is 'off'
+  $querySource           = $querySource.filter(function() {
+    return !$('#application').hasClass('off');
+  });
   var $querySubscription = $querySource.subscribe(function(e) {
     var target = $(e.target);
     if (!$('.slider').length) {
@@ -302,7 +306,10 @@ var command    = require('../events/run'),
 module.exports = function(App) {
   var $sources = $('.function'),
       $source  = Rx.Observable.fromEvent($sources, "keypress");
-
+  // Filter when the application is 'off'
+  $source      = $source.filter(function() {
+    return !$('#application').hasClass('off');
+  });
   var $functionSubscription = $source.subscribe(function(e) {
     if (e.keyCode == 13) {
       var func = new Parser(e.target.value);
@@ -342,6 +349,10 @@ module.exports = function(App, board) {
   var $zoomSources      = $('.zoom.in, .zoom.out');
   var $zoomSource       = Rx.Observable.fromEvent($zoomSources, "click");
 
+  // Filter when the application is 'off'
+  $zoomSource = $zoomSource.filter(function() {
+    return !$('#application').hasClass('off');
+  });
 
   var $zoomSubscription = $zoomSource.subscribe(function(e) {
     var target          = $(e.target),
@@ -454,6 +465,7 @@ module.exports = function(App) {
     });
     $('.end-record').click(function() {
       App.stopRecording();
+      $('#application').addClass('off'); // turn application off
       $(this)
         .html('Finished')
         .addClass('finished')

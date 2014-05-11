@@ -5,6 +5,10 @@ module.exports = function(App, board) {
   var $zoomSources      = $('.zoom.in, .zoom.out');
   var $zoomSource       = Rx.Observable.fromEvent($zoomSources, "click");
 
+  // Filter when the application is 'off'
+  $zoomSource = $zoomSource.filter(function() {
+    return !$('#application').hasClass('off');
+  });
 
   var $zoomSubscription = $zoomSource.subscribe(function(e) {
     var target          = $(e.target),
