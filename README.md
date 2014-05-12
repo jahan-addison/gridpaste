@@ -2,6 +2,7 @@
 ![gridpaste](http://i.imgur.com/SgA43Vu.png) 
 
 [![Built with Grunt](https://cdn.gruntjs.com/builtwith.png)](http://gruntjs.com/)
+[![Build Status](https://travis-ci.org/jahan-addison/gridpaste.svg?branch=master)](https://travis-ci.org/jahan-addison/gridpaste)
 
 A tool to paste computations, transformations, and structures on a geometric plane.
 

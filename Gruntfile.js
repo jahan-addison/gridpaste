@@ -49,7 +49,9 @@ module.exports = function (grunt) {
     karma: {
       unit: {
         configFile: 'karma.conf.js',
-        singleRun: true
+        singleRun: true,
+        browsers: ['PhantomJS'],
+        logLevel: 'ERROR'
       }
     },
     develop: {
@@ -125,10 +127,12 @@ module.exports = function (grunt) {
     }, 500);
   });
 
+
   grunt.registerTask('test', "Application wide test run", function() {
-    console.log("****************************************************************\nApplication spec");
+    console.log('********************************************************************\nApplication Spec:');
     grunt.task.run('mochaTest');
     grunt.task.run('karma');
+
   });
 
   grunt.registerTask('default', ['develop', 'compass', 'browserify2:compile', 'watch']);
