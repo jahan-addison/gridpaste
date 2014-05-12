@@ -7132,7 +7132,8 @@ BoardTransform.prototype = (function() {
 
   RotateTransform.prototype.apply = function() {
     var transform = this.board.create("transform", 
-      [degreeToRadian.call(this, this.options.degrees)],
+      [degreeToRadian.call(this, this.options.degrees),
+      this.options.points[1] || this.options.points[0]],
       {type: "rotate"});
 
     transform.applyOnce(this.options.points);

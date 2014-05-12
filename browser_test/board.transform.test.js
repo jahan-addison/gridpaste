@@ -60,9 +60,9 @@ describe("BoardTransform Factory", function() {
         degrees: 45,
         points: [brd.points.A, brd.points.B, brd.points.C]
       }).apply();
-      expect(brd.points.A.coords.usrCoords.map(function(e) { return e.toFixed(2)}).equals(['1.00','-35.36','0.00'])).to.be.true;
-      expect(brd.points.B.coords.usrCoords.map(function(e) { return e.toFixed(2)}).equals(['1.00','-17.68','-17.68'])).to.be.true;
-      expect(brd.points.C.coords.usrCoords.map(function(e) { return e.toFixed(2)}).equals(['1.00','0.00','0.00'])).to.be.true;
+      expect(brd.points.A.coords.usrCoords.map(function(e) { return e.toFixed(2)}).equals(['1.00','-42.68','17.68'])).to.be.true;
+      expect(brd.points.B.coords.usrCoords.map(function(e) { return e.toFixed(2)}).equals(['1.00','-25.00','0.00'])).to.be.true;
+      expect(brd.points.C.coords.usrCoords.map(function(e) { return e.toFixed(2)}).equals(['1.00','-7.32','17.68'])).to.be.true;
     });
   });
   describe("ReflectTransform", function() {
