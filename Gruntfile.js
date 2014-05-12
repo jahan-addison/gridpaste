@@ -28,9 +28,13 @@ module.exports = function (grunt) {
         beforeHook: function(bundle) {
           shim(bundle, {
             RxJS: {
-              path: './public/components/rxjs/rx.lite,js',
-              exports: 'Rx'
+              path: './public/components/mousetrap/mousetrap.min',
+              exports: 'Mousetrap'
             },
+            Mousetrap: {
+              path: './public/components/rxjs/rx.lite,js',
+              exports: 'Rx'              
+            }
           });
         }
       }

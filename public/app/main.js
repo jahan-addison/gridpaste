@@ -21,15 +21,19 @@ $(function() {
     board.shapes = [];
     var axx      = board.axx = board.create('axis',[[0,0],[1,0]]);
     var axy      = board.axy = board.create('axis',[[0,0],[0,1]]);
-    /* Show coordinates at mouse */
     if (!$paste) {
+      /* Show coordinates at mouse */
       require('./helper/mouse')(board);
+      /* keyboard bindings */
+      require('./helper/bindings')();
     }
     board.unsuspendUpdate();    
   })();
   if (!$('#application').hasClass('paste')) {
     /* Subscribe to application */
     var App = require('./subscribe')(board);
+    // prevent 'dirty board'
+    require('./helper/dirty')(App);
   } else {
     /* Play Paste */
     require('./helper/play')($AppPaste, board);

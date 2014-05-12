@@ -16,6 +16,10 @@ module.exports = function(App) {
   ].join(','));
   // The query observer prepares the way for the following operations subscription
   var $querySource       = Rx.Observable.fromEvent($querySources, 'click');
+  // Filter queries when the application is 'off'
+  $querySource           = $querySource.filter(function() {
+    return !$('#application').hasClass('off');
+  });
   var $querySubscription = $querySource.subscribe(function(e) {
     var target = $(e.target);
     if (!$('.slider').length) {

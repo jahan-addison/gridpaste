@@ -5,7 +5,10 @@ var command    = require('../events/run'),
 module.exports = function(App) {
   var $sources = $('.function'),
       $source  = Rx.Observable.fromEvent($sources, "keypress");
-
+  // Filter when the application is 'off'
+  $source      = $source.filter(function() {
+    return !$('#application').hasClass('off');
+  });
   var $functionSubscription = $source.subscribe(function(e) {
     if (e.keyCode == 13) {
       var func = new Parser(e.target.value);

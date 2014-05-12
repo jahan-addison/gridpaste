@@ -273,6 +273,9 @@ h2 {
 #bottom {
   border-top: rgba($light-brown, .45) 1px dashed;
   width:95%;
+  .button {
+    padding: 10px 17px;
+  }
   & > .col:first-child {
     margin-top:15px;
   }

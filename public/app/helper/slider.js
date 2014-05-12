@@ -11,7 +11,16 @@ module.exports = function(content, width, height, source, top) {
     })
   $block.animate({
     left: 0
-  }, 320);
+  }, 320, function() {
+    $block.find('input:first').focus();
+  });
+  $('.slider input').keydown( function(e) {
+    var key = e.charCode ? e.charCode : e.keyCode ? e.keyCode : 0;
+    if(key == 13) {
+      e.preventDefault();
+      $block.find('.button').click();
+    }
+  });
   $('.close-slider').click(function() {
     $(this).parent()
       .find('*')
