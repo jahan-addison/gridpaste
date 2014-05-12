@@ -5,7 +5,7 @@ html,body,#application {
 }
 
 p {
-  @include adelle(13px);
+  @include adelle(14px);
   color: #EBE9E8;
 }
 
@@ -14,7 +14,11 @@ body {
 }
 
 .red {
-  color: $red;
+  color: lighten($red, 3%);
+}
+
+.segment {
+  padding: 10px 12px !important;
 }
 
 #query {
@@ -191,12 +195,57 @@ h2 {
   }
 }
 
+.col .button:nth-child(n + 2) {
+  margin-left:3px !important
+}
+
+.ellipse {
+ padding: 10px 16px  !important;
+}
+.segment {
+  padding: 10px 10px !important;
+}
+.text {
+  position:relative;
+  left:3px;
+  padding: 10px 23px !important;
+}
+.line {
+  padding: 10px 16px !important;
+  margin-left: 6px   !important
+}
+.point {
+  position:relative;
+  left:7px;
+}
+.rotate {
+  padding: 10px 20px !important;
+}
+.translate {
+  padding: 10px 12px !important;
+}
+.reflect {
+  padding: 10px 11px !important;
+}
+.scale {
+  padding: 10px 16px !important;
+}
+.shear {
+  padding: 10px 13px !important;
+}
+.new {
+  padding: 10px 21px;
+}
+.replay {
+  padding: 10px 15px;
+}
+
 #transform {
   @include clearfix();
   .col {
    .button {
       padding: 10px 15px;
-      margin: 3px 6px;
+      margin: 3px 5px;
     }
   }
 }
@@ -205,12 +254,28 @@ h2 {
 #bottom footer p {
   padding: 15px 8px;
   clear:both;
+  @include text-shadow(1px 1px 2px rgba(96,96,96,0.35));
+  word-spacing:1px;
+  .underline {
+    color:#EBE9E8;
+    text-decoration:underline;
+    &:hover {
+      text-decoration:none;
+    }
+  }
   width:95%;
 }
 
+#new {
+  @include clearfix();
+  margin-bottom:-7px;
+}
 #bottom {
   border-top: rgba($light-brown, .45) 1px dashed;
   width:95%;
+  .button {
+    padding: 10px 17px;
+  }
   & > .col:first-child {
     margin-top:15px;
   }
@@ -218,15 +283,28 @@ h2 {
   @include clearfix();
 }
 
+.url {
+  width:200px;
+}
+
 #left-bar {
   header img {
+    .paste & {
+      width:140px;
+      height:80px;
+    }
     width:195px;
     height:96px;
   }
   padding-left:8px;
   header p {
-    width:95%;
+    width: 93.6%;
+    word-spacing:2px;
+    @include text-shadow(1px 1px 2px rgba(96,96,96,0.35));
     margin:0 auto;
+  }
+  .paste & {
+    width:160px;
   }
   width: 259px;
   height:100%;
@@ -258,6 +336,9 @@ h2 {
 }
 
 #grid {
+  .paste & {
+    width: calc(100% - 160px);    
+  }
   width: calc(100% - 259px);
   height:100%;
 }

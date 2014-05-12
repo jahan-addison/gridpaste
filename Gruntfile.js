@@ -23,16 +23,33 @@ module.exports = function (grunt) {
     },
     browserify2: {
       compile: {
-        entry: './public/js/main.js',
-        compile: './public/js/dist/build.js',
+        entry: './public/app/main.js',
+        compile: './public/app/dist/build.js',
         beforeHook: function(bundle) {
           shim(bundle, {
             RxJS: {
-              path: './public/components/rxjs/rx.lite,js',
-              exports: 'Rx'
+              path: './public/components/mousetrap/mousetrap.min',
+              exports: 'Mousetrap'
             },
+            Mousetrap: {
+              path: './public/components/rxjs/rx.lite,js',
+              exports: 'Rx'              
+            }
           });
         }
+      }
+    },
+    mochaTest: {
+      test: {
+        options: {
+        },
+        src: ['test/**/*.js']
+      }
+    },
+    karma: {
+      unit: {
+        configFile: 'karma.conf.js',
+        singleRun: true
       }
     },
     develop: {
@@ -54,7 +71,7 @@ module.exports = function (grunt) {
         tasks: ['develop', 'delayed-livereload']
       },
       js: {
-        files: ['public/js/**/*.js', './Gruntfile.js'],
+        files: ['public/app/**/*.js', './Gruntfile.js'],
         options: {
           livereload: reloadPort
         }
@@ -67,8 +84,15 @@ module.exports = function (grunt) {
         }
       },
       browserify: {
-        files: ['public/js/**/*.js'],
+        files: ['public/app/**/*.js'],
         tasks: ['browserify2:compile'],
+        options: {
+          livereload: reloadPort
+        }
+      },
+      karma: {
+        files: ['public/app/**/*.js', 'browser_test/*.js'],
+        tasks: ['karma'],
         options: {
           livereload: reloadPort
         }
@@ -99,6 +123,12 @@ module.exports = function (grunt) {
           done(reloaded);
         });
     }, 500);
+  });
+
+  grunt.registerTask('test', "Application wide test run", function() {
+    console.log("****************************************************************\nApplication spec");
+    grunt.task.run('mochaTest');
+    grunt.task.run('karma');
   });
 
   grunt.registerTask('default', ['develop', 'compass', 'browserify2:compile', 'watch']);

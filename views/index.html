@@ -3,7 +3,7 @@
   {% parent %}
   <script type="text/javascript" src="//use.typekit.net/cmr6vjy.js"></script>
   <script type="text/javascript">try{Typekit.load();}catch(e){}</script>
-  <script type="text/javascript" src="/js/external/jsxgraph.js"></script>
+  <script type="text/javascript" src="/app/external/jsxgraph.js"></script>
 {% endblock %}
 {% block content %}
     <div id="application" role="application">
@@ -11,7 +11,7 @@
           <header>
             <img src="/images/gridpaste-logo.svg" alt="logo" />
             <p>
-              <span class="red">Lorem ipsum</span> dolor sit amet, consectetur adipiscing elit. Cras sapien leo, molestie sit amet tellus a, viverra ornare augue. Vestibulum quam sem, molestie eu velit ut, rhoncus molestie augue. Mauris ultrices sapien nec lorem bibendum semper. Mauris id quam mollis, luctus enim vitae, vehicula odio. N nec est. Nulla facilisi. Aenean non
+              <span class="red">Gridpaste</span> is an online math tool to share computations, transformations, and annotations on geometric structures in a coordinate plane. One starts with a clean board and places their geometric elements and performs actions on these elements in a recordable sequence. The sequence may then be saved and shared by a unique URL to colleagues or instructors.
             </p>
           </header> 
           <section id="auth">
@@ -19,7 +19,7 @@
             <div class="col"><a href="#">Login</a></div>
           </section>
           <section id="run-function">
-            <span id="f">f</span> <input type="text" class="function" name="run" value="e^z" />
+            <span id="f">f</span> <input type="text" class="function" name="run" value="" />
           </section>
           <h2>Elements</h2>
           <section id="elements">
@@ -79,16 +79,6 @@
               </div>
             </div>
             <div class="col">
-              <!--
-              <div class="button semicircle">Semicircle</div>
-              <div data-html="semicircle">
-                <div class="draw-semicircle">
-                  <label for="point1">Point 1 (x,y):</label><input type="text" name="point1" class="inside" value="0.0,0.0" />
-                  <br /><label for="point2">Point 2 (x,y):</label><input type="text" name="point2" class="inside" value="0.0,0.0" />
-                  <div class="button draw">Draw to board</div>
-                </div>
-              </div>
-              -->
               <div class="button polygon">Polygon</div>
               <div data-html="polygon">
                 <div class="draw-polygon">
@@ -178,12 +168,25 @@
               <div class="end-record button">End Record</div>
             </div>
             <div class="col">
-              <div class="button">Share</div>
+              <div class="button share">Share</div>
+              <div data-html="share">
+                <div class="misc-share">
+                 <label for="title">Title</label><input type="text" name="title" class="inside title" value="" />
+                 <br />
+                 <br />
+                  <div class="button submit">Save and Share!</div>
+                </div>
+              </div>
+              <div data-html="done">
+                <div class="misc-done">
+                 <label for="url">The URL!</label><input type="text" name="url" class="inside url" value="" />
+                </div>
+              </div>
               <div class="button undo">Undo</div>
             </div>
             <footer>
               <p>
-                Vivamus mollis leo at accumsan cursus. Interdum et malesuada fames ac ante ipsum primis in faucibus. Nullam pharetra nunc enim, sit amet vehicula purus volutpat sit amet. Nunc interdum malesuada pulvinar. it amet nunc.
+                This is an <a target="_blank" class="underline" href="https://github.com/jahan-addison/gridpaste">open</a> tool available as a public service. Please report bugs to <a class="underline" href="mailto:jahan.addison@jacata.me">this address</a>, and to send any questions or concerns. 
               </p>
               <address>Copyright &copy; 2014</address>
             </footer>
@@ -198,5 +201,5 @@
     <script src='//localhost:35728/livereload.js'></script>
     {% endif %}
     <script src="//code.jquery.com/jquery-1.11.0.min.js"></script>
-    <script src="/js/dist/build.js"></script>
+    <script src="/app/dist/build.js"></script>
 {% endblock %}

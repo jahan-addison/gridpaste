@@ -1,11 +1,11 @@
-var assert     = require('assert'),
-    db         = require('../database'),
-    users      = require('../services/userservice'),
-    bcrypt     = require('bcrypt-nodejs');
+var assert = require('assert'),
+    bcrypt = require('bcrypt-nodejs'),
+    db     = require('../environment/sequelize'),
+    util   = require('util'),
+    Users  = db.Users; 
 
 describe('User', function() {
 
-    db.connect();
 
     var mockUsername       = 'dummy',
         mockUnusedUsername = 'dummy2',
@@ -15,7 +15,7 @@ describe('User', function() {
 
     before(function(done) {
         bcrypt.hash(mockPassword, null, null, function(err, hash){
-            db.users.create({
+            Users.create({
                     username: mockUsername,
                     password: hash,
                     email: mockEmail
@@ -26,7 +26,7 @@ describe('User', function() {
     });
 
     after(function(done) {
-        db.users.destroy({
+        Users.destroy({
             email: mockEmail
         }).success(function() {
             done();
@@ -35,10 +35,10 @@ describe('User', function() {
 
     describe('#usernameExists()', function() {
         it('should prevent duplicate username entries', function(done) {
-            users.usernameExists(db, mockUsername, function(result) {
+            var t = Users.usernameExists(mockUsername, function(result) {
                 assert.equal(result, true);
             });
-            users.usernameExists(db, mockUnusedUsername, function(result) {
+            Users.usernameExists(mockUnusedUsername, function(result) {
                 assert.equal(result, false);
             });
             done();
@@ -47,10 +47,10 @@ describe('User', function() {
 
     describe('#emailExists()', function() {
         it('should prevent duplicate email entries', function(done) {
-            users.emailExists(db, mockEmail, function(result) {
+            Users.emailExists(mockEmail, function(result) {
                 assert.equal(result, true);
             });
-            users.emailExists(db, mockUnusedEmail, function(result) {
+            Users.emailExists(mockUnusedEmail, function(result) {
                 assert.equal(result, false);
             });
             done();
@@ -59,9 +59,9 @@ describe('User', function() {
 
     describe('#register()', function() {
         it('should register successfully', function(done) {
-            users.register(db, mockUsername, mockPassword, mockEmail, function() {
+            assert.doesNotThrow(function() {Users.register(mockUsername, mockPassword, mockEmail, function() {
                 done();
-            })
+            }); });
         });
     })
 });
