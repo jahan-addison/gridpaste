@@ -8,7 +8,8 @@
   ],
   "dependencies": {
     "meyer-reset": "*",
-    "rxjs": "2.2.18"
+    "rxjs": "2.2.18",
+    "mousetrap": "~1.4.6"
   },
   "devDependencies": {
     "jquery": "~2.1.1"
