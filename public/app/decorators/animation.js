@@ -1,5 +1,5 @@
 /*
-  JXG.Transformations.prototype.applyOnce Decorator
+  JXG.Transformation.prototype.applyOnce Decorator
   @NOTE not in use
 */  
 

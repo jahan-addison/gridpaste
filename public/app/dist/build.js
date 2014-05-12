@@ -22,9 +22,11 @@ $(function() {
     board.shapes = [];
     var axx      = board.axx = board.create('axis',[[0,0],[1,0]]);
     var axy      = board.axy = board.create('axis',[[0,0],[0,1]]);
-    /* Show coordinates at mouse */
     if (!$paste) {
+      /* Show coordinates at mouse */
       require('./helper/mouse')(board);
+      /* keyboard bindings */
+      require('./helper/bindings')();
     }
     board.unsuspendUpdate();    
   })();
@@ -47,7 +49,7 @@ $(function() {
     });
   }
 }); 
-},{"./helper/mouse":2,"./subscribe":3,"./helper/dirty":4,"./helper/play":5}],2:[function(require,module,exports){
+},{"./helper/mouse":2,"./helper/bindings":3,"./subscribe":4,"./helper/dirty":5,"./helper/play":6}],2:[function(require,module,exports){
 module.exports = function(board) {
   var getMouseCoords = function(e, i) {
     var cPos = board.getCoordsTopLeftCorner(e, i),
@@ -79,7 +81,7 @@ module.exports = function(board) {
     clearTimeout(still);
   });
 };
-},{}],4:[function(require,module,exports){
+},{}],5:[function(require,module,exports){
 module.exports = function(App) {
   $(window).on('beforeunload', function() {
     if (!$('#application').hasClass('shared')) {
@@ -89,7 +91,7 @@ module.exports = function(App) {
     }
   });
 };
-},{}],3:[function(require,module,exports){
+},{}],4:[function(require,module,exports){
 var execute    = require('./operation');
 
 module.exports = function(board) {
@@ -110,7 +112,56 @@ module.exports = function(board) {
   return operationExec;
 };
 
-},{"./operation":6,"./helper/helpers":7,"./subscriptions/board":8,"./subscriptions/function":9,"./subscriptions/zoom":10}],5:[function(require,module,exports){
+},{"./operation":7,"./helper/helpers":8,"./subscriptions/board":9,"./subscriptions/function":10,"./subscriptions/zoom":11}],3:[function(require,module,exports){
+require('../../components/mousetrap/mousetrap.min');
+
+module.exports = function() {
+  var drawBindLimit      = 9,
+      transformBindLimit = 5,
+      i;
+  $(function() {
+    /* Zoom in/out */
+    Mousetrap.bind('ctrl =', function() { $('.zoom.in').click(); });
+    Mousetrap.bind('ctrl -', function() { $('.zoom.out').click(); });
+    /* Function */
+    Mousetrap.bind('f', function() { setTimeout(function() { $('.function').focus(); },200); });
+    /* Undo */
+    Mousetrap.bind('ctrl+z', function() { $('.undo').click(); });    
+    /* Clear */
+    Mousetrap.bind('m c', function() { $('.clear').click(); });
+    /* Start recording */
+    Mousetrap.bind('tab', function() { $('.start-record').click(); return false; });    
+    /* Cancel query */
+    Mousetrap.bind('escape', function() { $('.close-slider').click(); });        
+
+    Mousetrap.stopCallback = function(e, element, combo) {
+      // if the element has the class "mousetrap" then no need to stop
+      if ((' ' + element.className + ' ').indexOf(' mousetrap ') > -1) {
+          return false;
+      }
+      // Allow escape while in queries
+      if ($(element).parent().parent().hasClass('slider') && combo.match(/esc|escape/)) {
+        return false;
+      }
+      // stop for input, select, and textarea
+      return element.tagName == 'INPUT' || element.tagName == 'SELECT' || element.tagName == 'TEXTAREA' || (element.contentEditable && element.contentEditable == 'true');
+    };
+    
+    /* Draw */
+    for(i = 0; i < drawBindLimit; i++) {
+      Mousetrap.bind('d ' + (i+1), 
+        new Function("$('#elements .button').not('.draw').not('.more').eq("+i+").click();")
+      ); 
+    }
+    /* Transform */
+    for(i = 0; i < transformBindLimit; i++) {
+      Mousetrap.bind('t ' + (i+1), 
+        new Function("$('#transform .button').not('.transform').not('.more').eq("+i+").click();")
+      ); 
+    }
+  });
+};
+},{"../../components/mousetrap/mousetrap.min":12}],6:[function(require,module,exports){
 var iterator = require('../iterate'),
     command  = require('../events/run');
 
@@ -179,7 +230,18 @@ module.exports = function(App, board) {
     });
   }
 };
-},{"../iterate":11,"../events/run":12}],11:[function(require,module,exports){
+},{"../iterate":13,"../events/run":14}],12:[function(require,module,exports){
+/* mousetrap v1.4.6 craig.is/killing/mice */
+(function(J,r,f){function s(a,b,d){a.addEventListener?a.addEventListener(b,d,!1):a.attachEvent("on"+b,d)}function A(a){if("keypress"==a.type){var b=String.fromCharCode(a.which);a.shiftKey||(b=b.toLowerCase());return b}return h[a.which]?h[a.which]:B[a.which]?B[a.which]:String.fromCharCode(a.which).toLowerCase()}function t(a){a=a||{};var b=!1,d;for(d in n)a[d]?b=!0:n[d]=0;b||(u=!1)}function C(a,b,d,c,e,v){var g,k,f=[],h=d.type;if(!l[a])return[];"keyup"==h&&w(a)&&(b=[a]);for(g=0;g<l[a].length;++g)if(k=
+l[a][g],!(!c&&k.seq&&n[k.seq]!=k.level||h!=k.action||("keypress"!=h||d.metaKey||d.ctrlKey)&&b.sort().join(",")!==k.modifiers.sort().join(","))){var m=c&&k.seq==c&&k.level==v;(!c&&k.combo==e||m)&&l[a].splice(g,1);f.push(k)}return f}function K(a){var b=[];a.shiftKey&&b.push("shift");a.altKey&&b.push("alt");a.ctrlKey&&b.push("ctrl");a.metaKey&&b.push("meta");return b}function x(a,b,d,c){m.stopCallback(b,b.target||b.srcElement,d,c)||!1!==a(b,d)||(b.preventDefault?b.preventDefault():b.returnValue=!1,b.stopPropagation?
+b.stopPropagation():b.cancelBubble=!0)}function y(a){"number"!==typeof a.which&&(a.which=a.keyCode);var b=A(a);b&&("keyup"==a.type&&z===b?z=!1:m.handleKey(b,K(a),a))}function w(a){return"shift"==a||"ctrl"==a||"alt"==a||"meta"==a}function L(a,b,d,c){function e(b){return function(){u=b;++n[a];clearTimeout(D);D=setTimeout(t,1E3)}}function v(b){x(d,b,a);"keyup"!==c&&(z=A(b));setTimeout(t,10)}for(var g=n[a]=0;g<b.length;++g){var f=g+1===b.length?v:e(c||E(b[g+1]).action);F(b[g],f,c,a,g)}}function E(a,b){var d,
+c,e,f=[];d="+"===a?["+"]:a.split("+");for(e=0;e<d.length;++e)c=d[e],G[c]&&(c=G[c]),b&&"keypress"!=b&&H[c]&&(c=H[c],f.push("shift")),w(c)&&f.push(c);d=c;e=b;if(!e){if(!p){p={};for(var g in h)95<g&&112>g||h.hasOwnProperty(g)&&(p[h[g]]=g)}e=p[d]?"keydown":"keypress"}"keypress"==e&&f.length&&(e="keydown");return{key:c,modifiers:f,action:e}}function F(a,b,d,c,e){q[a+":"+d]=b;a=a.replace(/\s+/g," ");var f=a.split(" ");1<f.length?L(a,f,b,d):(d=E(a,d),l[d.key]=l[d.key]||[],C(d.key,d.modifiers,{type:d.action},
+c,a,e),l[d.key][c?"unshift":"push"]({callback:b,modifiers:d.modifiers,action:d.action,seq:c,level:e,combo:a}))}var h={8:"backspace",9:"tab",13:"enter",16:"shift",17:"ctrl",18:"alt",20:"capslock",27:"esc",32:"space",33:"pageup",34:"pagedown",35:"end",36:"home",37:"left",38:"up",39:"right",40:"down",45:"ins",46:"del",91:"meta",93:"meta",224:"meta"},B={106:"*",107:"+",109:"-",110:".",111:"/",186:";",187:"=",188:",",189:"-",190:".",191:"/",192:"`",219:"[",220:"\\",221:"]",222:"'"},H={"~":"`","!":"1",
+"@":"2","#":"3",$:"4","%":"5","^":"6","&":"7","*":"8","(":"9",")":"0",_:"-","+":"=",":":";",'"':"'","<":",",">":".","?":"/","|":"\\"},G={option:"alt",command:"meta","return":"enter",escape:"esc",mod:/Mac|iPod|iPhone|iPad/.test(navigator.platform)?"meta":"ctrl"},p,l={},q={},n={},D,z=!1,I=!1,u=!1;for(f=1;20>f;++f)h[111+f]="f"+f;for(f=0;9>=f;++f)h[f+96]=f;s(r,"keypress",y);s(r,"keydown",y);s(r,"keyup",y);var m={bind:function(a,b,d){a=a instanceof Array?a:[a];for(var c=0;c<a.length;++c)F(a[c],b,d);return this},
+unbind:function(a,b){return m.bind(a,function(){},b)},trigger:function(a,b){if(q[a+":"+b])q[a+":"+b]({},a);return this},reset:function(){l={};q={};return this},stopCallback:function(a,b){return-1<(" "+b.className+" ").indexOf(" mousetrap ")?!1:"INPUT"==b.tagName||"SELECT"==b.tagName||"TEXTAREA"==b.tagName||b.isContentEditable},handleKey:function(a,b,d){var c=C(a,b,d),e;b={};var f=0,g=!1;for(e=0;e<c.length;++e)c[e].seq&&(f=Math.max(f,c[e].level));for(e=0;e<c.length;++e)c[e].seq?c[e].level==f&&(g=!0,
+b[c[e].seq]=1,x(c[e].callback,d,c[e].combo,c[e].seq)):g||x(c[e].callback,d,c[e].combo);c="keypress"==d.type&&I;d.type!=u||w(a)||c||t(b);I=g&&"keydown"==d.type}};J.Mousetrap=m;"function"===typeof define&&define.amd&&define(m)})(window,document);
+
+},{}],13:[function(require,module,exports){
 /* The Iterator */
 
 var Iterator = function(List) {
@@ -204,7 +266,7 @@ Iterator.prototype.prev    = function() {
 };
 
 module.exports = Iterator;
-},{}],6:[function(require,module,exports){
+},{}],7:[function(require,module,exports){
 /* The Invoker */
 
 var Operation = function(board) {
@@ -240,7 +302,7 @@ Operation.prototype.undoLastExecute = function() {
   require("./decorators/recording")(Operation);
 
 module.exports = Operation;
-},{"./decorators/recording":13}],7:[function(require,module,exports){
+},{"./decorators/recording":15}],8:[function(require,module,exports){
 module.exports = function(App) {
   require('./more')  ();               // attach event to "more" button for polygon construction
   require('./undo')  (App);            // attach event to undo button
@@ -250,7 +312,7 @@ module.exports = function(App) {
   require('./share') (App)             // attach event to share button
 };
 
-},{"./more":14,"./undo":15,"./record":16,"./clear":17,"./play":5,"./share":18}],8:[function(require,module,exports){
+},{"./more":16,"./undo":17,"./record":18,"./clear":19,"./play":6,"./share":20}],9:[function(require,module,exports){
 var command    = require('../events/run'),
     slider     = require('../helper/slider'),
     Rx         = require('../../components/rxjs/rx.lite').Rx;
@@ -310,7 +372,7 @@ module.exports = function(App) {
       console.log("Error: %s", e.message);
     });
 };
-},{"../events/run":12,"../helper/slider":19,"../../components/rxjs/rx.lite":20}],9:[function(require,module,exports){
+},{"../events/run":14,"../helper/slider":21,"../../components/rxjs/rx.lite":22}],10:[function(require,module,exports){
 var command    = require('../events/run'),
     Parser     = require('../board/functions/parser'),
     Rx         = require('../../components/rxjs/rx.lite').Rx;
@@ -353,7 +415,7 @@ module.exports = function(App) {
     console.log("Error: %s", e.message);
   });
 };
-},{"../events/run":12,"../board/functions/parser":21,"../../components/rxjs/rx.lite":20}],10:[function(require,module,exports){
+},{"../events/run":14,"../board/functions/parser":23,"../../components/rxjs/rx.lite":22}],11:[function(require,module,exports){
 var command    = require('../events/run'),
     Rx         = require('../../components/rxjs/rx.lite').Rx;
 
@@ -384,7 +446,7 @@ module.exports = function(App, board) {
   });
 
 }
-},{"../events/run":12,"../../components/rxjs/rx.lite":20}],12:[function(require,module,exports){
+},{"../events/run":14,"../../components/rxjs/rx.lite":22}],14:[function(require,module,exports){
 
 module.exports = {
   draw:      require('./draw'),
@@ -395,7 +457,7 @@ module.exports = {
 };
 
 
-},{"./draw":22,"./transform":23,"./zoom":24,"./function":25}],13:[function(require,module,exports){
+},{"./draw":24,"./transform":25,"./zoom":26,"./function":27}],15:[function(require,module,exports){
 /*
   OperationDecorator
 */
@@ -444,7 +506,7 @@ module.exports = function(Operation) {
   }; 
 };
 
-},{}],14:[function(require,module,exports){
+},{}],16:[function(require,module,exports){
 module.exports = function() {
   $(function() {
     var points = 3;
@@ -455,7 +517,7 @@ module.exports = function() {
     });
   });
 };
-},{}],15:[function(require,module,exports){
+},{}],17:[function(require,module,exports){
 module.exports = function(App) {
   $(function() {
     $('.button.undo').click(function() {
@@ -466,7 +528,7 @@ module.exports = function(App) {
     });
   });
 };
-},{}],16:[function(require,module,exports){
+},{}],18:[function(require,module,exports){
 module.exports = function(App) {
   $(function() {
     $('.start-record').click(function() {
@@ -495,7 +557,7 @@ module.exports = function(App) {
     });
   });
 };
-},{}],19:[function(require,module,exports){
+},{}],21:[function(require,module,exports){
 module.exports = function(content, width, height, source, top) {
   $block = $('<div class="slider"> <div class="close-slider">x</div> </div>');
   $block.append(content)
@@ -512,6 +574,13 @@ module.exports = function(content, width, height, source, top) {
   }, 320, function() {
     $block.find('input:first').focus();
   });
+  $('.slider input').keydown( function(e) {
+    var key = e.charCode ? e.charCode : e.keyCode ? e.keyCode : 0;
+    if(key == 13) {
+      e.preventDefault();
+      $block.find('.button').click();
+    }
+  });
   $('.close-slider').click(function() {
     $(this).parent()
       .find('*')
@@ -523,7 +592,7 @@ module.exports = function(content, width, height, source, top) {
     });
   });
 };
-},{}],26:[function(require,module,exports){
+},{}],28:[function(require,module,exports){
 // shim for using process in browser
 
 var process = module.exports = {};
@@ -578,7 +647,7 @@ process.chdir = function (dir) {
     throw new Error('process.chdir is not supported');
 };
 
-},{}],20:[function(require,module,exports){
+},{}],22:[function(require,module,exports){
 (function(process,global){// Copyright (c) Microsoft Open Technologies, Inc. All rights reserved. See License.txt in the project root for license information.
 
 ;(function (undefined) {
@@ -6056,7 +6125,7 @@ process.chdir = function (dir) {
     }
 }.call(this));
 })(require("__browserify_process"),window)
-},{"__browserify_process":26}],24:[function(require,module,exports){
+},{"__browserify_process":28}],26:[function(require,module,exports){
 /* Commands */
 
 /*--
@@ -6098,7 +6167,7 @@ module.exports = {
   zoomIn: zoomIn,
   zoomOut: zoomOut
 };
-},{}],17:[function(require,module,exports){
+},{}],19:[function(require,module,exports){
 var execute = require('../operation');
 
 module.exports = function(App) {
@@ -6130,7 +6199,7 @@ module.exports = function(App) {
     })
   });
 };
-},{"../operation":6,"./record":16}],18:[function(require,module,exports){
+},{"../operation":7,"./record":18}],20:[function(require,module,exports){
 var slider = require('./slider');
 
 module.exports = function(App) {
@@ -6175,7 +6244,7 @@ module.exports = function(App) {
     })
   });
 }
-},{"./slider":19}],21:[function(require,module,exports){
+},{"./slider":21}],23:[function(require,module,exports){
 var Lexer = require('./lexer');
 
 /*
@@ -6286,7 +6355,7 @@ Parser.prototype = (function() {
 
 module.exports = Parser;
 
-},{"./lexer":27}],22:[function(require,module,exports){
+},{"./lexer":29}],24:[function(require,module,exports){
 var element = require('../board/element'),
     coords  = require('../helper/coords')();
 
@@ -6497,7 +6566,7 @@ module.exports = {
   point: point,
   text: text
 };
-},{"../board/element":28,"../helper/coords":29}],23:[function(require,module,exports){
+},{"../board/element":30,"../helper/coords":31}],25:[function(require,module,exports){
 var transform = require('../board/transform'),
     coords    = require('../helper/coords')();
 
@@ -6746,7 +6815,7 @@ module.exports = {
   translate: translate,
   scale:     scale
 };
-},{"../board/transform":30,"../helper/coords":29}],25:[function(require,module,exports){
+},{"../board/transform":32,"../helper/coords":31}],27:[function(require,module,exports){
 var func    = require('../board/functions/functions'),
     Parser  = require('../board/functions/parser'),
     element = require('../board/element');  
@@ -6962,7 +7031,7 @@ module.exports = {
   angle: angle,
   area:  area
 };
-},{"../board/functions/functions":31,"../board/functions/parser":21,"../board/element":28}],27:[function(require,module,exports){
+},{"../board/functions/functions":33,"../board/functions/parser":23,"../board/element":30}],29:[function(require,module,exports){
 /*
  * Geometry Function Tokenizer
  */
@@ -7082,7 +7151,7 @@ Lexer.prototype = (function() {
 })();
 
 module.exports = Lexer;
-},{}],29:[function(require,module,exports){
+},{}],31:[function(require,module,exports){
 module.exports = function() {
   jQuery.fn.coord = function() {
     if (this.val()) {
@@ -7096,7 +7165,7 @@ module.exports = function() {
   };
 };
 
-},{}],30:[function(require,module,exports){
+},{}],32:[function(require,module,exports){
 /*
   BoardTransform Factory
   */
@@ -7239,7 +7308,7 @@ BoardTransform.prototype = (function() {
 })();
 
 module.exports = BoardTransform;
-},{}],31:[function(require,module,exports){
+},{}],33:[function(require,module,exports){
 /* GeometryFunction Factory */
 
 var GeometryFunction = function(JXG, func, options) {
@@ -7367,7 +7436,7 @@ GeometryFunction.prototype = (function() {
 })();
 
 module.exports = GeometryFunction;
-},{}],28:[function(require,module,exports){
+},{}],30:[function(require,module,exports){
 var point = require('./point'),
     shape = require('./shape')
 
@@ -7599,7 +7668,7 @@ BoardElement.prototype = (function() {
 })();
 
 module.exports = BoardElement; 
-},{"./point":32,"./shape":33}],32:[function(require,module,exports){
+},{"./point":34,"./shape":35}],34:[function(require,module,exports){
 var Point = function(board, coords) {
   this.board  = board;
   this.coords = coords;
@@ -7641,7 +7710,7 @@ Point.prototype = (function() {
 })();
 
 module.exports = Point;
-},{}],33:[function(require,module,exports){
+},{}],35:[function(require,module,exports){
 var Shape = function(board, shape, parents, options) {
   this.board   = board;
   this.shape   = shape;
