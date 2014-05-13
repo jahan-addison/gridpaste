@@ -20,7 +20,12 @@ module.exports = function(App, board) {
         'targetCommand':   targetCommand,
         'command':         command['zoom'][targetCommand]
       };
-      App.storeAndExecute($command);
+      try {
+        App.storeAndExecute($command);
+      } catch(e) {
+        alert("Warning: " + e.message.replace("JSXGraph: ", ''));
+        return;
+      }
       if (App.length > 0) {
         $('.button.undo').addClass('visible');
       }   
