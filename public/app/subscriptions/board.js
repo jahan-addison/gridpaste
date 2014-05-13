@@ -1,5 +1,6 @@
 var command    = require('../events/run'),
     slider     = require('../helper/slider'),
+    validate   = require('../helper/validate')(),
     Rx         = require('../../components/rxjs/rx.lite').Rx;
 
 module.exports = function(App) {
@@ -41,13 +42,23 @@ module.exports = function(App) {
     var target    = $(e.target).parent().attr('class').split('-');
     var targetOperation = target[0],
         targetCommand   = target[1];
+    // validation error
+    if ($(e.target).parent().find('[data-error]').length) {
+      alert($(e.target).parent().find('[data-error]').first().attr('data-error'));
+      return;
+    }
     // the request
     var $command  = {
       'targetOperation': targetOperation,
       'targetCommand':   targetCommand,
       'command':         command[targetOperation][targetCommand]
     };
-    App.storeAndExecute($command);
+    try {
+      App.storeAndExecute($command);
+    } catch(e) {
+      alert("Warning: " + e.message.replace("JSXGraph: ", ''));
+      return;
+    }
     if (App.length > 0) {
       $('.button.undo').addClass('visible');
     }
