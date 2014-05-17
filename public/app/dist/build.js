@@ -69,10 +69,10 @@ module.exports = function(board) {
       var coords = getMouseCoords(evt, i)
         .usrCoords
         .map(function(e) { 
-          return parseInt(e); 
+          return e.toFixed(2); 
         });
       board.usrAt = board.create("text", 
-        [coords[1] + 1.2, coords[2] + .5, // away from cursor
+        [parseFloat(coords[1] + 1.2), parseFloat(coords[2] + .5), // away from cursor
         "(" + coords[1] + "," + coords[2] + ")"]
       );
     }, 1000);
@@ -315,6 +315,7 @@ module.exports = function(App) {
 },{"./more":16,"./undo":17,"./record":18,"./clear":19,"./play":6,"./share":20}],9:[function(require,module,exports){
 var command    = require('../events/run'),
     slider     = require('../helper/slider'),
+    validate   = require('../helper/validate')(),
     Rx         = require('../../components/rxjs/rx.lite').Rx;
 
 module.exports = function(App) {
@@ -356,13 +357,23 @@ module.exports = function(App) {
     var target    = $(e.target).parent().attr('class').split('-');
     var targetOperation = target[0],
         targetCommand   = target[1];
+    // validation error
+    if ($(e.target).parent().find('[data-error]').length) {
+      alert($(e.target).parent().find('[data-error]').first().attr('data-error'));
+      return;
+    }
     // the request
     var $command  = {
       'targetOperation': targetOperation,
       'targetCommand':   targetCommand,
       'command':         command[targetOperation][targetCommand]
     };
-    App.storeAndExecute($command);
+    try {
+      App.storeAndExecute($command);
+    } catch(e) {
+      alert("Warning: " + e.message.replace("JSXGraph: ", ''));
+      return;
+    }
     if (App.length > 0) {
       $('.button.undo').addClass('visible');
     }
@@ -372,7 +383,7 @@ module.exports = function(App) {
       console.log("Error: %s", e.message);
     });
 };
-},{"../events/run":14,"../helper/slider":21,"../../components/rxjs/rx.lite":22}],10:[function(require,module,exports){
+},{"../events/run":14,"../helper/slider":21,"../helper/validate":22,"../../components/rxjs/rx.lite":23}],10:[function(require,module,exports){
 var command    = require('../events/run'),
     Parser     = require('../board/functions/parser'),
     Rx         = require('../../components/rxjs/rx.lite').Rx;
@@ -397,12 +408,21 @@ module.exports = function(App) {
       }
       var targetOperation = 'func',
           targetCommand   = func.identifier;
+      if (targetCommand in command[targetOperation] === false) {
+        alert("Warning: This GeometryFunction does not exist");
+        return;        
+      }
       var $command        = {
         'targetOperation': targetOperation,
         'targetCommand':   targetCommand,
         'command':         command[targetOperation][targetCommand]
       };
-      App.storeAndExecute($command);
+      try {
+        App.storeAndExecute($command);
+      } catch(e) {
+        alert("Warning: " + e.message.replace("JSXGraph: ", ''));
+        return;
+      }
       e.target.value = "";
       
       if (App.length > 0) {
@@ -415,7 +435,7 @@ module.exports = function(App) {
     console.log("Error: %s", e.message);
   });
 };
-},{"../events/run":14,"../board/functions/parser":23,"../../components/rxjs/rx.lite":22}],11:[function(require,module,exports){
+},{"../events/run":14,"../board/functions/parser":24,"../../components/rxjs/rx.lite":23}],11:[function(require,module,exports){
 var command    = require('../events/run'),
     Rx         = require('../../components/rxjs/rx.lite').Rx;
 
@@ -438,7 +458,12 @@ module.exports = function(App, board) {
         'targetCommand':   targetCommand,
         'command':         command['zoom'][targetCommand]
       };
-      App.storeAndExecute($command);
+      try {
+        App.storeAndExecute($command);
+      } catch(e) {
+        alert("Warning: " + e.message.replace("JSXGraph: ", ''));
+        return;
+      }
       if (App.length > 0) {
         $('.button.undo').addClass('visible');
       }   
@@ -446,7 +471,7 @@ module.exports = function(App, board) {
   });
 
 }
-},{"../events/run":14,"../../components/rxjs/rx.lite":22}],14:[function(require,module,exports){
+},{"../events/run":14,"../../components/rxjs/rx.lite":23}],14:[function(require,module,exports){
 
 module.exports = {
   draw:      require('./draw'),
@@ -457,7 +482,7 @@ module.exports = {
 };
 
 
-},{"./draw":24,"./transform":25,"./zoom":26,"./function":27}],15:[function(require,module,exports){
+},{"./draw":25,"./transform":26,"./zoom":27,"./function":28}],15:[function(require,module,exports){
 /*
   OperationDecorator
 */
@@ -592,7 +617,7 @@ module.exports = function(content, width, height, source, top) {
     });
   });
 };
-},{}],28:[function(require,module,exports){
+},{}],29:[function(require,module,exports){
 // shim for using process in browser
 
 var process = module.exports = {};
@@ -647,7 +672,7 @@ process.chdir = function (dir) {
     throw new Error('process.chdir is not supported');
 };
 
-},{}],22:[function(require,module,exports){
+},{}],23:[function(require,module,exports){
 (function(process,global){// Copyright (c) Microsoft Open Technologies, Inc. All rights reserved. See License.txt in the project root for license information.
 
 ;(function (undefined) {
@@ -6125,7 +6150,7 @@ process.chdir = function (dir) {
     }
 }.call(this));
 })(require("__browserify_process"),window)
-},{"__browserify_process":28}],26:[function(require,module,exports){
+},{"__browserify_process":29}],27:[function(require,module,exports){
 /* Commands */
 
 /*--
@@ -6244,7 +6269,66 @@ module.exports = function(App) {
     })
   });
 }
-},{"./slider":21}],23:[function(require,module,exports){
+},{"./slider":21}],22:[function(require,module,exports){
+var Lexer = require('../board/functions/lexer');
+
+module.exports = function() {
+  var Types = Object.freeze({
+    coord: "A coordinate must be two numbers separated by a comma",
+    radius: "A radius here must be a positive number",
+    pixel:  "A size in pixels is defined by a positive number",
+    text:   "",
+    axis:   "An axis must be either 'X' or 'Y', case-sensitive",  
+    figure: "A figure should begin with an uppercase letter and a number",
+    value:  "A value an amount in 'x,y', similar to coordinates",
+    degrees: "Here a degrees must always be a positive number"    
+  });
+  $(document).on('focusout keyup', '[data-type]', function() {
+    var value = $(this).val(),
+        type  = $(this).attr('data-type'),
+        failed,
+        lexer;
+    switch(type) {
+      case 'coord':
+      case 'value':
+        if (value.indexOf(',') === -1) {
+          failed = Types[type];
+        }
+        value = value.split(',');
+        if (!$.isNumeric(value[0]) || !$.isNumeric(value[1])) {
+          failed = Types[type];          
+        }
+        break;
+      case 'radius':
+      case 'pixel':
+      case 'degrees':
+        if (parseInt(value) < 0 || ! $.isNumeric(value)) {
+          failed = Types[type]
+        }
+        break;
+      case 'axis':
+        if (value !== 'X' && value !== 'Y') {
+          failed = Types[type];
+        }
+        break;
+      case 'figure':
+        lexer = new Lexer(value);
+        // expect a label and EOF.
+        var tokens = [lexer.getNextToken(), lexer.getNextToken()];
+        if (tokens[0] != 10 || tokens[1] != 11) {
+          failed = Types[type];
+        }
+        break;
+    }
+    if (typeof failed !== 'undefined') {
+      $(this).attr('data-error', failed);
+      failed = undefined;
+    } else {
+      $(this).removeAttr('data-error');
+    }
+  });
+};
+},{"../board/functions/lexer":30}],24:[function(require,module,exports){
 var Lexer = require('./lexer');
 
 /*
@@ -6355,7 +6439,7 @@ Parser.prototype = (function() {
 
 module.exports = Parser;
 
-},{"./lexer":29}],24:[function(require,module,exports){
+},{"./lexer":30}],25:[function(require,module,exports){
 var element = require('../board/element'),
     coords  = require('../helper/coords')();
 
@@ -6566,7 +6650,7 @@ module.exports = {
   point: point,
   text: text
 };
-},{"../board/element":30,"../helper/coords":31}],25:[function(require,module,exports){
+},{"../board/element":31,"../helper/coords":32}],26:[function(require,module,exports){
 var transform = require('../board/transform'),
     coords    = require('../helper/coords')();
 
@@ -6815,7 +6899,7 @@ module.exports = {
   translate: translate,
   scale:     scale
 };
-},{"../board/transform":32,"../helper/coords":31}],27:[function(require,module,exports){
+},{"../board/transform":33,"../helper/coords":32}],28:[function(require,module,exports){
 var func    = require('../board/functions/functions'),
     Parser  = require('../board/functions/parser'),
     element = require('../board/element');  
@@ -7031,7 +7115,7 @@ module.exports = {
   angle: angle,
   area:  area
 };
-},{"../board/functions/functions":33,"../board/functions/parser":23,"../board/element":30}],29:[function(require,module,exports){
+},{"../board/functions/functions":34,"../board/functions/parser":24,"../board/element":31}],30:[function(require,module,exports){
 /*
  * Geometry Function Tokenizer
  */
@@ -7151,7 +7235,7 @@ Lexer.prototype = (function() {
 })();
 
 module.exports = Lexer;
-},{}],31:[function(require,module,exports){
+},{}],32:[function(require,module,exports){
 module.exports = function() {
   jQuery.fn.coord = function() {
     if (this.val()) {
@@ -7165,7 +7249,7 @@ module.exports = function() {
   };
 };
 
-},{}],32:[function(require,module,exports){
+},{}],33:[function(require,module,exports){
 /*
   BoardTransform Factory
   */
@@ -7308,7 +7392,7 @@ BoardTransform.prototype = (function() {
 })();
 
 module.exports = BoardTransform;
-},{}],33:[function(require,module,exports){
+},{}],34:[function(require,module,exports){
 /* GeometryFunction Factory */
 
 var GeometryFunction = function(JXG, func, options) {
@@ -7436,7 +7520,7 @@ GeometryFunction.prototype = (function() {
 })();
 
 module.exports = GeometryFunction;
-},{}],30:[function(require,module,exports){
+},{}],31:[function(require,module,exports){
 var point = require('./point'),
     shape = require('./shape')
 
@@ -7668,7 +7752,7 @@ BoardElement.prototype = (function() {
 })();
 
 module.exports = BoardElement; 
-},{"./point":34,"./shape":35}],34:[function(require,module,exports){
+},{"./point":35,"./shape":36}],35:[function(require,module,exports){
 var Point = function(board, coords) {
   this.board  = board;
   this.coords = coords;
@@ -7710,7 +7794,7 @@ Point.prototype = (function() {
 })();
 
 module.exports = Point;
-},{}],35:[function(require,module,exports){
+},{}],36:[function(require,module,exports){
 var Shape = function(board, shape, parents, options) {
   this.board   = board;
   this.shape   = shape;

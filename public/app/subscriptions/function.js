@@ -22,12 +22,21 @@ module.exports = function(App) {
       }
       var targetOperation = 'func',
           targetCommand   = func.identifier;
+      if (targetCommand in command[targetOperation] === false) {
+        alert("Warning: This GeometryFunction does not exist");
+        return;        
+      }
       var $command        = {
         'targetOperation': targetOperation,
         'targetCommand':   targetCommand,
         'command':         command[targetOperation][targetCommand]
       };
-      App.storeAndExecute($command);
+      try {
+        App.storeAndExecute($command);
+      } catch(e) {
+        alert("Warning: " + e.message.replace("JSXGraph: ", ''));
+        return;
+      }
       e.target.value = "";
       
       if (App.length > 0) {
