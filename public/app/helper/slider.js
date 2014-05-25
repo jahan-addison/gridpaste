@@ -18,7 +18,11 @@ module.exports = function(content, width, height, source, top) {
     var key = e.charCode ? e.charCode : e.keyCode ? e.keyCode : 0;
     if(key == 13) {
       e.preventDefault();
-      $block.find('.button').click();
+      if ($block.find('.button').length == 2) {
+        $block.find('.button').eq(1).click();        
+      } else {
+        $block.find('.button').click();
+      }
     }
   });
   $('.close-slider').click(function() {
