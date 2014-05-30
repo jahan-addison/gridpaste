@@ -17,10 +17,10 @@ module.exports = function(board) {
       var coords = getMouseCoords(evt, i)
         .usrCoords
         .map(function(e) { 
-          return parseInt(e); 
+          return e.toFixed(2); 
         });
       board.usrAt = board.create("text", 
-        [coords[1] + 1.2, coords[2] + .5, // away from cursor
+        [parseFloat(coords[1] + 1.2), parseFloat(coords[2] + .5), // away from cursor
         "(" + coords[1] + "," + coords[2] + ")"]
       );
     }, 1000);
