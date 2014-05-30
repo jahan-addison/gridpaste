@@ -7,7 +7,6 @@ module.exports = function(App) {
   /**
     Pre-queries
    */
-
   var $querySources  = $([
     '.circle',   '  .angle',   '.arc',
     '.ellipse',    '.segment', '.line',
@@ -21,7 +20,13 @@ module.exports = function(App) {
   $querySource           = $querySource.filter(function() {
     return !$('#application').hasClass('off');
   });
+  var warned = 0;
   var $querySubscription = $querySource.subscribe(function(e) {
+    // before we do anything, warn if not recording after 4 queries
+    warned++;
+    if (!App.isRecording && warned == 4) {
+      alert('Warning: Your actions are not being recorded! Press "Start Record" or the tab key to begin recording');
+    }
     var target = $(e.target);
     if (!$('.slider').length) {
       slider(target.next().html(), 230, 'auto', '#application', target.parent().parent()); 

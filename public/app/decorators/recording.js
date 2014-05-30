@@ -11,6 +11,10 @@ module.exports = function(Operation) {
     get: function() { return recorded; }
   });
 
+  Object.defineProperty(Operation.prototype, "isRecording", {
+    get: function() { return recording; }
+  });
+
   Operation.prototype.startRecording = function() {
     recording = true;
   };
