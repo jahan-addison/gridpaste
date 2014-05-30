@@ -85,7 +85,7 @@ module.exports = function(board) {
 module.exports = function(App) {
   $(window).on('beforeunload', function() {
     if (!$('#application').hasClass('shared')) {
-      if (App.length) {
+      if (App.isRecording && App.length) {
         return "You have an unsaved grid paste! Are you sure you want to leave?";
       }
     }
@@ -302,17 +302,7 @@ Operation.prototype.undoLastExecute = function() {
   require("./decorators/recording")(Operation);
 
 module.exports = Operation;
-},{"./decorators/recording":15}],8:[function(require,module,exports){
-module.exports = function(App) {
-  require('./more')  ();               // attach event to "more" button for polygon construction
-  require('./undo')  (App);            // attach event to undo button
-  require('./record')(App);            // attach event to record button
-  require('./clear') (App);            // attach event to clear button
-  require('./play')  (App, App.board); // attach event to UI play button after recording
-  require('./share') (App)             // attach event to share button
-};
-
-},{"./more":16,"./undo":17,"./record":18,"./clear":19,"./play":6,"./share":20}],9:[function(require,module,exports){
+},{"./decorators/recording":15}],9:[function(require,module,exports){
 var command    = require('../events/run'),
     slider     = require('../helper/slider'),
     validate   = require('../helper/validate')(),
@@ -388,7 +378,17 @@ module.exports = function(App) {
       console.log("Error: %s", e.message);
     });
 };
-},{"../events/run":14,"../helper/slider":21,"../helper/validate":22,"../../components/rxjs/rx.lite":23}],10:[function(require,module,exports){
+},{"../events/run":14,"../helper/slider":16,"../helper/validate":17,"../../components/rxjs/rx.lite":18}],8:[function(require,module,exports){
+module.exports = function(App) {
+  require('./more')  ();               // attach event to "more" button for polygon construction
+  require('./undo')  (App);            // attach event to undo button
+  require('./record')(App);            // attach event to record button
+  require('./clear') (App);            // attach event to clear button
+  require('./play')  (App, App.board); // attach event to UI play button after recording
+  require('./share') (App)             // attach event to share button
+};
+
+},{"./more":19,"./undo":20,"./record":21,"./clear":22,"./play":6,"./share":23}],10:[function(require,module,exports){
 var command    = require('../events/run'),
     Parser     = require('../board/functions/parser'),
     Rx         = require('../../components/rxjs/rx.lite').Rx;
@@ -440,7 +440,7 @@ module.exports = function(App) {
     console.log("Error: %s", e.message);
   });
 };
-},{"../events/run":14,"../board/functions/parser":24,"../../components/rxjs/rx.lite":23}],11:[function(require,module,exports){
+},{"../events/run":14,"../board/functions/parser":24,"../../components/rxjs/rx.lite":18}],11:[function(require,module,exports){
 var command    = require('../events/run'),
     Rx         = require('../../components/rxjs/rx.lite').Rx;
 
@@ -476,7 +476,7 @@ module.exports = function(App, board) {
   });
 
 }
-},{"../events/run":14,"../../components/rxjs/rx.lite":23}],14:[function(require,module,exports){
+},{"../events/run":14,"../../components/rxjs/rx.lite":18}],14:[function(require,module,exports){
 
 module.exports = {
   draw:      require('./draw'),
@@ -541,60 +541,6 @@ module.exports = function(Operation) {
 };
 
 },{}],16:[function(require,module,exports){
-module.exports = function() {
-  $(function() {
-    var points = 3;
-    $('#application').on('click', '.more', function() {
-      if ($(this).parent().find('.inside').length == 3) {
-        points = 3;
-      }
-      points++;
-      var more = '<label for="point'+ points + '">Point ' + points + ' (x,y):</label><input type="text" name="point'+ points +'" class="inside" value="0.0,0.0" />';
-      $(this).before(more);
-    });
-  });
-};
-},{}],17:[function(require,module,exports){
-module.exports = function(App) {
-  $(function() {
-    $('.button.undo').click(function() {
-      App.undoLastExecute();
-      if(App.length === 0) {
-        $(this).removeClass('visible');
-      }
-    });
-  });
-};
-},{}],18:[function(require,module,exports){
-module.exports = function(App) {
-  $(function() {
-    $('.start-record').click(function() {
-      $('.clear').click();
-      App.startRecording();
-      $(this).html('Recording').addClass('dim');
-      $(this).unbind();
-    });
-    $('.end-record').click(function() {
-      App.stopRecording();
-      $('#application').addClass('off'); // turn subscriptions off 
-      $(this)
-        .html('Finished')
-        .addClass('finished')
-        .prev()
-        .html('Start Record');
-      $(this).unbind();
-      Object.freeze(App); // we're done
-      $('.undo').removeClass('visible');
-      $('.reset').show();
-      $('.reset').click(function() {
-        window.location.reload();
-      });
-      $('.clear').hide()
-        .prev().show();
-    });
-  });
-};
-},{}],21:[function(require,module,exports){
 module.exports = function(content, width, height, source, top) {
   $block = $('<div class="slider"> <div class="close-slider">x</div> </div>');
   $block.append(content)
@@ -630,6 +576,60 @@ module.exports = function(content, width, height, source, top) {
       left: -width || -230
     }, 320, function() {
       $(this).remove();
+    });
+  });
+};
+},{}],19:[function(require,module,exports){
+module.exports = function() {
+  $(function() {
+    var points = 3;
+    $('#application').on('click', '.more', function() {
+      if ($(this).parent().find('.inside').length == 3) {
+        points = 3;
+      }
+      points++;
+      var more = '<label for="point'+ points + '">Point ' + points + ' (x,y):</label><input type="text" name="point'+ points +'" class="inside" value="0.0,0.0" />';
+      $(this).before(more);
+    });
+  });
+};
+},{}],20:[function(require,module,exports){
+module.exports = function(App) {
+  $(function() {
+    $('.button.undo').click(function() {
+      App.undoLastExecute();
+      if(App.length === 0) {
+        $(this).removeClass('visible');
+      }
+    });
+  });
+};
+},{}],21:[function(require,module,exports){
+module.exports = function(App) {
+  $(function() {
+    $('.start-record').click(function() {
+      $('.clear').click();
+      App.startRecording();
+      $(this).html('Recording').addClass('dim');
+      $(this).unbind();
+    });
+    $('.end-record').click(function() {
+      App.stopRecording();
+      $('#application').addClass('off'); // turn subscriptions off 
+      $(this)
+        .html('Finished')
+        .addClass('finished')
+        .prev()
+        .html('Start Record');
+      $(this).unbind();
+      Object.freeze(App); // we're done
+      $('.undo').removeClass('visible');
+      $('.reset').show();
+      $('.reset').click(function() {
+        window.location.reload();
+      });
+      $('.clear').hide()
+        .prev().show();
     });
   });
 };
@@ -688,7 +688,7 @@ process.chdir = function (dir) {
     throw new Error('process.chdir is not supported');
 };
 
-},{}],23:[function(require,module,exports){
+},{}],18:[function(require,module,exports){
 (function(process,global){// Copyright (c) Microsoft Open Technologies, Inc. All rights reserved. See License.txt in the project root for license information.
 
 ;(function (undefined) {
@@ -6208,84 +6208,7 @@ module.exports = {
   zoomIn: zoomIn,
   zoomOut: zoomOut
 };
-},{}],19:[function(require,module,exports){
-var execute = require('../operation');
-
-module.exports = function(App) {
-  $(function() {
-    var board = App.board;
-    $('.button.clear').click(function() {
-      for(point in board.points) {
-        if (board.points.hasOwnProperty(point)) {
-          board.removeObject(board.points[point]);
-        }
-      }
-      board.points = {};
-      var size = board.shapes.length;
-      for (var i = 0; i < size; i++) {
-        board.removeObject(board.shapes[i]);
-      }
-      board.shapes = [];
-      $('.function').val('');
-      $('.undo').removeClass('visible');
-      board.zoom100();
-      board.update();
-
-      App.clearCommandList();
-
-      // Reset recording UI
-      require('./record')(App); // reattach record events   
-      $('.start-record').removeClass('dim').html('Start Record');
-      $('.end-record').removeClass('dim').html('End Record');
-    })
-  });
-};
-},{"../operation":7,"./record":18}],20:[function(require,module,exports){
-var slider = require('./slider');
-
-module.exports = function(App) {
-  var $html;
-  $(function() {
-    $('.share').click(function() {
-      if (Object.isFrozen(App)) {
-        var done;
-        if (typeof $html !== 'undefined') {
-          slider($html, 230, 'auto', '#application', $('#transform'));           
-          return;
-        }
-        slider($(this).next().html(), 230, 'auto', '#application', $('#transform')); 
-        $('#application').on('click', '.submit', function() {
-          var $paste = App.getRecorded.map(function(e) {
-            delete e.command; // we no longer need constructors
-            return e;
-          });
-          var data   = {
-            title: $('input.title:last').val(),
-            paste: $paste
-          };
-          $('.close-slider').click();
-          $.ajax({
-            url: '/paste',
-            type: 'POST',
-            data: JSON.stringify(data),
-            contentType: "application/json",
-            complete: function(token) {
-              $html = ['<div class="misc-done">',
-                '<label for="url">The URL!</label><input type="text" name="url" class="inside url" value="',
-                document.location.href + token.responseJSON.token,
-                '" />',
-                '</div>'
-              ].join('');
-              $('#application').addClass('shared');
-              slider($html, 250, 'auto', '#application', $('#transform'));
-            }
-          });
-        });
-      }
-    })
-  });
-}
-},{"./slider":21}],22:[function(require,module,exports){
+},{}],17:[function(require,module,exports){
 var Lexer = require('../board/functions/lexer');
 
 module.exports = function() {
@@ -6344,7 +6267,84 @@ module.exports = function() {
     }
   });
 };
-},{"../board/functions/lexer":30}],24:[function(require,module,exports){
+},{"../board/functions/lexer":30}],22:[function(require,module,exports){
+var execute = require('../operation');
+
+module.exports = function(App) {
+  $(function() {
+    var board = App.board;
+    $('.button.clear').click(function() {
+      for(point in board.points) {
+        if (board.points.hasOwnProperty(point)) {
+          board.removeObject(board.points[point]);
+        }
+      }
+      board.points = {};
+      var size = board.shapes.length;
+      for (var i = 0; i < size; i++) {
+        board.removeObject(board.shapes[i]);
+      }
+      board.shapes = [];
+      $('.function').val('');
+      $('.undo').removeClass('visible');
+      board.zoom100();
+      board.update();
+
+      App.clearCommandList();
+
+      // Reset recording UI
+      require('./record')(App); // reattach record events   
+      $('.start-record').removeClass('dim').html('Start Record');
+      $('.end-record').removeClass('dim').html('End Record');
+    })
+  });
+};
+},{"../operation":7,"./record":21}],23:[function(require,module,exports){
+var slider = require('./slider');
+
+module.exports = function(App) {
+  var $html;
+  $(function() {
+    $('.share').click(function() {
+      if (Object.isFrozen(App)) {
+        var done;
+        if (typeof $html !== 'undefined') {
+          slider($html, 230, 'auto', '#application', $('#transform'));           
+          return;
+        }
+        slider($(this).next().html(), 230, 'auto', '#application', $('#transform')); 
+        $('#application').on('click', '.submit', function() {
+          var $paste = App.getRecorded.map(function(e) {
+            delete e.command; // we no longer need constructors
+            return e;
+          });
+          var data   = {
+            title: $('input.title:last').val(),
+            paste: $paste
+          };
+          $('.close-slider').click();
+          $.ajax({
+            url: '/paste',
+            type: 'POST',
+            data: JSON.stringify(data),
+            contentType: "application/json",
+            complete: function(token) {
+              $html = ['<div class="misc-done">',
+                '<label for="url">The URL!</label><input type="text" name="url" class="inside url" value="',
+                document.location.href + token.responseJSON.token,
+                '" />',
+                '</div>'
+              ].join('');
+              $('#application').addClass('shared');
+              slider($html, 250, 'auto', '#application', $('#transform'));
+            }
+          });
+        });
+      }
+    })
+  });
+}
+},{"./slider":16}],24:[function(require,module,exports){
 var Lexer = require('./lexer');
 
 /*
