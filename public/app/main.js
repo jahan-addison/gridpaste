@@ -31,7 +31,7 @@ $(function() {
   })();
   if (!$('#application').hasClass('paste')) {
     /* Subscribe to application */
-    var App = require('./subscribe')(board);
+    var App = window.App = require('./subscribe')(board);
     // prevent 'dirty board'
     require('./helper/dirty')(App);
   } else {

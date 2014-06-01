@@ -32,7 +32,7 @@ $(function() {
   })();
   if (!$('#application').hasClass('paste')) {
     /* Subscribe to application */
-    var App = require('./subscribe')(board);
+    var App = window.App = require('./subscribe')(board);
     // prevent 'dirty board'
     require('./helper/dirty')(App);
   } else {
@@ -85,7 +85,7 @@ module.exports = function(board) {
 module.exports = function(App) {
   $(window).on('beforeunload', function() {
     if (!$('#application').hasClass('shared')) {
-      if (App.length) {
+      if (App.isRecording && App.length) {
         return "You have an unsaved grid paste! Are you sure you want to leave?";
       }
     }
@@ -322,13 +322,12 @@ module.exports = function(App) {
   /**
     Pre-queries
    */
-
   var $querySources  = $([
     '.circle',   '  .angle',   '.arc',
     '.ellipse',    '.segment', '.line',
      '.polygon',   '.point',   '.text',
      '.rotate',    '.reflect', '.shear',
-     '.translate', '.scale'
+     '.translate', '.scale',   '.delete_'
   ].join(','));
   // The query observer prepares the way for the following operations subscription
   var $querySource       = Rx.Observable.fromEvent($querySources, 'click');
@@ -336,7 +335,13 @@ module.exports = function(App) {
   $querySource           = $querySource.filter(function() {
     return !$('#application').hasClass('off');
   });
+  var warned = 0;
   var $querySubscription = $querySource.subscribe(function(e) {
+    // before we do anything, warn if not recording after 4 queries
+    warned++;
+    if (!App.isRecording && warned == 4) {
+      alert('Warning: Your actions are not being recorded! Press "Start Record" or the tab key to begin recording');
+    }
     var target = $(e.target);
     if (!$('.slider').length) {
       slider(target.next().html(), 230, 'auto', '#application', target.parent().parent()); 
@@ -347,7 +352,7 @@ module.exports = function(App) {
     Board operations
    */
 
-  var $operationSources      = '.button.draw, .button.transform';
+  var $operationSources      = '.button.draw, .button.transform, .button.misc';
   var $operationSource       = Rx.Observable.fromEventPattern(
     function addHandler(h) { $('#application').on('click', $operationSources, h) },  
     function delHandler(h) { $('#application').off('click', $operationSources, h) }  
@@ -375,6 +380,7 @@ module.exports = function(App) {
       return;
     }
     if (App.length > 0) {
+      $('.button.delete_').css('display', 'block');
       $('.button.undo').addClass('visible');
     }
     $('.close-slider').click();
@@ -477,12 +483,12 @@ module.exports = {
   draw:      require('./draw'),
   transform: require('./transform'),
   zoom:      require('./zoom'),
-  func:      require('./function')
-  // drag: require('./drag')
+  func:      require('./function'),
+  misc:      require('./misc')
 };
 
 
-},{"./draw":25,"./transform":26,"./zoom":27,"./function":28}],15:[function(require,module,exports){
+},{"./draw":25,"./transform":26,"./zoom":27,"./function":28,"./misc":29}],15:[function(require,module,exports){
 /*
   OperationDecorator
 */
@@ -494,6 +500,10 @@ module.exports = function(Operation) {
 
   Object.defineProperty(Operation.prototype, "getRecorded", {
     get: function() { return recorded; }
+  });
+
+  Object.defineProperty(Operation.prototype, "isRecording", {
+    get: function() { return recording; }
   });
 
   Operation.prototype.startRecording = function() {
@@ -624,7 +634,7 @@ module.exports = function(content, width, height, source, top) {
     });
   });
 };
-},{}],29:[function(require,module,exports){
+},{}],30:[function(require,module,exports){
 // shim for using process in browser
 
 var process = module.exports = {};
@@ -6157,7 +6167,7 @@ process.chdir = function (dir) {
     }
 }.call(this));
 })(require("__browserify_process"),window)
-},{"__browserify_process":29}],27:[function(require,module,exports){
+},{"__browserify_process":30}],27:[function(require,module,exports){
 /* Commands */
 
 /*--
@@ -6198,6 +6208,53 @@ var zoomOut = function(board, args) {
 module.exports = {
   zoomIn: zoomIn,
   zoomOut: zoomOut
+};
+},{}],29:[function(require,module,exports){
+/* Commands */
+
+/*--
+Interface Command {
+  public void   constructor(JSXGraph board, object Arguments)
+  public void   remove()
+  public object execute()
+}
+--*/
+
+var delete_ = function(board, args) {
+  var args = args || {
+    figure: $('input[name="figure"]:last').val()
+  };
+  this.remove = function() {
+    this.figure.visible(true);
+    this.figure.isVisible = true;
+    for (i in this.figure.ancestors) {
+      if (this.figure.ancestors.hasOwnProperty(i)) {
+        this.figure.ancestors[i].visible(true);
+        this.figure.ancestors[i].isVisible = true;
+      }
+    }
+  };
+  this.execute = function() {
+    for(var i = 0; i <  board.shapes.length; i++) {
+      if (board.shapes[i].name == args.figure) {
+        board.shapes[i].visible(false);
+        this.figure           = board.shapes[i];
+        this.figure.isVisible = false;
+        for (i in this.figure.ancestors) {
+          this.figure.ancestors[i].visible(false);          
+          this.figure.ancestors[i].isVisible = false;
+        }
+      }
+    }
+    if (typeof this.figure === 'undefined') {
+      throw ReferenceError("Could not find figure '" + args.figure + "'");
+    }
+    return args;
+  };
+};
+
+module.exports = {
+  delete_: delete_
 };
 },{}],19:[function(require,module,exports){
 var execute = require('../operation');
@@ -6281,13 +6338,13 @@ var Lexer = require('../board/functions/lexer');
 
 module.exports = function() {
   var Types = Object.freeze({
-    coord: "A coordinate must be two numbers separated by a comma",
+    coord: "A coordinate must be an ordered pair separated by a comma",
     radius: "A radius here must be a positive number",
     pixel:  "A size in pixels is defined by a positive number",
     text:   "",
     axis:   "An axis must be either 'X' or 'Y', case-sensitive",  
-    figure: "A figure should begin with an uppercase letter and a number",
-    value:  "A value an amount in 'x,y', similar to coordinates",
+    figure: "A figure should begin with an uppercase letter and an integer",
+    value:  "A value is an ordered pair e.g. 'x,y', similar to coordinates",
     degrees: "Here a degrees must always be a positive number"    
   });
   $(document).on('focusout keyup', '[data-type]', function() {
@@ -6335,7 +6392,7 @@ module.exports = function() {
     }
   });
 };
-},{"../board/functions/lexer":30}],24:[function(require,module,exports){
+},{"../board/functions/lexer":31}],24:[function(require,module,exports){
 var Lexer = require('./lexer');
 
 /*
@@ -6446,7 +6503,7 @@ Parser.prototype = (function() {
 
 module.exports = Parser;
 
-},{"./lexer":30}],25:[function(require,module,exports){
+},{"./lexer":31}],25:[function(require,module,exports){
 var element = require('../board/element'),
     coords  = require('../helper/coords')();
 
@@ -6657,7 +6714,7 @@ module.exports = {
   point: point,
   text: text
 };
-},{"../board/element":31,"../helper/coords":32}],26:[function(require,module,exports){
+},{"../board/element":32,"../helper/coords":33}],26:[function(require,module,exports){
 var transform = require('../board/transform'),
     coords    = require('../helper/coords')();
 
@@ -6906,7 +6963,7 @@ module.exports = {
   translate: translate,
   scale:     scale
 };
-},{"../board/transform":33,"../helper/coords":32}],28:[function(require,module,exports){
+},{"../board/transform":34,"../helper/coords":33}],28:[function(require,module,exports){
 var func    = require('../board/functions/functions'),
     Parser  = require('../board/functions/parser'),
     element = require('../board/element');  
@@ -7122,7 +7179,7 @@ module.exports = {
   angle: angle,
   area:  area
 };
-},{"../board/functions/functions":34,"../board/functions/parser":24,"../board/element":31}],30:[function(require,module,exports){
+},{"../board/functions/functions":35,"../board/functions/parser":24,"../board/element":32}],31:[function(require,module,exports){
 /*
  * Geometry Function Tokenizer
  */
@@ -7242,7 +7299,7 @@ Lexer.prototype = (function() {
 })();
 
 module.exports = Lexer;
-},{}],32:[function(require,module,exports){
+},{}],33:[function(require,module,exports){
 module.exports = function() {
   jQuery.fn.coord = function() {
     if (this.val()) {
@@ -7256,7 +7313,7 @@ module.exports = function() {
   };
 };
 
-},{}],33:[function(require,module,exports){
+},{}],34:[function(require,module,exports){
 /*
   BoardTransform Factory
   */
@@ -7399,7 +7456,7 @@ BoardTransform.prototype = (function() {
 })();
 
 module.exports = BoardTransform;
-},{}],34:[function(require,module,exports){
+},{}],35:[function(require,module,exports){
 /* GeometryFunction Factory */
 
 var GeometryFunction = function(JXG, func, options) {
@@ -7527,7 +7584,7 @@ GeometryFunction.prototype = (function() {
 })();
 
 module.exports = GeometryFunction;
-},{}],31:[function(require,module,exports){
+},{}],32:[function(require,module,exports){
 var point = require('./point'),
     shape = require('./shape')
 
@@ -7759,7 +7816,7 @@ BoardElement.prototype = (function() {
 })();
 
 module.exports = BoardElement; 
-},{"./point":35,"./shape":36}],35:[function(require,module,exports){
+},{"./point":36,"./shape":37}],36:[function(require,module,exports){
 var Point = function(board, coords) {
   this.board  = board;
   this.coords = coords;
@@ -7801,7 +7858,7 @@ Point.prototype = (function() {
 })();
 
 module.exports = Point;
-},{}],36:[function(require,module,exports){
+},{}],37:[function(require,module,exports){
 var Shape = function(board, shape, parents, options) {
   this.board   = board;
   this.shape   = shape;

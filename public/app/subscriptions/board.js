@@ -7,13 +7,12 @@ module.exports = function(App) {
   /**
     Pre-queries
    */
-
   var $querySources  = $([
     '.circle',   '  .angle',   '.arc',
     '.ellipse',    '.segment', '.line',
      '.polygon',   '.point',   '.text',
      '.rotate',    '.reflect', '.shear',
-     '.translate', '.scale'
+     '.translate', '.scale',   '.delete_'
   ].join(','));
   // The query observer prepares the way for the following operations subscription
   var $querySource       = Rx.Observable.fromEvent($querySources, 'click');
@@ -21,7 +20,13 @@ module.exports = function(App) {
   $querySource           = $querySource.filter(function() {
     return !$('#application').hasClass('off');
   });
+  var warned = 0;
   var $querySubscription = $querySource.subscribe(function(e) {
+    // before we do anything, warn if not recording after 4 queries
+    warned++;
+    if (!App.isRecording && warned == 4) {
+      alert('Warning: Your actions are not being recorded! Press "Start Record" or the tab key to begin recording');
+    }
     var target = $(e.target);
     if (!$('.slider').length) {
       slider(target.next().html(), 230, 'auto', '#application', target.parent().parent()); 
@@ -32,7 +37,7 @@ module.exports = function(App) {
     Board operations
    */
 
-  var $operationSources      = '.button.draw, .button.transform';
+  var $operationSources      = '.button.draw, .button.transform, .button.misc';
   var $operationSource       = Rx.Observable.fromEventPattern(
     function addHandler(h) { $('#application').on('click', $operationSources, h) },  
     function delHandler(h) { $('#application').off('click', $operationSources, h) }  
@@ -60,6 +65,7 @@ module.exports = function(App) {
       return;
     }
     if (App.length > 0) {
+      $('.button.delete_').css('display', 'block');
       $('.button.undo').addClass('visible');
     }
     $('.close-slider').click();

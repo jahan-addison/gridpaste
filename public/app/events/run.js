@@ -3,7 +3,7 @@ module.exports = {
   draw:      require('./draw'),
   transform: require('./transform'),
   zoom:      require('./zoom'),
-  func:      require('./function')
-  // drag: require('./drag')
+  func:      require('./function'),
+  misc:      require('./misc')
 };
 
