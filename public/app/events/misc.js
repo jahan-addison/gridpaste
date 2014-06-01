@@ -2,7 +2,7 @@
 
 /*--
 Interface Command {
-  public void   constructor(JSXGraph board, Object Arguments)
+  public void   constructor(JSXGraph board, object Arguments)
   public void   remove()
   public object execute()
 }
@@ -10,28 +10,32 @@ Interface Command {
 
 var delete_ = function(board, args) {
   var args = args || {
-    obj: $('input[name="figure"]:last').val()
+    figure: $('input[name="figure"]:last').val()
   };
   this.remove = function() {
-    this.obj.visible(true);
-    for (i in this.obj.ancestors) {
-      if (this.obj.ancestors.hasOwnProperty(i)) {
-        this.obj.ancestors[i].visible(true);
+    this.figure.visible(true);
+    this.figure.isVisible = true;
+    for (i in this.figure.ancestors) {
+      if (this.figure.ancestors.hasOwnProperty(i)) {
+        this.figure.ancestors[i].visible(true);
+        this.figure.ancestors[i].isVisible = true;
       }
     }
   };
   this.execute = function() {
     for(var i = 0; i <  board.shapes.length; i++) {
-      if (board.shapes[i].name == args.obj) {
+      if (board.shapes[i].name == args.figure) {
         board.shapes[i].visible(false);
-        this.obj = board.shapes[i];
-        for (i in this.obj.ancestors) {
-          this.obj.ancestors[i].visible(false);          
+        this.figure           = board.shapes[i];
+        this.figure.isVisible = false;
+        for (i in this.figure.ancestors) {
+          this.figure.ancestors[i].visible(false);          
+          this.figure.ancestors[i].isVisible = false;
         }
       }
     }
-    if (typeof this.obj === 'undefined') {
-      throw ReferenceError("Could not find figure '" + args.obj + "'");
+    if (typeof this.figure === 'undefined') {
+      throw ReferenceError("Could not find figure '" + args.figure + "'");
     }
     return args;
   };
