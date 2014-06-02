@@ -90,6 +90,13 @@ describe("transform Command concrete", function() {
       expect(brd.points.B.coords.usrCoords.map(function(e) { return e.toFixed(2)}).equals(['1.00','25.00','0.00'])).to.be.true;
       expect(brd.points.C.coords.usrCoords.map(function(e) { return e.toFixed(2)}).equals(['1.00','0.00','0.00'])).to.be.true;
     });
+    it("should work on a single point", function() {
+      command = new transform.reflect(brd, {
+        figure: "A0", 
+        line: 'Y'});
+      command.execute();
+      expect(brd.points.A.coords.usrCoords.map(function(e) { return e.toFixed(2)}).equals(['1.00','25.00','25.00'])).to.be.true;
+    });
     it("can be undone", function() {
       command = new transform.reflect(brd);
       command.execute();
@@ -142,8 +149,15 @@ describe("transform Command concrete", function() {
       expect(brd.points.B.coords.usrCoords.map(function(e) { return e.toFixed(2)}).equals(['1.00','0.00','0.00'])).to.be.true;
       expect(brd.points.C.coords.usrCoords.map(function(e) { return e.toFixed(2)}).equals(['1.00','25.00','0.00'])).to.be.true;
     });
+    it("should work on a single point", function() {
+      command = new transform.translate(brd, {
+        figure: "A0", 
+        values: [25, 0]});
+      command.execute();
+      expect(brd.points.A.coords.usrCoords.map(function(e) { return e.toFixed(2)}).equals(['1.00','0.00','25.00'])).to.be.true;
+    });
     it("can be undone", function() {
-      command = new transform.shear(brd);
+      command = new transform.translate(brd);
       command.execute();
       command.remove();
       expect(brd.points.A.coords.usrCoords.map(function(e) { return e.toFixed(2)}).equals(['1.00','-25.00','25.00'])).to.be.true;
