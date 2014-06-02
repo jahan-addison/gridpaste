@@ -12,7 +12,7 @@ module.exports = function(App) {
     '.ellipse',    '.segment', '.line',
      '.polygon',   '.point',   '.text',
      '.rotate',    '.reflect', '.shear',
-     '.translate', '.scale'
+     '.translate', '.scale',   '.delete_'
   ].join(','));
   // The query observer prepares the way for the following operations subscription
   var $querySource       = Rx.Observable.fromEvent($querySources, 'click');
@@ -37,7 +37,7 @@ module.exports = function(App) {
     Board operations
    */
 
-  var $operationSources      = '.button.draw, .button.transform';
+  var $operationSources      = '.button.draw, .button.transform, .button.misc';
   var $operationSource       = Rx.Observable.fromEventPattern(
     function addHandler(h) { $('#application').on('click', $operationSources, h) },  
     function delHandler(h) { $('#application').off('click', $operationSources, h) }  
@@ -65,6 +65,7 @@ module.exports = function(App) {
       return;
     }
     if (App.length > 0) {
+      $('.button.delete_').css('display', 'block');
       $('.button.undo').addClass('visible');
     }
     $('.close-slider').click();
