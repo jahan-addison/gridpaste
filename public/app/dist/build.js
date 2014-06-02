@@ -32,7 +32,7 @@ $(function() {
   })();
   if (!$('#application').hasClass('paste')) {
     /* Subscribe to application */
-    var App = window.App = require('./subscribe')(board);
+    var App = require('./subscribe')(board);
     // prevent 'dirty board'
     require('./helper/dirty')(App);
   } else {
@@ -6246,6 +6246,18 @@ var delete_ = function(board, args) {
         }
       }
     }
+    // try with a single point
+    if (typeof this.figure === 'undefined') {
+      for(p in board.points) {
+        if (board.points.hasOwnProperty(p)) {
+          if (board.points[p].name + '0' == args.figure) {
+            this.figure           = board.points[p];
+            this.figure.isVisible = false;
+            this.figure.visible(false);
+          }
+        }
+      }
+    }
     if (typeof this.figure === 'undefined') {
       throw ReferenceError("Could not find figure '" + args.figure + "'");
     }
@@ -6792,12 +6804,21 @@ var reflect = function(board, args) {
   } else {
     transformArgs.line = board.axy;
   }
-
   board.shapes.forEach(function(shape) {
     if (shape.name == transformArgs.figure) {
       transformArgs.points = shape.usrSetCoords;
     }
   });
+  // a single point
+  if (!transformArgs.points.length) {
+    for(p in board.points) {
+      if (board.points.hasOwnProperty(p)) {
+        if (board.points[p].name + '0' == transformArgs.figure) {
+          transformArgs.points = [board.points[p]];
+        }
+      }
+    }
+  }
   delete transformArgs.figure;
 
   this.reflect = new transform(board, "reflect", transformArgs);
@@ -6887,6 +6908,16 @@ var translate = function(board, args) {
       transformArgs.points = shape.usrSetCoords;
     }
   });
+  // a single point
+  if (!transformArgs.points.length) {
+    for(p in board.points) {
+      if (board.points.hasOwnProperty(p)) {
+        if (board.points[p].name + '0' == transformArgs.figure) {
+          transformArgs.points = [board.points[p]];
+        }
+      }
+    }
+  }
   delete transformArgs.figure;
   this.translate = new transform(board, "translate", transformArgs);
   this.remove    = function() {
