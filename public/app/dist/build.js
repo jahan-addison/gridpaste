@@ -6354,6 +6354,7 @@ module.exports = function() {
     radius: "A radius here must be a positive number",
     pixel:  "A size in pixels is defined by a positive number",
     text:   "",
+    point:  "A point is a single uppercase letter that identifies a defined point on the plane",
     axis:   "An axis must be either 'X' or 'Y', case-sensitive",  
     figure: "A figure should begin with an uppercase letter and an integer",
     value:  "A value is an ordered pair e.g. 'x,y', similar to coordinates",
@@ -6387,6 +6388,14 @@ module.exports = function() {
           failed = Types[type];
         }
         break;
+      case 'point':
+        lexer = new Lexer(value);
+        // expect a letter and EOF.
+        var tokens = [lexer.getNextToken(), lexer.getNextToken()];
+        if (tokens[0] != 4 || tokens[1] != 11) {
+          failed = Types[type];
+        }
+        break;        
       case 'figure':
         lexer = new Lexer(value);
         // expect a label and EOF.
@@ -6743,6 +6752,7 @@ Interface Command {
 var rotate = function(board, args) {
   var args   = args || {
     figure:  $('input[name="figure"]:last').val(),
+    center:  $('input[name="point"]:last').val(),
     degrees: parseInt($('input[name="degrees"]:last').val()),
   },
     usrPoints = this.points = {};  
@@ -6753,7 +6763,6 @@ var rotate = function(board, args) {
     }
   }
   transformArgs.points = [];
-
   board.shapes.forEach(function(shape) {
     if (shape.name == transformArgs.figure) {
       transformArgs.points = shape.usrSetCoords;
@@ -7371,6 +7380,7 @@ BoardTransform.prototype = (function() {
   /*
   Options: {
     degrees: signed int
+    center   Point  pt
     points:  [Point p1, Point p2, ...]
   }
   */
@@ -7383,9 +7393,7 @@ BoardTransform.prototype = (function() {
   RotateTransform.prototype.apply = function() {
     var transform = this.board.create("transform", 
       [degreeToRadian.call(this, this.options.degrees),
-      this.options.points[1] || this.options.points[0]],
-      {type: "rotate"});
-
+      this.options.center], {type: "rotate"});
     transform.applyOnce(this.options.points);
     this.board.update();
   };

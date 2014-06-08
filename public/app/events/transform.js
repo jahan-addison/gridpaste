@@ -14,6 +14,7 @@ Interface Command {
 var rotate = function(board, args) {
   var args   = args || {
     figure:  $('input[name="figure"]:last').val(),
+    center:  $('input[name="point"]:last').val(),
     degrees: parseInt($('input[name="degrees"]:last').val()),
   },
     usrPoints = this.points = {};  
@@ -24,7 +25,6 @@ var rotate = function(board, args) {
     }
   }
   transformArgs.points = [];
-
   board.shapes.forEach(function(shape) {
     if (shape.name == transformArgs.figure) {
       transformArgs.points = shape.usrSetCoords;
