@@ -48,16 +48,17 @@ describe("transform Command concrete", function() {
     try { command.remove(); } catch(e) {}
   });
   describe("transform.rotate command", function() {
-    it("should receive arguments from DOM if not provided and perform a rotation", function() {
+    it("should receive arguments from DOM if not provided and perform a rotation per a center point", function() {
       command = new transform.rotate(brd);
       command.execute();
       expect(brd.points.A.coords.usrCoords.map(function(e) { return e.toFixed(2)}).equals(['1.00','-42.68','17.68'])).to.be.true;
       expect(brd.points.B.coords.usrCoords.map(function(e) { return e.toFixed(2)}).equals(['1.00','-25.00','0.00'])).to.be.true;
       expect(brd.points.C.coords.usrCoords.map(function(e) { return e.toFixed(2)}).equals(['1.00','-7.32','17.68'])).to.be.true;
     });
-    it("should use passed arguments if provided and perform a rotation", function() {
+    it("should use passed arguments if provided and perform a rotation per a center point", function() {
       command = new transform.rotate(brd, {
-        figure: "A1", 
+        figure: "A1",
+        center: 'B', 
         degrees: '45'});
       command.execute();
       expect(brd.points.A.coords.usrCoords.map(function(e) { return e.toFixed(2)}).equals(['1.00','-42.68','17.68'])).to.be.true;
@@ -89,6 +90,13 @@ describe("transform Command concrete", function() {
       expect(brd.points.A.coords.usrCoords.map(function(e) { return e.toFixed(2)}).equals(['1.00','25.00','25.00'])).to.be.true;
       expect(brd.points.B.coords.usrCoords.map(function(e) { return e.toFixed(2)}).equals(['1.00','25.00','0.00'])).to.be.true;
       expect(brd.points.C.coords.usrCoords.map(function(e) { return e.toFixed(2)}).equals(['1.00','0.00','0.00'])).to.be.true;
+    });
+    it("should work on a single point", function() {
+      command = new transform.reflect(brd, {
+        figure: "A0", 
+        line: 'Y'});
+      command.execute();
+      expect(brd.points.A.coords.usrCoords.map(function(e) { return e.toFixed(2)}).equals(['1.00','25.00','25.00'])).to.be.true;
     });
     it("can be undone", function() {
       command = new transform.reflect(brd);
@@ -142,8 +150,15 @@ describe("transform Command concrete", function() {
       expect(brd.points.B.coords.usrCoords.map(function(e) { return e.toFixed(2)}).equals(['1.00','0.00','0.00'])).to.be.true;
       expect(brd.points.C.coords.usrCoords.map(function(e) { return e.toFixed(2)}).equals(['1.00','25.00','0.00'])).to.be.true;
     });
+    it("should work on a single point", function() {
+      command = new transform.translate(brd, {
+        figure: "A0", 
+        values: [25, 0]});
+      command.execute();
+      expect(brd.points.A.coords.usrCoords.map(function(e) { return e.toFixed(2)}).equals(['1.00','0.00','25.00'])).to.be.true;
+    });
     it("can be undone", function() {
-      command = new transform.shear(brd);
+      command = new transform.translate(brd);
       command.execute();
       command.remove();
       expect(brd.points.A.coords.usrCoords.map(function(e) { return e.toFixed(2)}).equals(['1.00','-25.00','25.00'])).to.be.true;

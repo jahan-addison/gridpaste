@@ -34,6 +34,18 @@ var delete_ = function(board, args) {
         }
       }
     }
+    // try with a single point
+    if (typeof this.figure === 'undefined') {
+      for(p in board.points) {
+        if (board.points.hasOwnProperty(p)) {
+          if (board.points[p].name + '0' == args.figure) {
+            this.figure           = board.points[p];
+            this.figure.isVisible = false;
+            this.figure.visible(false);
+          }
+        }
+      }
+    }
     if (typeof this.figure === 'undefined') {
       throw ReferenceError("Could not find figure '" + args.figure + "'");
     }

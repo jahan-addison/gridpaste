@@ -37,6 +37,13 @@ describe("misc Command concrete", function() {
       command.execute();
       brd.shapes[0].isVisible.should.be.false;
     });
+    it("should work on a single point", function() {
+      command = new misc.delete_(brd, {
+        figure: 'A0'}
+      );
+      command.execute();
+      brd.points.A.isVisible.should.be.false;
+    });
     it("can be undone", function() {
       command = new misc.delete_(brd);
       command.execute();

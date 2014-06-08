@@ -14,6 +14,7 @@ Interface Command {
 var rotate = function(board, args) {
   var args   = args || {
     figure:  $('input[name="figure"]:last').val(),
+    center:  $('input[name="point"]:last').val(),
     degrees: parseInt($('input[name="degrees"]:last').val()),
   },
     usrPoints = this.points = {};  
@@ -24,7 +25,6 @@ var rotate = function(board, args) {
     }
   }
   transformArgs.points = [];
-
   board.shapes.forEach(function(shape) {
     if (shape.name == transformArgs.figure) {
       transformArgs.points = shape.usrSetCoords;
@@ -75,12 +75,21 @@ var reflect = function(board, args) {
   } else {
     transformArgs.line = board.axy;
   }
-
   board.shapes.forEach(function(shape) {
     if (shape.name == transformArgs.figure) {
       transformArgs.points = shape.usrSetCoords;
     }
   });
+  // a single point
+  if (!transformArgs.points.length) {
+    for(p in board.points) {
+      if (board.points.hasOwnProperty(p)) {
+        if (board.points[p].name + '0' == transformArgs.figure) {
+          transformArgs.points = [board.points[p]];
+        }
+      }
+    }
+  }
   delete transformArgs.figure;
 
   this.reflect = new transform(board, "reflect", transformArgs);
@@ -170,6 +179,16 @@ var translate = function(board, args) {
       transformArgs.points = shape.usrSetCoords;
     }
   });
+  // a single point
+  if (!transformArgs.points.length) {
+    for(p in board.points) {
+      if (board.points.hasOwnProperty(p)) {
+        if (board.points[p].name + '0' == transformArgs.figure) {
+          transformArgs.points = [board.points[p]];
+        }
+      }
+    }
+  }
   delete transformArgs.figure;
   this.translate = new transform(board, "translate", transformArgs);
   this.remove    = function() {

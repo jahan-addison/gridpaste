@@ -55,9 +55,10 @@ describe("BoardTransform Factory", function() {
     done();
   });
   describe("RotateTransform", function() {
-    it("should perform a rotation", function() {
+    it("should perform a rotation per a center point", function() {
       p = new transform(brd, "rotate", {
         degrees: 45,
+        center: brd.points.B,
         points: [brd.points.A, brd.points.B, brd.points.C]
       }).apply();
       expect(brd.points.A.coords.usrCoords.map(function(e) { return e.toFixed(2)}).equals(['1.00','-42.68','17.68'])).to.be.true;
