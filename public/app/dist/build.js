@@ -20,8 +20,10 @@ $(function() {
     });
     board.points = {};
     board.shapes = [];
-    var axx      = board.axx = board.create('axis',[[0,0],[1,0]]);
-    var axy      = board.axy = board.create('axis',[[0,0],[0,1]]);
+    board.xx     = xx;
+    board.yy     = yy;
+    board.axx    = board.create('axis',[[0,0],[1,0]]);
+    board.axy    = board.create('axis',[[0,0],[0,1]]);
     if (!$paste) {
       /* Show coordinates at mouse */
       require('./helper/mouse')(board);
@@ -165,7 +167,6 @@ module.exports = function() {
 var iterator = require('../iterate'),
     command  = require('../events/run');
 
-
 module.exports = function(App, board) {
   if (board.playing) {
     return false;
@@ -194,14 +195,17 @@ module.exports = function(App, board) {
     var AppIterator = new iterator($AppPaste);
     board.animate();
     var play;
+    $('.replay').addClass('dim');
     play = setInterval(function() {
       var next         = AppIterator.next();
       target           = next.toString.split('.');       
       var $constructor = command[target[0]][target[1]];
+      require('./position')(next.arguments, board);
       var $command     = new $constructor(board, next.arguments);      
       $command.execute();
       if(!AppIterator.hasNext()) {
         clearInterval(play);
+        $('.replay').removeClass('dim');
         board.playing = undefined;
       }
     }, 1100);
@@ -230,7 +234,7 @@ module.exports = function(App, board) {
     });
   }
 };
-},{"../iterate":13,"../events/run":14}],12:[function(require,module,exports){
+},{"../iterate":13,"../events/run":14,"./position":15}],12:[function(require,module,exports){
 /* mousetrap v1.4.6 craig.is/killing/mice */
 (function(J,r,f){function s(a,b,d){a.addEventListener?a.addEventListener(b,d,!1):a.attachEvent("on"+b,d)}function A(a){if("keypress"==a.type){var b=String.fromCharCode(a.which);a.shiftKey||(b=b.toLowerCase());return b}return h[a.which]?h[a.which]:B[a.which]?B[a.which]:String.fromCharCode(a.which).toLowerCase()}function t(a){a=a||{};var b=!1,d;for(d in n)a[d]?b=!0:n[d]=0;b||(u=!1)}function C(a,b,d,c,e,v){var g,k,f=[],h=d.type;if(!l[a])return[];"keyup"==h&&w(a)&&(b=[a]);for(g=0;g<l[a].length;++g)if(k=
 l[a][g],!(!c&&k.seq&&n[k.seq]!=k.level||h!=k.action||("keypress"!=h||d.metaKey||d.ctrlKey)&&b.sort().join(",")!==k.modifiers.sort().join(","))){var m=c&&k.seq==c&&k.level==v;(!c&&k.combo==e||m)&&l[a].splice(g,1);f.push(k)}return f}function K(a){var b=[];a.shiftKey&&b.push("shift");a.altKey&&b.push("alt");a.ctrlKey&&b.push("ctrl");a.metaKey&&b.push("meta");return b}function x(a,b,d,c){m.stopCallback(b,b.target||b.srcElement,d,c)||!1!==a(b,d)||(b.preventDefault?b.preventDefault():b.returnValue=!1,b.stopPropagation?
@@ -266,6 +270,89 @@ Iterator.prototype.prev    = function() {
 };
 
 module.exports = Iterator;
+},{}],15:[function(require,module,exports){
+module.exports = function(args, board) {
+  var translateX   = false,
+      translateY   = false,
+      placeX       = 0,
+      placeY       = 0;
+
+      
+  var move = function(point, places) {
+    var place;
+    if (translateX || Math.abs(point[0]) > board.xx) {
+      if (point[0] < 0) {
+        if (placeX) {
+          place = (-placeX / 2) - 3;
+        }
+        place    = place || point[0] + board.xx - 3;
+        point[0] = point[0] - (place * 2);      
+      } else {
+        if (placeX) {
+          place = (placeX / 2) + 3;
+        }
+        place    = place || point[0] - board.xx - 3;
+        point[0] = point[0] - (place * 2);
+      }
+    }
+    if (translateY || Math.abs(point[1]) > board.yy) {    
+      if (point[1] < 0) {
+        if (placeY) {
+          place = (-placeY / 1) - 3;
+        }
+        place    = place || point[1] + board.yy + 3;
+        point[1] = point[1] - place;      
+      } else {
+        if (placeY) {
+          place = (placeY / 1) + 3;
+        }
+        place    = place || point[1] - board.yy + 3;
+        point[1] = point[1] - place;
+      }
+    }
+  };
+
+  // first pass
+  for(arg in args) {
+    if (args.hasOwnProperty(arg)) {
+      if ($.isArray(args[arg])) {
+        if (arg == 'center') {
+          var point = args[arg];
+          if (Math.abs(point[0]) > board.xx || Math.abs(point[1]) > board.yy) {
+            move(args[arg]);
+          }
+        }
+        if (arg.match(/point\d*?/)) {
+          var point = args[arg];
+          if (Math.abs(point[0]) > board.xx) {
+            translateX = true;
+            if (Math.abs(point[0]) - board.xx > placeX) {
+              placeX = Math.abs(point[0]) - board.xx;
+            }
+          }
+          if (Math.abs(point[1]) > board.yy) {
+            translateY = true;
+            if (Math.abs(point[1]) - board.yy > placeY) {
+              placeY = Math.abs(point[1]) - board.yy;
+            }
+          }
+        }
+      }
+    }
+  }
+  // second pass, perform distance-preserving translation
+  if (translateX || translateY) {
+    for(arg in args) {
+      if (args.hasOwnProperty(arg)) {
+        if ($.isArray(args[arg])) {
+          if (arg.match(/point\d?/)) {
+            move(args[arg]);            
+          }
+        }
+      }
+    }    
+  }
+};
 },{}],7:[function(require,module,exports){
 /* The Invoker */
 
@@ -302,7 +389,7 @@ Operation.prototype.undoLastExecute = function() {
   require("./decorators/recording")(Operation);
 
 module.exports = Operation;
-},{"./decorators/recording":15}],8:[function(require,module,exports){
+},{"./decorators/recording":16}],8:[function(require,module,exports){
 module.exports = function(App) {
   require('./more')  ();               // attach event to "more" button for polygon construction
   require('./undo')  (App);            // attach event to undo button
@@ -312,7 +399,7 @@ module.exports = function(App) {
   require('./share') (App)             // attach event to share button
 };
 
-},{"./more":16,"./undo":17,"./record":18,"./clear":19,"./play":6,"./share":20}],9:[function(require,module,exports){
+},{"./more":17,"./undo":18,"./record":19,"./clear":20,"./play":6,"./share":21}],9:[function(require,module,exports){
 var command    = require('../events/run'),
     slider     = require('../helper/slider'),
     validate   = require('../helper/validate')(),
@@ -389,7 +476,7 @@ module.exports = function(App) {
       console.log("Error: %s", e.message);
     });
 };
-},{"../events/run":14,"../helper/slider":21,"../helper/validate":22,"../../components/rxjs/rx.lite":23}],10:[function(require,module,exports){
+},{"../events/run":14,"../helper/slider":22,"../helper/validate":23,"../../components/rxjs/rx.lite":24}],10:[function(require,module,exports){
 var command    = require('../events/run'),
     Parser     = require('../board/functions/parser'),
     Rx         = require('../../components/rxjs/rx.lite').Rx;
@@ -441,7 +528,7 @@ module.exports = function(App) {
     console.log("Error: %s", e.message);
   });
 };
-},{"../events/run":14,"../board/functions/parser":24,"../../components/rxjs/rx.lite":23}],11:[function(require,module,exports){
+},{"../events/run":14,"../board/functions/parser":25,"../../components/rxjs/rx.lite":24}],11:[function(require,module,exports){
 var command    = require('../events/run'),
     Rx         = require('../../components/rxjs/rx.lite').Rx;
 
@@ -477,7 +564,7 @@ module.exports = function(App, board) {
   });
 
 }
-},{"../events/run":14,"../../components/rxjs/rx.lite":23}],14:[function(require,module,exports){
+},{"../events/run":14,"../../components/rxjs/rx.lite":24}],14:[function(require,module,exports){
 
 module.exports = {
   draw:      require('./draw'),
@@ -488,7 +575,7 @@ module.exports = {
 };
 
 
-},{"./draw":25,"./transform":26,"./zoom":27,"./function":28,"./misc":29}],15:[function(require,module,exports){
+},{"./draw":26,"./transform":27,"./zoom":28,"./function":29,"./misc":30}],16:[function(require,module,exports){
 /*
   OperationDecorator
 */
@@ -541,7 +628,7 @@ module.exports = function(Operation) {
   }; 
 };
 
-},{}],16:[function(require,module,exports){
+},{}],17:[function(require,module,exports){
 module.exports = function() {
   $(function() {
     var points = 3;
@@ -555,7 +642,7 @@ module.exports = function() {
     });
   });
 };
-},{}],17:[function(require,module,exports){
+},{}],18:[function(require,module,exports){
 module.exports = function(App) {
   $(function() {
     $('.button.undo').click(function() {
@@ -566,7 +653,7 @@ module.exports = function(App) {
     });
   });
 };
-},{}],18:[function(require,module,exports){
+},{}],19:[function(require,module,exports){
 module.exports = function(App) {
   $(function() {
     $('.start-record').click(function() {
@@ -595,7 +682,7 @@ module.exports = function(App) {
     });
   });
 };
-},{}],21:[function(require,module,exports){
+},{}],22:[function(require,module,exports){
 module.exports = function(content, width, height, source, top) {
   $block = $('<div class="slider"> <div class="close-slider">x</div> </div>');
   $block.append(content)
@@ -634,7 +721,7 @@ module.exports = function(content, width, height, source, top) {
     });
   });
 };
-},{}],30:[function(require,module,exports){
+},{}],31:[function(require,module,exports){
 // shim for using process in browser
 
 var process = module.exports = {};
@@ -689,7 +776,7 @@ process.chdir = function (dir) {
     throw new Error('process.chdir is not supported');
 };
 
-},{}],23:[function(require,module,exports){
+},{}],24:[function(require,module,exports){
 (function(process,global){// Copyright (c) Microsoft Open Technologies, Inc. All rights reserved. See License.txt in the project root for license information.
 
 ;(function (undefined) {
@@ -6167,7 +6254,7 @@ process.chdir = function (dir) {
     }
 }.call(this));
 })(require("__browserify_process"),window)
-},{"__browserify_process":30}],27:[function(require,module,exports){
+},{"__browserify_process":31}],28:[function(require,module,exports){
 /* Commands */
 
 /*--
@@ -6209,7 +6296,7 @@ module.exports = {
   zoomIn: zoomIn,
   zoomOut: zoomOut
 };
-},{}],29:[function(require,module,exports){
+},{}],30:[function(require,module,exports){
 /* Commands */
 
 /*--
@@ -6268,7 +6355,7 @@ var delete_ = function(board, args) {
 module.exports = {
   delete_: delete_
 };
-},{}],19:[function(require,module,exports){
+},{}],20:[function(require,module,exports){
 var execute = require('../operation');
 
 module.exports = function(App) {
@@ -6300,7 +6387,7 @@ module.exports = function(App) {
     })
   });
 };
-},{"../operation":7,"./record":18}],20:[function(require,module,exports){
+},{"../operation":7,"./record":19}],21:[function(require,module,exports){
 var slider = require('./slider');
 
 module.exports = function(App) {
@@ -6345,7 +6432,7 @@ module.exports = function(App) {
     })
   });
 }
-},{"./slider":21}],22:[function(require,module,exports){
+},{"./slider":22}],23:[function(require,module,exports){
 var Lexer = require('../board/functions/lexer');
 
 module.exports = function() {
@@ -6413,7 +6500,7 @@ module.exports = function() {
     }
   });
 };
-},{"../board/functions/lexer":31}],24:[function(require,module,exports){
+},{"../board/functions/lexer":32}],25:[function(require,module,exports){
 var Lexer = require('./lexer');
 
 /*
@@ -6524,7 +6611,7 @@ Parser.prototype = (function() {
 
 module.exports = Parser;
 
-},{"./lexer":31}],25:[function(require,module,exports){
+},{"./lexer":32}],26:[function(require,module,exports){
 var element = require('../board/element'),
     coords  = require('../helper/coords')();
 
@@ -6735,7 +6822,7 @@ module.exports = {
   point: point,
   text: text
 };
-},{"../board/element":32,"../helper/coords":33}],26:[function(require,module,exports){
+},{"../board/element":33,"../helper/coords":34}],27:[function(require,module,exports){
 var transform = require('../board/transform'),
     coords    = require('../helper/coords')();
 
@@ -7003,7 +7090,7 @@ module.exports = {
   translate: translate,
   scale:     scale
 };
-},{"../board/transform":34,"../helper/coords":33}],28:[function(require,module,exports){
+},{"../board/transform":35,"../helper/coords":34}],29:[function(require,module,exports){
 var func    = require('../board/functions/functions'),
     Parser  = require('../board/functions/parser'),
     element = require('../board/element');  
@@ -7219,7 +7306,7 @@ module.exports = {
   angle: angle,
   area:  area
 };
-},{"../board/functions/functions":35,"../board/functions/parser":24,"../board/element":32}],31:[function(require,module,exports){
+},{"../board/functions/functions":36,"../board/functions/parser":25,"../board/element":33}],32:[function(require,module,exports){
 /*
  * Geometry Function Tokenizer
  */
@@ -7339,7 +7426,7 @@ Lexer.prototype = (function() {
 })();
 
 module.exports = Lexer;
-},{}],33:[function(require,module,exports){
+},{}],34:[function(require,module,exports){
 module.exports = function() {
   jQuery.fn.coord = function() {
     if (this.val()) {
@@ -7353,7 +7440,7 @@ module.exports = function() {
   };
 };
 
-},{}],34:[function(require,module,exports){
+},{}],35:[function(require,module,exports){
 /*
   BoardTransform Factory
   */
@@ -7495,7 +7582,7 @@ BoardTransform.prototype = (function() {
 })();
 
 module.exports = BoardTransform;
-},{}],35:[function(require,module,exports){
+},{}],36:[function(require,module,exports){
 /* GeometryFunction Factory */
 
 var GeometryFunction = function(JXG, func, options) {
@@ -7623,7 +7710,7 @@ GeometryFunction.prototype = (function() {
 })();
 
 module.exports = GeometryFunction;
-},{}],32:[function(require,module,exports){
+},{}],33:[function(require,module,exports){
 var point = require('./point'),
     shape = require('./shape')
 
@@ -7855,7 +7942,7 @@ BoardElement.prototype = (function() {
 })();
 
 module.exports = BoardElement; 
-},{"./point":36,"./shape":37}],36:[function(require,module,exports){
+},{"./point":37,"./shape":38}],37:[function(require,module,exports){
 var Point = function(board, coords) {
   this.board  = board;
   this.coords = coords;
@@ -7897,7 +7984,7 @@ Point.prototype = (function() {
 })();
 
 module.exports = Point;
-},{}],37:[function(require,module,exports){
+},{}],38:[function(require,module,exports){
 var Shape = function(board, shape, parents, options) {
   this.board   = board;
   this.shape   = shape;
