@@ -1,7 +1,6 @@
 var iterator = require('../iterate'),
     command  = require('../events/run');
 
-
 module.exports = function(App, board) {
   if (board.playing) {
     return false;
@@ -30,14 +29,17 @@ module.exports = function(App, board) {
     var AppIterator = new iterator($AppPaste);
     board.animate();
     var play;
+    $('.replay').addClass('dim');
     play = setInterval(function() {
       var next         = AppIterator.next();
       target           = next.toString.split('.');       
       var $constructor = command[target[0]][target[1]];
+      require('./position')(next.arguments, board);
       var $command     = new $constructor(board, next.arguments);      
       $command.execute();
       if(!AppIterator.hasNext()) {
         clearInterval(play);
+        $('.replay').removeClass('dim');
         board.playing = undefined;
       }
     }, 1100);
