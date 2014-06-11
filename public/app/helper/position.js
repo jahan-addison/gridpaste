@@ -5,7 +5,7 @@ module.exports = function(args, board) {
       placeY       = 0;
 
       
-  var move = function(point, places) {
+  var move = function(point) {
     var place;
     if (translateX || Math.abs(point[0]) > board.xx) {
       if (point[0] < 0) {
