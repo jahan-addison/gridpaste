@@ -13,13 +13,13 @@ module.exports = function(args, board) {
           place = (-placeX / 2) - 3;
         }
         place    = place || point[0] + board.xx - 3;
-        point[0] = point[0] - (place * 2);      
+        point[0] = point[0] - ((placeX) ? place * 2 : place);      
       } else {
         if (placeX) {
           place = (placeX / 2) + 3;
         }
         place    = place || point[0] - board.xx - 3;
-        point[0] = point[0] - (place * 2);
+        point[0] = point[0] - ((placeX) ? place * 2 : place);
       }
     }
     if (translateY || Math.abs(point[1]) > board.yy) {    
@@ -43,13 +43,13 @@ module.exports = function(args, board) {
   for(arg in args) {
     if (args.hasOwnProperty(arg)) {
       if ($.isArray(args[arg])) {
-        if (arg == 'center') {
+        if (arg == 'center' || arg == 'position') {
           var point = args[arg];
           if (Math.abs(point[0]) > board.xx || Math.abs(point[1]) > board.yy) {
             move(args[arg]);
           }
         }
-        if (arg.match(/point\d*?/)) {
+        if (arg.indexOf("point") !== -1) {
           var point = args[arg];
           if (Math.abs(point[0]) > board.xx) {
             translateX = true;
