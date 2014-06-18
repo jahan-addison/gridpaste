@@ -1,13 +1,14 @@
-var express   = require('express')
+var express    = require('express')
   , expressValidator = require('express-validator')
-  , routes    = require('./routes')
-  , user      = require('./routes/user')
-  , paste     = require('./routes/paste')
-  , http      = require('http')
-  , swig      = require('swig')
-  , path      = require('path')
-  , Sequelize = require('./environment/sequelize')
-  , Mongoose  = require('./environment/mongoose')
+  , routes     = require('./routes')
+  , user       = require('./routes/user')
+  , paste      = require('./routes/paste')
+  , http       = require('http')
+  , swig       = require('swig')
+  , path       = require('path')
+  , Sequelize  = require('./environment/sequelize')
+  , Mongoose   = require('./environment/mongoose')
+  , MongoStore = require('connect-mongo')(express); 
 
 
 var app = express();
@@ -22,6 +23,12 @@ app.configure(function(){
     app.use(express.logger('dev'));
     app.use(express.bodyParser());
     app.use(expressValidator({}));
+    app.use(express.cookieParser());
+    app.use(express.session({
+      secret: require('./config').secret,
+      maxAge: new Date(Date.now() + 3600000),
+      store:  new MongoStore({ db: Mongoose.db})
+    }));
     app.use(express.methodOverride());
     app.use(app.router);
 
@@ -33,7 +40,10 @@ if ('development' == app.get('env')) {
 }
 
 app.get('/',          routes.index);
+app.get('/login',     routes.login);
+app.get('/register',  routes.register);
 app.get('/:id',       routes.show);
+app.post('/login',    user.login);
 app.post('/register', user.register);
 app.post('/paste',    paste.action);
 
