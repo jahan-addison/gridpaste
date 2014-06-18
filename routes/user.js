@@ -37,3 +37,10 @@ exports.register = function(req, res) {
       }
     });
 };
+
+/*
+ * POST Login
+ */
+exports.login = function(req, res) {
+
+};

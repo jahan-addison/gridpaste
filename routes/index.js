@@ -23,3 +23,23 @@ exports.show = function(req, res) {
     }
   });
 };
+
+/*
+ * GET login
+ */
+
+exports.login = function(req, res) {
+  if (req.session.loggedIn) {
+    res.redirect('/')
+  } else {
+    res.render('login.html', { env: req.env });
+  }
+};
+
+/* 
+ * GET register
+ */
+
+exports.register = function(req, res) {
+
+};

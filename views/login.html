@@ -1,0 +1,27 @@
+{% extends 'layout.html' %}
+{% block head %}
+  {% parent %}
+  <script type="text/javascript" src="//use.typekit.net/cmr6vjy.js"></script>
+  <script type="text/javascript">try{Typekit.load();}catch(e){}</script>
+{% endblock %}
+{% block content %}
+  <section class="page">
+    <header>
+      <figure>
+        <img src="/images/gridpaste-logo.svg" alt="logo" />
+      </figure>
+    </header>
+    <h1>Login</h1>
+    <div class="form">
+      <form method="post" action="">
+        <label for="username">Username: </label>
+        <input type="text" name="username" value="" />
+        <label for="password">Password: </label>
+        <input type="password" name="password" value="" />
+        <input type="submit" class="button" value="Login" />
+      </form>
+      <a href="/">Go back</a>
+    </div>
+  </section>
+    <script src="/app/dist/build.js"></script>
+{% endblock %}

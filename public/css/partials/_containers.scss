@@ -10,7 +10,7 @@ p {
 }
 
 body {
-  background: #F2F2F2;
+  background: lighten(#F2F2F2,5%);
 }
 
 .red {
@@ -46,6 +46,35 @@ body {
 .finished {
   cursor:default !important;
 }
+
+.page {
+  width:  890px;
+  height: auto;
+  min-height: 800px;
+  margin: 0 auto;
+  background: #fff;
+}
+
+.page form {
+  input {
+    background: rgba(240, 205, 26, 0.18);
+    border: darken(#ccc, 15%) 1px solid;
+  }
+  width:500px;
+}
+
+.page header {
+  figure {
+    width:230px;
+    margin: 0 auto;
+    img {
+      margin-top:-10px;
+    }
+  }
+  height: 100px;
+  background: $oynx-brown;
+}
+
 
 .zoom {
   background: $pale-brown;
