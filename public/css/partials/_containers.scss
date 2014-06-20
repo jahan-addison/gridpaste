@@ -10,7 +10,7 @@ p {
 }
 
 body {
-  background: lighten(#F2F2F2,5%);
+  background: #F2F2F2;
 }
 
 .red {
@@ -48,33 +48,105 @@ body {
 }
 
 .page {
-  width:  890px;
+  width:  720px;
   height: auto;
-  min-height: 800px;
+  min-height: 400px;
   margin: 0 auto;
   background: #fff;
 }
 
 .page form {
+  @include clearfix();
+  display:block;
+  padding:10px;
+  margin:0 auto;
+  label {
+    font-variant: small-caps;
+    font-weight:bold;
+    margin-bottom:5px;
+    width:30px;
+    font-size:1.4em;
+    color: darken($pale-brown,15%);
+    font-family: Verdana;
+//    @include monaco(1.5em, darken($pale-brown,15%));
+  }
   input {
     background: rgba(240, 205, 26, 0.18);
-    border: darken(#ccc, 15%) 1px solid;
+    border: rgba(228, 216, 216, 0.7) 1px solid;
+    display:block;
+    font-family: monospace;
+    margin-bottom:25px;
+    margin-left:-3px;
+    width:100%;
+    color: #464444;
   }
-  width:500px;
+  .button {
+    margin-left:-3px;
+    display:block;
+    clear:both;
+    @include clearfix();
+  }
+  width:390px;
+}
+
+.col.user {
+  padding-right:25px !important;
+}
+
+.page footer {
+  background: $oynx-brown;
+  height:50px;
+  width:100%;
+  margin-top:50px;
+  address {
+    padding-top:2.5%;
+  }
+}
+
+.page label.error {
+  position: absolute;
+  width: 100%;
+  margin-top: -73px;
+  margin-left: 85px;
+  color: $red;
+}
+
+.page div.error {
+  width: 100%;
+  font-weight:bold;
+  margin-bottom:10px;
+  font-size:1.4em;
+  color: darken($pale-brown,15%);
+  color: $red;
+}
+
+.page a {
+  width:intrinsic;
+  position: relative;
+  top:8px;
+  display:inline-block;
+}
+
+.page .button + div {
+  display:block;
+  clear:both;
 }
 
 .page header {
   figure {
     width:230px;
-    margin: 0 auto;
+    padding-top:10px;
     img {
       margin-top:-10px;
     }
   }
   height: 100px;
-  background: $oynx-brown;
+  background: lighten($oynx-brown, 1%);
 }
 
+.page label {
+  display:block;
+}
 
 .zoom {
   background: $pale-brown;
@@ -172,7 +244,7 @@ address {
 
 input {
   background: #514645;
-  padding:10px;
+  padding: 0 10px;
   height:27px;
   margin-left:15px;
   width:75%;

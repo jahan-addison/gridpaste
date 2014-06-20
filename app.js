@@ -8,6 +8,7 @@ var express    = require('express')
   , path       = require('path')
   , Sequelize  = require('./environment/sequelize')
   , Mongoose   = require('./environment/mongoose')
+  , flash      = require('express-flash')
   , MongoStore = require('connect-mongo')(express); 
 
 
@@ -29,6 +30,11 @@ app.configure(function(){
       maxAge: new Date(Date.now() + 3600000),
       store:  new MongoStore({ db: Mongoose.db})
     }));
+    app.use(function(req,res,next){
+        res.locals.session = req.session;
+        next();
+    });
+    app.use(flash());
     app.use(express.methodOverride());
     app.use(app.router);
 
@@ -41,6 +47,7 @@ if ('development' == app.get('env')) {
 
 app.get('/',          routes.index);
 app.get('/login',     routes.login);
+app.get('/logout',    routes.logout);
 app.get('/register',  routes.register);
 app.get('/:id',       routes.show);
 app.post('/login',    user.login);

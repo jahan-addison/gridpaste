@@ -15,8 +15,13 @@
             </p>
           </header> 
           <section id="auth">
+            {% if session.loggedIn %}
+            <div class="col user"><a href="/logout"> Log out ({{ session.user}}) </a></div>
+            <div class="col"><a href="/pastes">View Pastes</a></div>
+            {% else %}
             <div class="col"><a href="/register">Sign Up</a></div>
             <div class="col"><a href="/login">Login</a></div>
+            {% endif %}
           </section>
           <section id="run-function">
             <span id="f">f</span> <input type="text" class="function" name="run" value="" />
