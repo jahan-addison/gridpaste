@@ -30,10 +30,6 @@ app.configure(function(){
       maxAge: new Date(Date.now() + 3600000),
       store:  new MongoStore({ db: Mongoose.db})
     }));
-    app.use(function(req,res,next){
-        res.locals.session = req.session;
-        next();
-    });
     app.use(flash());
     app.use(express.methodOverride());
     app.use(app.router);
@@ -49,6 +45,7 @@ app.get('/',          routes.index);
 app.get('/login',     routes.login);
 app.get('/logout',    routes.logout);
 app.get('/register',  routes.register);
+app.get('/pastes',    paste.list);
 app.get('/:id',       routes.show);
 app.post('/login',    user.login);
 app.post('/register', user.register);

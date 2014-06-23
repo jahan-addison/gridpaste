@@ -17,7 +17,7 @@
           <section id="auth">
             {% if session.loggedIn %}
             <div class="col user"><a href="/logout"> Log out ({{ session.user}}) </a></div>
-            <div class="col"><a href="/pastes">Pastes</a></div>
+            <div class="col"><a href="/pastes">Manage Pastes</a></div>
             {% else %}
             <div class="col"><a href="/register">Sign Up</a></div>
             <div class="col"><a href="/login">Login</a></div>

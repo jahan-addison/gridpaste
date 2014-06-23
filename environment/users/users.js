@@ -33,7 +33,8 @@ module.exports = function(sequelize, datatypes) {
         },
         isUser: function (username, password, callback) {
           Users.find({where: {'username': username,}}).success(function(user) {
-            bcrypt.compare(password, user.password, callback);   
+              user = user || {};
+              bcrypt.compare(password, user.password, callback);   
           });
         }
       }

@@ -4,7 +4,8 @@
  */
 
 exports.index = function(req, res){
-  res.render('index.html', { env: req.env });
+  res.render('index.html', { env: req.env,
+    session: req.session });
 };
 
 /*
@@ -17,9 +18,12 @@ exports.show = function(req, res) {
   Paste.findOne({"id": req.params.id}, {"paste._id":0}, function(error, paste) {
     if (!paste) {
       // todo: better page
-      res.send(500, "Paste ID does not exist!");
+      res.send(404, "Paste ID does not exist!");
     } else {
-     res.render('show.html', { env: req.env, paste: paste });
+     res.render('show.html', { 
+      env:     req.env,
+      session: req.session,
+      paste:   paste });
     }
   });
 };

@@ -60,11 +60,16 @@ exports.login = function(req, res) {
   var password = req.body.password;
   Users.isUser(username, password, function(err, result) {
     if (result) {
-      req.session.loggedIn = true;
       Users.getUser(username, function(user) {
-        req.session.user  = user.dataValues.username;
-        req.session.email = user.dataValues.email;
-        res.redirect('/');
+        if (!user) {
+          req.flash('error', "An error occurred! Try again later."); 
+          res.redirect('/login');      
+        } else {
+          req.session.loggedIn = true;
+          req.session.user     = user.dataValues.username;
+          req.session.email    = user.dataValues.email;
+          res.redirect('/');         
+        }
       })
     } else {
       req.flash('error', "This user does not exist!");

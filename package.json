@@ -14,7 +14,9 @@
     "mongoose": "~3.8.8",
     "randomstring": "~1.0.3",
     "connect-mongo": "~0.4.1",
-    "express-flash": "0.0.2"
+    "express-flash": "0.0.2",
+    "express-paginate": "0.0.2",
+    "mongoose-paginate": "~3.1.0"
   },
   "devDependencies": {
     "grunt": "~0.4.1",

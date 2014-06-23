@@ -1,9 +1,9 @@
-/*
- * Pastes
- */
+var Paste            = require ('../environment/pastes/pastes'),
+    randomstring     = require('randomstring');0
 
-var Paste        = require ('../environment/pastes/pastes'),
-    randomstring = require("randomstring");
+/*
+ * POST action
+ */
 
 exports.action = function(req, res) {
   req.checkBody('title', 'Please give a title!').notEmpty();
@@ -16,11 +16,34 @@ exports.action = function(req, res) {
     var token = randomstring.generate(8);
     new Paste({id: token, 
         title: req.body.title, 
-        user:  'anonymous', 
+        user:  req.session.user || 'anonymous', 
         paste: req.body.paste}
     ).save(function(err) {
       if (err) throw err;
       res.send({token: token});
     });      
 };
-  
+
+/*
+ * GET list
+ */
+
+exports.list = function(req, res) {
+  if (!req.session.loggedIn) {
+    res.redirect('/');
+  }
+  Paste.paginate({ user: req.session.user  }, 1, 10, function(error, pageCount, paginatedResults, itemCount) {
+    if (error) {
+      req.flash('error', "You don't have any saved pastes!");
+    } else {
+      console.log('Pages:', pageCount);
+      console.log(paginatedResults);
+       res.render('pastes.html', {
+        results:   paginatedResults,
+        pageCount: pageCount,
+        itemCount: itemCount
+      });
+    }
+  });
+
+};

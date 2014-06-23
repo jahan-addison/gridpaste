@@ -113,12 +113,16 @@ body {
 }
 
 .page div.error {
-  width: 100%;
+  width: 450px;
   font-weight:bold;
   margin-bottom:10px;
   font-size:1.4em;
   color: darken($pale-brown,15%);
   color: $red;
+}
+
+#auth div.margin {
+  margin-bottom:3px;
 }
 
 .page a {
