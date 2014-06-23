@@ -278,7 +278,7 @@ body {
 /* line 92, ../partials/_containers.scss */
 .col.user {
   padding-right: 25px !important;
-  width: 49%;
+  width: auto;
 }
 
 /* line 97, ../partials/_containers.scss */
