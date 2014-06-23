@@ -476,7 +476,7 @@ module.exports = function(App) {
       console.log("Error: %s", e.message);
     });
 };
-},{"../events/run":14,"../helper/slider":22,"../helper/validate":23,"../../components/rxjs/rx.lite":24}],10:[function(require,module,exports){
+},{"../events/run":14,"../helper/validate":22,"../helper/slider":23,"../../components/rxjs/rx.lite":24}],10:[function(require,module,exports){
 var command    = require('../events/run'),
     Parser     = require('../board/functions/parser'),
     Rx         = require('../../components/rxjs/rx.lite').Rx;
@@ -682,7 +682,7 @@ module.exports = function(App) {
     });
   });
 };
-},{}],22:[function(require,module,exports){
+},{}],23:[function(require,module,exports){
 module.exports = function(content, width, height, source, top) {
   $block = $('<div class="slider"> <div class="close-slider">x</div> </div>');
   $block.append(content)
@@ -6432,7 +6432,7 @@ module.exports = function(App) {
     })
   });
 }
-},{"./slider":22}],23:[function(require,module,exports){
+},{"./slider":23}],22:[function(require,module,exports){
 var Lexer = require('../board/functions/lexer');
 
 module.exports = function() {
@@ -7426,20 +7426,6 @@ Lexer.prototype = (function() {
 })();
 
 module.exports = Lexer;
-},{}],34:[function(require,module,exports){
-module.exports = function() {
-  jQuery.fn.coord = function() {
-    if (this.val()) {
-      if (this.val().indexOf(',') !== -1) {
-        return this.val().split(',')
-          .map(function(e) {
-            return parseFloat(e);
-          });
-      }
-    }
-  };
-};
-
 },{}],35:[function(require,module,exports){
 /*
   BoardTransform Factory
@@ -7582,6 +7568,20 @@ BoardTransform.prototype = (function() {
 })();
 
 module.exports = BoardTransform;
+},{}],34:[function(require,module,exports){
+module.exports = function() {
+  jQuery.fn.coord = function() {
+    if (this.val()) {
+      if (this.val().indexOf(',') !== -1) {
+        return this.val().split(',')
+          .map(function(e) {
+            return parseFloat(e);
+          });
+      }
+    }
+  };
+};
+
 },{}],36:[function(require,module,exports){
 /* GeometryFunction Factory */
 
