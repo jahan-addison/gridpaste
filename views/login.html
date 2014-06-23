@@ -17,9 +17,9 @@
           <div class="error">{{ messages.error }}</div>
         {% endif %}
         <label for="username">username </label>
-        <input type="text" maxlength="20" minlength="4" name="username" value="" />
+        <input type="text" maxlength="20" minlength="4" name="username" value="" required/>
         <label for="password">password </label>
-        <input type="password" name="password" value="" />
+        <input type="password" name="password" value="" required/>
         <div class="button submit">Login</div>
         <div>
           <a href="/">Go back</a>
@@ -37,6 +37,12 @@
       $('#form').validate();
       $('.submit').click(function() {
         $('#form').submit();
+      });
+      $('input').keypress(function (e) {
+        if (e.which == 13) {
+          $('form#form').submit();
+          return false;
+        }
       });
     });
     </script>

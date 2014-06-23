@@ -40,6 +40,12 @@
       $('.submit').click(function() {
         $('#form').submit();
       });
+      $('input').keypress(function (e) {
+        if (e.which == 13) {
+          $('form#form').submit();
+          return false;
+        }
+      });
     });
     </script>
 {% endblock %}
