@@ -83,12 +83,18 @@ ol  {
   font-size:0.7em;
   color:#CFCABA;
   float:left;
+  position:relative;
+  z-index:10;
+  background:#fff;
   & + span {
-    float:left;
+//    float:left;
+    display:block;
+    z-index:5;
     position: relative;
     top:6px;
+    margin-top: -17px;
     left:1px;
-    width:91.2%;
+    width:100%;
     border-top: rgba(#ccc, 0.5) 1px solid;
   }
 }
