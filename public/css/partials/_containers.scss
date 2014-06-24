@@ -43,16 +43,105 @@ body {
   cursor:default !important;
 }
 
+#content .new {
+  display:inline-block;
+  float:none;
+}
+
 .finished {
   cursor:default !important;
 }
 
+#content {
+  min-height:300px;
+  padding:10px;
+}
+
+.center {
+  width:100%;
+}
+
+h2.title {
+  font-size:1.8em;
+  font-weight:bold;
+  font-variant: small-caps;
+  color: $oynx-brown;
+}
+
+#content .back {
+  margin-top:10px;
+  margin-left:13px;
+}
+
+ol  {
+  margin-top:25px;
+  //list-style-type: decimal;
+}
+
+
+#items li > span:first-child {
+  font-size:0.7em;
+  color:#CFCABA;
+  float:left;
+  & + span {
+    float:left;
+    position: relative;
+    top:6px;
+    left:1px;
+    width:91.2%;
+    border-top: rgba(#ccc, 0.5) 1px solid;
+  }
+}
+
+a.item {
+  width:80% !important;
+}
+
+li.next {
+  margin-bottom:3px;
+}
+
+ol li {
+  width: 98%;
+  &:hover {
+    cursor:pointer;
+    & > span:first-child + span + br + a {
+      color: $red;
+    }
+  }
+  margin-left:12px;
+  padding: 15px 0;
+  margin-bottom:8px;
+  //border-top: rgba(#ccc, 0.5) 1px solid;
+  border-bottom: rgba(#ccc, 0.5) 1px solid;
+  a {
+    &.right {
+      color: #CFCABA;
+      font-size:0.7em;
+      position:relative;
+      left:50px;
+      &:hover {
+        text-decoration:underline;
+      }
+      top:5px !important;
+      float:right;
+
+    }
+    color:#815D1F;
+    text-decoration:none;
+    top: 0 !important;
+  }
+  color: $red;
+  font-size:1.5em;
+}
+
 .page {
-  width:  720px;
+  width:  860px; //720px;
   height: auto;
   min-height: 400px;
   margin: 0 auto;
   background: #fff;
+  @include box-shadow(rgba(#000, 0.33333) 0px 0px 4px);
 }
 
 .page form {
@@ -100,7 +189,7 @@ body {
   width:100%;
   margin-top:50px;
   address {
-    padding-top:2.5%;
+    padding-top:2.2%;
   }
 }
 
