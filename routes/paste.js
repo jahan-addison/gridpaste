@@ -1,5 +1,24 @@
 var Paste            = require ('../environment/pastes/pastes'),
-    randomstring     = require('randomstring');0
+    randomstring     = require('randomstring');
+
+/*
+ * GET paste
+ */
+
+exports.show = function(req, res) {
+  Paste.findOne({"id": req.params.id}, {"paste._id":0}, function(error, paste) {
+    if (!paste) {
+      // final route -- throw 404
+      // todo: better page
+      res.send(404, "Paste ID does not exist!");
+    } else {
+     res.render('show.html', { 
+      env:     req.env,
+      session: req.session,
+      paste:   paste });
+    }
+  });
+};
 
 /*
  * POST action
@@ -32,18 +51,38 @@ exports.list = function(req, res) {
   if (!req.session.loggedIn) {
     res.redirect('/');
   }
-  Paste.paginate({ user: req.session.user  }, 1, 10, function(error, pageCount, paginatedResults, itemCount) {
-    if (error) {
-      req.flash('error', "You don't have any saved pastes!");
-    } else {
-      console.log('Pages:', pageCount);
-      console.log(paginatedResults);
-       res.render('pastes.html', {
-        results:   paginatedResults,
-        pageCount: pageCount,
-        itemCount: itemCount
+  Paste.paginate({ user: req.session.user  }, req.query.page, req.query.limit, function(error, pageCount, paginatedResults, itemCount) {
+    if (error) return next(error);
+    res.render('pastes.html', {
+      host:      req.get('host'),
+      req:       req,
+      pastes:    paginatedResults,
+      pageCount: pageCount,
+      itemCount: itemCount
+    });
+  }, {sortBy: {_id: -1}});
+};
+
+/*
+ * GET delete
+ */
+
+exports.remove = function(req, res) {
+  if (!req.session.loggedIn) {
+    res.redirect('/');
+  }
+  Paste.findOne({"id": req.params.id}, {"paste._id":0}, function(error, paste) {
+    if (error) return next(error);
+    if(paste.user === req.session.user) {
+      Paste.findOneAndRemove({"id": req.params.id}, {"paste._id":0}, function(error) {
+        if (error) {
+          return next(error);
+        } else {
+          res.redirect('/pastes');
+        }
       });
+    } else {
+      res.redirect('/');
     }
   });
-
-};
+}

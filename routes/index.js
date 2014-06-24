@@ -9,26 +9,6 @@ exports.index = function(req, res){
 };
 
 /*
- * GET paste
- */
-
- var Paste = require ('../environment/pastes/pastes');
-
-exports.show = function(req, res) {
-  Paste.findOne({"id": req.params.id}, {"paste._id":0}, function(error, paste) {
-    if (!paste) {
-      // todo: better page
-      res.send(404, "Paste ID does not exist!");
-    } else {
-     res.render('show.html', { 
-      env:     req.env,
-      session: req.session,
-      paste:   paste });
-    }
-  });
-};
-
-/*
  * GET login
  */
 
