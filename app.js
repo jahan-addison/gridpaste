@@ -9,6 +9,7 @@ var express    = require('express')
   , Sequelize  = require('./environment/sequelize')
   , Mongoose   = require('./environment/mongoose')
   , flash      = require('express-flash')
+  , paginate   = require('express-paginate')
   , MongoStore = require('connect-mongo')(express); 
 
 
@@ -30,6 +31,7 @@ app.configure(function(){
       maxAge: new Date(Date.now() + 3600000),
       store:  new MongoStore({ db: Mongoose.db})
     }));
+    app.use(paginate.middleware(10));
     app.use(flash());
     app.use(express.methodOverride());
     app.use(app.router);
@@ -41,15 +43,16 @@ if ('development' == app.get('env')) {
   app.use(express.errorHandler());
 }
 
-app.get('/',          routes.index);
-app.get('/login',     routes.login);
-app.get('/logout',    routes.logout);
-app.get('/register',  routes.register);
-app.get('/pastes',    paste.list);
-app.get('/:id',       routes.show);
-app.post('/login',    user.login);
-app.post('/register', user.register);
-app.post('/paste',    paste.action);
+app.get('/',           routes.index);
+app.get('/login',      routes.login);
+app.get('/logout',     routes.logout);
+app.get('/register',   routes.register);
+app.get('/pastes',     paste.list);
+app.get('/delete/:id', paste.remove)
+app.get('/:id',        paste.show);
+app.post('/login',     user.login);
+app.post('/register',  user.register);
+app.post('/paste',     paste.action);
 
 Sequelize
   .sequelize
