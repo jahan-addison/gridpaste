@@ -52,6 +52,7 @@ app.get('/delete/:id', paste.remove)
 app.get('/:id',        paste.show);
 app.post('/login',     user.login);
 app.post('/register',  user.register);
+app.post('/edit/:id',  paste.edit);
 app.post('/paste',     paste.action);
 
 Sequelize

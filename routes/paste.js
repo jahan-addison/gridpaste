@@ -86,3 +86,27 @@ exports.remove = function(req, res) {
     }
   });
 }
+
+/*
+ * POST edit
+ */
+
+exports.edit = function(req, res) {
+  if (!req.session.loggedIn) {
+    res.json({result: 'failed'});
+  }
+  Paste.findOne({"id": req.params.id}, {"paste._id":0}, function(error, paste) {
+    if (error || !paste) return res.json({result: 'failed'});
+    if(paste.user === req.session.user) {
+      Paste.update({_id: paste._id}, {title: req.body.title}, function(error) {
+        if (error) {
+          res.json({result: 'failed'});
+        } else {
+          res.json({result: 'success'});
+        }
+      });
+    } else {
+      res.json({result: 'failed'});
+    }
+  });
+};

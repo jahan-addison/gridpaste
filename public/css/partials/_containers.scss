@@ -25,6 +25,14 @@ body {
   display:none;
 }
 
+a.edit, a.remove {
+  width: auto !important;
+}
+
+a.edit {
+  margin-right:8px;
+}
+
 #query {
 }
 
@@ -125,7 +133,7 @@ ol li {
       color: #CFCABA;
       font-size:0.7em;
       position:relative;
-      left:50px;
+      left:-10px;
       &:hover {
         text-decoration:underline;
       }
@@ -150,6 +158,23 @@ ol li {
   @include box-shadow(rgba(#000, 0.33333) 0px 0px 4px);
 }
 
+%page-input {
+  background: rgba(240, 205, 26, 0.18);
+  border: rgba(228, 216, 216, 0.7) 1px solid;
+  display:block;
+  font-family: monospace;
+  margin-bottom:25px;
+  margin-left:-3px;
+  width:100%;
+  color: #464444;
+}
+
+input.edit {
+  background: rgba(240, 205, 26, 0.18);
+  border: rgba(228, 216, 216, 0.7) 1px solid;
+  color: #464444;
+}
+
 .page form {
   @include clearfix();
   display:block;
@@ -166,14 +191,7 @@ ol li {
 //    @include monaco(1.5em, darken($pale-brown,15%));
   }
   input {
-    background: rgba(240, 205, 26, 0.18);
-    border: rgba(228, 216, 216, 0.7) 1px solid;
-    display:block;
-    font-family: monospace;
-    margin-bottom:25px;
-    margin-left:-3px;
-    width:100%;
-    color: #464444;
+    @extend %page-input;
   }
   .button {
     margin-left:-3px;
