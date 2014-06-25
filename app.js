@@ -27,9 +27,11 @@ app.configure(function(){
     app.use(expressValidator({}));
     app.use(express.cookieParser());
     app.use(express.session({
-      secret: require('./config').secret,
-      maxAge: new Date(Date.now() + 5184e6),
-      store:  new MongoStore({ db: Mongoose.db})
+      secret:  require('./config').secret,
+      cookie: {
+        expires: 2629740000        
+      },
+      store:   new MongoStore({ db: Mongoose.db})
     }));
     app.use(paginate.middleware(10));
     app.use(flash());
