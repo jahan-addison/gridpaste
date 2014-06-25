@@ -25,6 +25,14 @@ body {
   display:none;
 }
 
+a.edit, a.remove {
+  width: auto !important;
+}
+
+a.edit {
+  margin-right:8px;
+}
+
 #query {
 }
 
@@ -43,8 +51,219 @@ body {
   cursor:default !important;
 }
 
+#content .new {
+  display:inline-block;
+  float:none;
+}
+
 .finished {
   cursor:default !important;
+}
+
+#content {
+  min-height:300px;
+  padding:10px;
+}
+
+.center {
+  width:100%;
+}
+
+h2.title {
+  font-size:1.8em;
+  font-weight:bold;
+  font-variant: small-caps;
+  color: $oynx-brown;
+}
+
+#content .back {
+  margin-top:10px;
+  margin-left:13px;
+}
+
+ol  {
+  margin-top:25px;
+  //list-style-type: decimal;
+}
+
+
+#items li > span:first-child {
+  font-size:0.7em;
+  color:#CFCABA;
+  float:left;
+  position:relative;
+  z-index:10;
+  background:#fff;
+  & + span {
+//    float:left;
+    display:block;
+    z-index:5;
+    position: relative;
+    top:6px;
+    margin-top: -17px;
+    left:1px;
+    width:100%;
+    border-top: rgba(#ccc, 0.5) 1px solid;
+  }
+}
+
+a.item {
+  width:80% !important;
+}
+
+li.next {
+  margin-bottom:3px;
+}
+
+ol li {
+  width: 98%;
+  &:hover {
+    cursor:pointer;
+    & > span:first-child + span + br + a {
+      color: $red;
+    }
+  }
+  margin-left:12px;
+  padding: 15px 0;
+  margin-bottom:8px;
+  //border-top: rgba(#ccc, 0.5) 1px solid;
+  border-bottom: rgba(#ccc, 0.5) 1px solid;
+  a {
+    &.right {
+      color: #CFCABA;
+      font-size:0.7em;
+      position:relative;
+      left:-10px;
+      &:hover {
+        text-decoration:underline;
+      }
+      top:5px !important;
+      float:right;
+
+    }
+    color:#815D1F;
+    text-decoration:none;
+    top: 0 !important;
+  }
+  color: $red;
+  font-size:1.5em;
+}
+
+.page {
+  width:  860px; //720px;
+  height: auto;
+  min-height: 400px;
+  margin: 0 auto;
+  background: #fff;
+  @include box-shadow(rgba(#000, 0.33333) 0px 0px 4px);
+}
+
+%page-input {
+  background: rgba(240, 205, 26, 0.18);
+  border: rgba(228, 216, 216, 0.7) 1px solid;
+  display:block;
+  font-family: monospace;
+  margin-bottom:25px;
+  margin-left:-3px;
+  width:100%;
+  color: #464444;
+}
+
+input.edit {
+  background: rgba(240, 205, 26, 0.18);
+  border: rgba(228, 216, 216, 0.7) 1px solid;
+  color: #464444;
+}
+
+.page form {
+  @include clearfix();
+  display:block;
+  padding:10px;
+  margin:0 auto;
+  label {
+    font-variant: small-caps;
+    font-weight:bold;
+    margin-bottom:5px;
+    width:30px;
+    font-size:1.4em;
+    color: darken($pale-brown,15%);
+    font-family: Verdana;
+//    @include monaco(1.5em, darken($pale-brown,15%));
+  }
+  input {
+    @extend %page-input;
+  }
+  .button {
+    margin-left:-3px;
+    display:block;
+    clear:both;
+    @include clearfix();
+  }
+  width:390px;
+}
+
+.col.user {
+  padding-right:25px !important;
+  width:auto;
+}
+
+.page footer {
+  background: $oynx-brown;
+  height:50px;
+  width:100%;
+  margin-top:50px;
+  address {
+    padding-top:2.2%;
+  }
+}
+
+.page label.error {
+  position: absolute;
+  width: 100%;
+  margin-top: -73px;
+  margin-left: 85px;
+  color: $red;
+}
+
+.page div.error {
+  width: 450px;
+  font-weight:bold;
+  margin-bottom:10px;
+  font-size:1.4em;
+  color: darken($pale-brown,15%);
+  color: $red;
+}
+
+#auth div.margin {
+  margin-bottom:3px;
+}
+
+.page a {
+  width:150px;
+  position: relative;
+  top:8px;
+  display:inline-block;
+}
+
+.page .button + div {
+  display:block;
+  clear:both;
+}
+
+.page header {
+  figure {
+    width:230px;
+    padding-top:10px;
+    img {
+      margin-top:-10px;
+    }
+  }
+  height: 100px;
+  background: lighten($oynx-brown, 1%);
+}
+
+.page label {
+  display:block;
 }
 
 .zoom {
@@ -143,7 +362,7 @@ address {
 
 input {
   background: #514645;
-  padding:10px;
+  padding: 0 10px;
   height:27px;
   margin-left:15px;
   width:75%;
@@ -298,7 +517,7 @@ h2 {
       height:80px;
     }
     width:195px;
-    height:96px;
+    height:86px;
   }
   padding-left:8px;
   header p {

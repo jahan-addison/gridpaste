@@ -26,7 +26,7 @@ A live video tutorial is coming soon to demonstrate how to use the application e
 
 Contributing
 ===
-Currently, I'm interested in adding more relatively useful geometric functions to perform on structures. You can see what's available now [here](https://github.com/jahan-addison/gridpaste/blob/master/public/app/board/functions/functions.js). You may also add decorators for either an object in Gridpaste itself or an object in the JSXGraph library. Note that adding a Function object will mean you must also implement a Command object in order for it to be used in the application.
+Currently, I'm interested in adding more relatively useful geometric functions to perform on structures. You can see what's available now [here](https://github.com/jahan-addison/gridpaste/blob/master/public/app/board/functions/functions.js). You may also add decorators for either an object in Gridpaste itself or an object in the JSXGraph library. Note that adding a Function object will mean you must also implement a Command object in order for it to be used in the application. 
 
 The signature of the Command interface is as follows:
 ```
@@ -55,7 +55,9 @@ exports.sequelize = {
   user:     "username",
   password: "password"
 };
- 
+
+exports.secret = "your_secret";
+
 exports.mongo = {
   url: 'mongodb://localhost/gridpaste'
 };

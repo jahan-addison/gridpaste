@@ -11,4 +11,6 @@ var PastesSchema = new Schema({
   }]
 });
 
+PastesSchema.plugin(require('mongoose-paginate'));
+
 module.exports = mongoose.model('Pastes', PastesSchema);

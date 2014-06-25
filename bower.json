@@ -1,6 +1,6 @@
 {
   "name": "gridpaste",
-  "version": "0.2.0",
+  "version": "0.3.0",
   "ignore": [
     "**/.*",
     "node_modules",
@@ -9,7 +9,8 @@
   "dependencies": {
     "meyer-reset": "*",
     "rxjs": "2.2.18",
-    "mousetrap": "~1.4.6"
+    "mousetrap": "~1.4.6",
+    "jquery.validation": "~1.12.0"
   },
   "devDependencies": {
     "jquery": "~2.1.1"

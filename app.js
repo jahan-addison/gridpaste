@@ -1,13 +1,16 @@
-var express   = require('express')
+var express    = require('express')
   , expressValidator = require('express-validator')
-  , routes    = require('./routes')
-  , user      = require('./routes/user')
-  , paste     = require('./routes/paste')
-  , http      = require('http')
-  , swig      = require('swig')
-  , path      = require('path')
-  , Sequelize = require('./environment/sequelize')
-  , Mongoose  = require('./environment/mongoose')
+  , routes     = require('./routes')
+  , user       = require('./routes/user')
+  , paste      = require('./routes/paste')
+  , http       = require('http')
+  , swig       = require('swig')
+  , path       = require('path')
+  , Sequelize  = require('./environment/sequelize')
+  , Mongoose   = require('./environment/mongoose')
+  , flash      = require('express-flash')
+  , paginate   = require('express-paginate')
+  , MongoStore = require('connect-mongo')(express); 
 
 
 var app = express();
@@ -22,6 +25,14 @@ app.configure(function(){
     app.use(express.logger('dev'));
     app.use(express.bodyParser());
     app.use(expressValidator({}));
+    app.use(express.cookieParser());
+    app.use(express.session({
+      secret: require('./config').secret,
+      maxAge: new Date(Date.now() + 5184e6),
+      store:  new MongoStore({ db: Mongoose.db})
+    }));
+    app.use(paginate.middleware(10));
+    app.use(flash());
     app.use(express.methodOverride());
     app.use(app.router);
 
@@ -32,10 +43,17 @@ if ('development' == app.get('env')) {
   app.use(express.errorHandler());
 }
 
-app.get('/',          routes.index);
-app.get('/:id',       routes.show);
-app.post('/register', user.register);
-app.post('/paste',    paste.action);
+app.get('/',           routes.index);
+app.get('/login',      routes.login);
+app.get('/logout',     routes.logout);
+app.get('/register',   routes.register);
+app.get('/pastes',     paste.list);
+app.get('/delete/:id', paste.remove)
+app.get('/:id',        paste.show);
+app.post('/login',     user.login);
+app.post('/register',  user.register);
+app.post('/edit/:id',  paste.edit);
+app.post('/paste',     paste.action);
 
 Sequelize
   .sequelize

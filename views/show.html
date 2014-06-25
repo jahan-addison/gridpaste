@@ -15,8 +15,13 @@
             </p>
           </header> 
           <section id="auth">
-            <div class="col"><a href="#">Sign Up</a></div>
-            <div class="col"><a href="#">Login</a></div>
+            {% if session.loggedIn %}
+            <div class="margin"><a href="/logout"> Log out ({{ session.user}}) </a></div>
+            <div class="margin"><a href="/pastes">Manage Pastes</a></div>
+            {% else %}
+            <div class="col"><a href="/register">Sign Up</a></div>
+            <div class="col"><a href="/login">Login</a></div>
+            {% endif %}
           </section>
           <div id="new">
             <div class="button new">New</div>

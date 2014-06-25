@@ -1,6 +1,6 @@
 {
   "name": "gridpaste",
-  "version": "0.2.0",
+  "version": "0.3.0",
   "scripts": {
     "start": "grunt"
   },
@@ -12,7 +12,11 @@
     "express-validator": "~2.1.0",
     "swig": "^1.3.2",
     "mongoose": "~3.8.8",
-    "randomstring": "~1.0.3"
+    "randomstring": "~1.0.3",
+    "connect-mongo": "~0.4.1",
+    "express-flash": "0.0.2",
+    "express-paginate": "0.0.2",
+    "mongoose-paginate": "~3.1.0"
   },
   "devDependencies": {
     "grunt": "~0.4.1",
