@@ -28,7 +28,7 @@ app.configure(function(){
     app.use(express.cookieParser());
     app.use(express.session({
       secret: require('./config').secret,
-      maxAge: new Date(Date.now() + 3600000),
+      maxAge: new Date(Date.now() + 5184e6),
       store:  new MongoStore({ db: Mongoose.db})
     }));
     app.use(paginate.middleware(10));
