@@ -8,7 +8,7 @@ A tool to paste computations, transformations, and structures on a geometric pla
 
 Gridpaste
 =========
-Gridpaste is an online mathematics tool to share computations, transformations, and annotations on geometric structures in a coordinate plane. One starts with a clean board and places their geometric elements and performs actions on these elements in a recordable sequence. The sequence may then be saved and shared by a unique URL to colleagues or instructors. The tool is packed with a built-in function runner with annotations and placement of text in an orderly way to present a proof or construction.
+Gridpaste is an online mathematics tool to share computations, transformations, and annotations on geometric structures in a coordinate plane. One starts with a clean board and places their geometric elements and performs actions on these elements in a recordable sequence. The sequence may then be saved and shared by a unique URL to colleagues or instructors. The tool is packed with a built-in function runner with annotations and placement of text in an orderly way to present a proof or construction. 
 
 
 Requirements
