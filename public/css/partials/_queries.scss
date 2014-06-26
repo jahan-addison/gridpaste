@@ -1,0 +1,25 @@
+@media only screen 
+and (min-width : 768px) 
+and (max-width : 1280px) 
+and (orientation : landscape) { 
+  #left-bar header p {
+    display: none;
+  }
+  #auth {
+    margin: 6px 5px 15px 5px;
+  }
+  #bottom {
+    & > .col:first-child + .col {
+      float:none;
+    }
+  }
+  #bottom footer {
+    p {
+      display:none;
+    }
+    address {
+      margin-top:10px;
+      display:block;
+    }
+  }
+}

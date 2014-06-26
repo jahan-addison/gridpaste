@@ -951,3 +951,30 @@ h2 {
 .paste #grid {
   width: calc(100% - 160px);
 }
+
+@media only screen and (min-width: 768px) and (max-width: 1280px) and (orientation: landscape) {
+  /* line 5, ../partials/_queries.scss */
+  #left-bar header p {
+    display: none;
+  }
+
+  /* line 8, ../partials/_queries.scss */
+  #auth {
+    margin: 6px 5px 15px 5px;
+  }
+
+  /* line 12, ../partials/_queries.scss */
+  #bottom > .col:first-child + .col {
+    float: none;
+  }
+
+  /* line 17, ../partials/_queries.scss */
+  #bottom footer p {
+    display: none;
+  }
+  /* line 20, ../partials/_queries.scss */
+  #bottom footer address {
+    margin-top: 10px;
+    display: block;
+  }
+}
