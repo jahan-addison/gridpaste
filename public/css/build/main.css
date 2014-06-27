@@ -962,17 +962,25 @@ h2 {
   #auth {
     margin: 6px 5px 15px 5px;
   }
+  /* line 9, ../partials/_queries.scss */
+  #auth .col {
+    width: 105px;
+  }
 
-  /* line 12, ../partials/_queries.scss */
+  /* line 15, ../partials/_queries.scss */
   #bottom > .col:first-child + .col {
     float: none;
   }
+  /* line 18, ../partials/_queries.scss */
+  #bottom > .col:first-child .button {
+    width: 105px;
+  }
 
-  /* line 17, ../partials/_queries.scss */
+  /* line 23, ../partials/_queries.scss */
   #bottom footer p {
     display: none;
   }
-  /* line 20, ../partials/_queries.scss */
+  /* line 26, ../partials/_queries.scss */
   #bottom footer address {
     margin-top: 10px;
     display: block;

@@ -6,11 +6,17 @@ and (orientation : landscape) {
     display: none;
   }
   #auth {
+    .col {
+      width:105px;
+    }
     margin: 6px 5px 15px 5px;
   }
   #bottom {
     & > .col:first-child + .col {
       float:none;
+    }
+    & > .col:first-child .button {
+      width: 105px;
     }
   }
   #bottom footer {
