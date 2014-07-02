@@ -22,7 +22,6 @@ body {
 }
 
 .delete_ {
-  display:none;
 }
 
 a.edit, a.remove {
@@ -31,6 +30,10 @@ a.edit, a.remove {
 
 a.edit {
   margin-right:8px;
+}
+
+.hidden {
+  display:none;
 }
 
 #query {
