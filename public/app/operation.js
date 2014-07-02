@@ -10,8 +10,12 @@ Object.defineProperty(Operation.prototype, "length", {
   get: function() { return this.commands.length }
 });
 
-Operation.prototype.storeAndExecute = function(command) {
-  var $command =  new command.command(this.board),
+Object.defineProperty(Operation.prototype, "last", {
+  get: function() { return this.commands[this.length-1] }
+});
+
+Operation.prototype.storeAndExecute = function(command, args) {
+  var $command =  new command.command(this.board, args),
       args     =  $command.execute();
   this.commands.push({
     arguments:   args,
