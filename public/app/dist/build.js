@@ -25,16 +25,16 @@ $(function() {
     board.axx    = board.create('axis',[[0,0],[1,0]]);
     board.axy    = board.create('axis',[[0,0],[0,1]]);
     if (!$paste) {
-      /* Show coordinates at mouse */
+      /* Show coordinates at cursor */
       require('./helper/mouse')(board);
-      /* keyboard bindings */
-      require('./helper/bindings')();
     }
     board.unsuspendUpdate();    
   })();
   if (!$('#application').hasClass('paste')) {
     /* Subscribe to application */
     var App = require('./subscribe')(board);
+    /* keyboard bindings */
+    require('./helper/bindings')(App);
     // prevent 'dirty board'
     require('./helper/dirty')(App);
   } else {
@@ -51,7 +51,7 @@ $(function() {
     });
   }
 }); 
-},{"./helper/mouse":2,"./helper/bindings":3,"./subscribe":4,"./helper/dirty":5,"./helper/play":6}],2:[function(require,module,exports){
+},{"./helper/mouse":2,"./subscribe":3,"./helper/bindings":4,"./helper/dirty":5,"./helper/play":6}],2:[function(require,module,exports){
 module.exports = function(board) {
   var getMouseCoords = function(e, i) {
     var cPos = board.getCoordsTopLeftCorner(e, i),
@@ -93,7 +93,7 @@ module.exports = function(App) {
     }
   });
 };
-},{}],4:[function(require,module,exports){
+},{}],3:[function(require,module,exports){
 var execute    = require('./operation');
 
 module.exports = function(board) {
@@ -114,10 +114,11 @@ module.exports = function(board) {
   return operationExec;
 };
 
-},{"./operation":7,"./helper/helpers":8,"./subscriptions/board":9,"./subscriptions/function":10,"./subscriptions/zoom":11}],3:[function(require,module,exports){
+},{"./operation":7,"./helper/helpers":8,"./subscriptions/board":9,"./subscriptions/function":10,"./subscriptions/zoom":11}],4:[function(require,module,exports){
+var command = require('../events/run');
 require('../../components/mousetrap/mousetrap.min');
 
-module.exports = function() {
+module.exports = function(App) {
   var drawBindLimit      = 9,
       transformBindLimit = 5,
       i;
@@ -129,6 +130,24 @@ module.exports = function() {
     Mousetrap.bind('f', function() { setTimeout(function() { $('.function').focus(); },200); });
     /* Undo */
     Mousetrap.bind('ctrl+z', function() { $('.undo').click(); });    
+    /* Repeat last command */
+    Mousetrap.bind('ctrl+enter', function() {
+      if (!App.length) {
+        return;
+      }
+      var target   = App.last.toString.split('.'),
+          $command = {
+            targetOperation: target[0],
+            targetCommand:   target[1],
+            command:         command[target[0]][target[1]] 
+          };
+      try {
+        App.storeAndExecute($command, App.last.arguments);
+      } catch(e) {
+        alert("Warning: " + e.message.replace("JSXGraph: ", ''));
+        return;
+      }
+    });
     /* Clear */
     Mousetrap.bind('m c', function() { $('.clear').click(); });
     /* Start recording */
@@ -163,7 +182,7 @@ module.exports = function() {
     }
   });
 };
-},{"../../components/mousetrap/mousetrap.min":12}],6:[function(require,module,exports){
+},{"../events/run":12,"../../components/mousetrap/mousetrap.min":13}],6:[function(require,module,exports){
 var iterator = require('../iterate'),
     command  = require('../events/run');
 
@@ -234,7 +253,7 @@ module.exports = function(App, board) {
     });
   }
 };
-},{"../iterate":13,"../events/run":14,"./position":15}],12:[function(require,module,exports){
+},{"../iterate":14,"../events/run":12,"./position":15}],13:[function(require,module,exports){
 /* mousetrap v1.4.6 craig.is/killing/mice */
 (function(J,r,f){function s(a,b,d){a.addEventListener?a.addEventListener(b,d,!1):a.attachEvent("on"+b,d)}function A(a){if("keypress"==a.type){var b=String.fromCharCode(a.which);a.shiftKey||(b=b.toLowerCase());return b}return h[a.which]?h[a.which]:B[a.which]?B[a.which]:String.fromCharCode(a.which).toLowerCase()}function t(a){a=a||{};var b=!1,d;for(d in n)a[d]?b=!0:n[d]=0;b||(u=!1)}function C(a,b,d,c,e,v){var g,k,f=[],h=d.type;if(!l[a])return[];"keyup"==h&&w(a)&&(b=[a]);for(g=0;g<l[a].length;++g)if(k=
 l[a][g],!(!c&&k.seq&&n[k.seq]!=k.level||h!=k.action||("keypress"!=h||d.metaKey||d.ctrlKey)&&b.sort().join(",")!==k.modifiers.sort().join(","))){var m=c&&k.seq==c&&k.level==v;(!c&&k.combo==e||m)&&l[a].splice(g,1);f.push(k)}return f}function K(a){var b=[];a.shiftKey&&b.push("shift");a.altKey&&b.push("alt");a.ctrlKey&&b.push("ctrl");a.metaKey&&b.push("meta");return b}function x(a,b,d,c){m.stopCallback(b,b.target||b.srcElement,d,c)||!1!==a(b,d)||(b.preventDefault?b.preventDefault():b.returnValue=!1,b.stopPropagation?
@@ -245,7 +264,7 @@ c,a,e),l[d.key][c?"unshift":"push"]({callback:b,modifiers:d.modifiers,action:d.a
 unbind:function(a,b){return m.bind(a,function(){},b)},trigger:function(a,b){if(q[a+":"+b])q[a+":"+b]({},a);return this},reset:function(){l={};q={};return this},stopCallback:function(a,b){return-1<(" "+b.className+" ").indexOf(" mousetrap ")?!1:"INPUT"==b.tagName||"SELECT"==b.tagName||"TEXTAREA"==b.tagName||b.isContentEditable},handleKey:function(a,b,d){var c=C(a,b,d),e;b={};var f=0,g=!1;for(e=0;e<c.length;++e)c[e].seq&&(f=Math.max(f,c[e].level));for(e=0;e<c.length;++e)c[e].seq?c[e].level==f&&(g=!0,
 b[c[e].seq]=1,x(c[e].callback,d,c[e].combo,c[e].seq)):g||x(c[e].callback,d,c[e].combo);c="keypress"==d.type&&I;d.type!=u||w(a)||c||t(b);I=g&&"keydown"==d.type}};J.Mousetrap=m;"function"===typeof define&&define.amd&&define(m)})(window,document);
 
-},{}],13:[function(require,module,exports){
+},{}],14:[function(require,module,exports){
 /* The Iterator */
 
 var Iterator = function(List) {
@@ -366,8 +385,12 @@ Object.defineProperty(Operation.prototype, "length", {
   get: function() { return this.commands.length }
 });
 
-Operation.prototype.storeAndExecute = function(command) {
-  var $command =  new command.command(this.board),
+Object.defineProperty(Operation.prototype, "last", {
+  get: function() { return this.commands[this.length-1] }
+});
+
+Operation.prototype.storeAndExecute = function(command, args) {
+  var $command =  new command.command(this.board, args),
       args     =  $command.execute();
   this.commands.push({
     arguments:   args,
@@ -399,7 +422,59 @@ module.exports = function(App) {
   require('./share') (App)             // attach event to share button
 };
 
-},{"./more":17,"./undo":18,"./record":19,"./clear":20,"./play":6,"./share":21}],9:[function(require,module,exports){
+},{"./more":17,"./undo":18,"./record":19,"./clear":20,"./play":6,"./share":21}],10:[function(require,module,exports){
+var command    = require('../events/run'),
+    Parser     = require('../board/functions/parser'),
+    Rx         = require('../../components/rxjs/rx.lite').Rx;
+
+module.exports = function(App) {
+  var $sources = $('.function'),
+      $source  = Rx.Observable.fromEvent($sources, "keypress");
+  // Filter when the application is 'off'
+  $source      = $source.filter(function() {
+    return !$('#application').hasClass('off');
+  });
+  var $functionSubscription = $source.subscribe(function(e) {
+    if (e.keyCode == 13) {
+      var func = new Parser(e.target.value);
+      try {
+        func.run(); // generate parse tree
+      } catch(e) {
+        // syntax error
+        console.log(e.message);
+        alert("Syntax: " + e.message);
+        return false;
+      }
+      var targetOperation = 'func',
+          targetCommand   = func.identifier;
+      if (targetCommand in command[targetOperation] === false) {
+        alert("Warning: This GeometryFunction does not exist");
+        return;        
+      }
+      var $command        = {
+        'targetOperation': targetOperation,
+        'targetCommand':   targetCommand,
+        'command':         command[targetOperation][targetCommand]
+      };
+      try {
+        App.storeAndExecute($command);
+      } catch(e) {
+        alert("Warning: " + e.message.replace("JSXGraph: ", ''));
+        return;
+      }
+      e.target.value = "";
+      
+      if (App.length > 0) {
+        $('.button.undo').addClass('visible');
+      }
+      $('.close-slider').click();
+    }
+  },
+  function(e) {
+    console.log("Error: %s", e.message);
+  });
+};
+},{"../events/run":12,"../board/functions/parser":22,"../../components/rxjs/rx.lite":23}],9:[function(require,module,exports){
 var command    = require('../events/run'),
     slider     = require('../helper/slider'),
     validate   = require('../helper/validate')(),
@@ -467,7 +542,7 @@ module.exports = function(App) {
       return;
     }
     if (App.length > 0) {
-      $('.button.delete_').css('display', 'block');
+      $('.button.delete_').removeClass('hidden')
       $('.button.undo').addClass('visible');
     }
     $('.close-slider').click();
@@ -476,59 +551,7 @@ module.exports = function(App) {
       console.log("Error: %s", e.message);
     });
 };
-},{"../events/run":14,"../helper/validate":22,"../helper/slider":23,"../../components/rxjs/rx.lite":24}],10:[function(require,module,exports){
-var command    = require('../events/run'),
-    Parser     = require('../board/functions/parser'),
-    Rx         = require('../../components/rxjs/rx.lite').Rx;
-
-module.exports = function(App) {
-  var $sources = $('.function'),
-      $source  = Rx.Observable.fromEvent($sources, "keypress");
-  // Filter when the application is 'off'
-  $source      = $source.filter(function() {
-    return !$('#application').hasClass('off');
-  });
-  var $functionSubscription = $source.subscribe(function(e) {
-    if (e.keyCode == 13) {
-      var func = new Parser(e.target.value);
-      try {
-        func.run(); // generate parse tree
-      } catch(e) {
-        // syntax error
-        console.log(e.message);
-        alert("Syntax: " + e.message);
-        return false;
-      }
-      var targetOperation = 'func',
-          targetCommand   = func.identifier;
-      if (targetCommand in command[targetOperation] === false) {
-        alert("Warning: This GeometryFunction does not exist");
-        return;        
-      }
-      var $command        = {
-        'targetOperation': targetOperation,
-        'targetCommand':   targetCommand,
-        'command':         command[targetOperation][targetCommand]
-      };
-      try {
-        App.storeAndExecute($command);
-      } catch(e) {
-        alert("Warning: " + e.message.replace("JSXGraph: ", ''));
-        return;
-      }
-      e.target.value = "";
-      
-      if (App.length > 0) {
-        $('.button.undo').addClass('visible');
-      }
-      $('.close-slider').click();
-    }
-  },
-  function(e) {
-    console.log("Error: %s", e.message);
-  });
-};
-},{"../events/run":14,"../board/functions/parser":25,"../../components/rxjs/rx.lite":24}],11:[function(require,module,exports){
+},{"../events/run":12,"../helper/slider":24,"../helper/validate":25,"../../components/rxjs/rx.lite":23}],11:[function(require,module,exports){
 var command    = require('../events/run'),
     Rx         = require('../../components/rxjs/rx.lite').Rx;
 
@@ -564,7 +587,7 @@ module.exports = function(App, board) {
   });
 
 }
-},{"../events/run":14,"../../components/rxjs/rx.lite":24}],14:[function(require,module,exports){
+},{"../events/run":12,"../../components/rxjs/rx.lite":23}],12:[function(require,module,exports){
 
 module.exports = {
   draw:      require('./draw'),
@@ -663,6 +686,10 @@ module.exports = function(App) {
       $(this).unbind();
     });
     $('.end-record').click(function() {
+      if (!App.isRecording) {
+        return;
+      }
+      $('.share').removeClass('hidden');
       App.stopRecording();
       $('#application').addClass('off'); // turn subscriptions off 
       $(this)
@@ -672,6 +699,7 @@ module.exports = function(App) {
         .html('Start Record');
       $(this).unbind();
       Object.freeze(App); // we're done
+      $('.delete_').addClass('hidden');
       $('.undo').removeClass('visible');
       $('.reset').show();
       $('.reset').click(function() {
@@ -682,7 +710,7 @@ module.exports = function(App) {
     });
   });
 };
-},{}],23:[function(require,module,exports){
+},{}],24:[function(require,module,exports){
 module.exports = function(content, width, height, source, top) {
   $block = $('<div class="slider"> <div class="close-slider">x</div> </div>');
   $block.append(content)
@@ -720,6 +748,107 @@ module.exports = function(content, width, height, source, top) {
       $(this).remove();
     });
   });
+};
+},{}],28:[function(require,module,exports){
+/* Commands */
+
+/*--
+Interface Command {
+  public void   constructor(JSXGraph board, Object Arguments)
+  public void   remove()
+  public object execute()
+}
+--*/
+
+var zoomIn = function(board, args) {
+  this.remove = function() {
+    board.zoomOut();
+  };
+  this.execute = function() {
+    board.zoomIn();
+    return {
+      'X': board.zoomX,
+      'Y': board.zoomY
+    };
+  }
+};
+
+var zoomOut = function(board, args) {
+  this.remove = function() {
+    board.zoomIn();
+  };
+  this.execute = function() {
+    board.zoomOut();
+    return {
+      'X': board.zoomX,
+      'Y': board.zoomY
+    };
+  };
+};
+
+
+module.exports = {
+  zoomIn: zoomIn,
+  zoomOut: zoomOut
+};
+},{}],30:[function(require,module,exports){
+/* Commands */
+
+/*--
+Interface Command {
+  public void   constructor(JSXGraph board, object Arguments)
+  public void   remove()
+  public object execute()
+}
+--*/
+
+var delete_ = function(board, args) {
+  var args = args || {
+    figure: $('input[name="figure"]:last').val()
+  };
+  this.remove = function() {
+    this.figure.visible(true);
+    this.figure.isVisible = true;
+    for (i in this.figure.ancestors) {
+      if (this.figure.ancestors.hasOwnProperty(i)) {
+        this.figure.ancestors[i].visible(true);
+        this.figure.ancestors[i].isVisible = true;
+      }
+    }
+  };
+  this.execute = function() {
+    for(var i = 0; i <  board.shapes.length; i++) {
+      if (board.shapes[i].name == args.figure) {
+        board.shapes[i].visible(false);
+        this.figure           = board.shapes[i];
+        this.figure.isVisible = false;
+        for (i in this.figure.ancestors) {
+          this.figure.ancestors[i].visible(false);          
+          this.figure.ancestors[i].isVisible = false;
+        }
+      }
+    }
+    // try with a single point
+    if (typeof this.figure === 'undefined') {
+      for(p in board.points) {
+        if (board.points.hasOwnProperty(p)) {
+          if (board.points[p].name + '0' == args.figure) {
+            this.figure           = board.points[p];
+            this.figure.isVisible = false;
+            this.figure.visible(false);
+          }
+        }
+      }
+    }
+    if (typeof this.figure === 'undefined') {
+      throw ReferenceError("Could not find figure '" + args.figure + "'");
+    }
+    return args;
+  };
+};
+
+module.exports = {
+  delete_: delete_
 };
 },{}],31:[function(require,module,exports){
 // shim for using process in browser
@@ -776,7 +905,7 @@ process.chdir = function (dir) {
     throw new Error('process.chdir is not supported');
 };
 
-},{}],24:[function(require,module,exports){
+},{}],23:[function(require,module,exports){
 (function(process,global){// Copyright (c) Microsoft Open Technologies, Inc. All rights reserved. See License.txt in the project root for license information.
 
 ;(function (undefined) {
@@ -6254,108 +6383,7 @@ process.chdir = function (dir) {
     }
 }.call(this));
 })(require("__browserify_process"),window)
-},{"__browserify_process":31}],28:[function(require,module,exports){
-/* Commands */
-
-/*--
-Interface Command {
-  public void   constructor(JSXGraph board, Object Arguments)
-  public void   remove()
-  public object execute()
-}
---*/
-
-var zoomIn = function(board, args) {
-  this.remove = function() {
-    board.zoomOut();
-  };
-  this.execute = function() {
-    board.zoomIn();
-    return {
-      'X': board.zoomX,
-      'Y': board.zoomY
-    };
-  }
-};
-
-var zoomOut = function(board, args) {
-  this.remove = function() {
-    board.zoomIn();
-  };
-  this.execute = function() {
-    board.zoomOut();
-    return {
-      'X': board.zoomX,
-      'Y': board.zoomY
-    };
-  };
-};
-
-
-module.exports = {
-  zoomIn: zoomIn,
-  zoomOut: zoomOut
-};
-},{}],30:[function(require,module,exports){
-/* Commands */
-
-/*--
-Interface Command {
-  public void   constructor(JSXGraph board, object Arguments)
-  public void   remove()
-  public object execute()
-}
---*/
-
-var delete_ = function(board, args) {
-  var args = args || {
-    figure: $('input[name="figure"]:last').val()
-  };
-  this.remove = function() {
-    this.figure.visible(true);
-    this.figure.isVisible = true;
-    for (i in this.figure.ancestors) {
-      if (this.figure.ancestors.hasOwnProperty(i)) {
-        this.figure.ancestors[i].visible(true);
-        this.figure.ancestors[i].isVisible = true;
-      }
-    }
-  };
-  this.execute = function() {
-    for(var i = 0; i <  board.shapes.length; i++) {
-      if (board.shapes[i].name == args.figure) {
-        board.shapes[i].visible(false);
-        this.figure           = board.shapes[i];
-        this.figure.isVisible = false;
-        for (i in this.figure.ancestors) {
-          this.figure.ancestors[i].visible(false);          
-          this.figure.ancestors[i].isVisible = false;
-        }
-      }
-    }
-    // try with a single point
-    if (typeof this.figure === 'undefined') {
-      for(p in board.points) {
-        if (board.points.hasOwnProperty(p)) {
-          if (board.points[p].name + '0' == args.figure) {
-            this.figure           = board.points[p];
-            this.figure.isVisible = false;
-            this.figure.visible(false);
-          }
-        }
-      }
-    }
-    if (typeof this.figure === 'undefined') {
-      throw ReferenceError("Could not find figure '" + args.figure + "'");
-    }
-    return args;
-  };
-};
-
-module.exports = {
-  delete_: delete_
-};
-},{}],20:[function(require,module,exports){
+},{"__browserify_process":31}],20:[function(require,module,exports){
 var execute = require('../operation');
 
 module.exports = function(App) {
@@ -6432,7 +6460,7 @@ module.exports = function(App) {
     })
   });
 }
-},{"./slider":23}],22:[function(require,module,exports){
+},{"./slider":24}],25:[function(require,module,exports){
 var Lexer = require('../board/functions/lexer');
 
 module.exports = function() {
@@ -6500,118 +6528,7 @@ module.exports = function() {
     }
   });
 };
-},{"../board/functions/lexer":32}],25:[function(require,module,exports){
-var Lexer = require('./lexer');
-
-/*
- * Geometry Function Parser
- */
-
-var Parser = function(expr) {
-  this.llex       = new Lexer(expr);
-  this._arguments = [];
-  this._identifier;
-  Object.defineProperty(this, "arguments", {
-    get: function() { return this._arguments; }
-  });
-  Object.defineProperty(this, "identifier", {
-    get: function() { return this._identifier; }
-  });
-  Object.defineProperty(this, "object", {
-    get: function() {return {
-        'identifier': this._identifier, 
-        'arguments':  this._arguments
-      };
-    }
-  });
-};
-
-Parser.prototype = (function() {
-  var tokens = Object.freeze({
-    T_UNKNOWN:     1,
-    T_INTEGER:     2,
-    T_FLOAT:       3,
-    T_LETTER:      4,
-    T_OPEN_PAREN:  5,
-    T_CLOSE_PAREN: 6,
-    T_COMMA:       7,
-    T_IDENTIFIER:  8,
-    T_EQUAL:       9,
-    T_LABEL:       10,
-    T_EOL:         11
-  });
-
-  var token_strings = Object.freeze({
-    1:     "unknown",
-    2:     "integer",
-    3:       "float",
-    4:      "letter",
-    5:           "(",
-    6:           ")",
-    7:           ",",
-    8:  "identifier",
-    9:           "=",
-    10:      "label",
-    11:        "EOL"
-  });
-
-  var t_error = function(llex, token, expected) {
-    if (expected instanceof Array) {
-      expected = expected[0];
-    }
-    var unexpected = (token_strings[token] == "unknown") ?
-      llex.scanner : token_strings[token];    
-    var msg = ["Unexpected token: '",
-      unexpected,
-      "', expected ",
-      token_strings[expected]
-    ].join('');
-    throw new Error(msg);
-  };
-
-  var accept  = function(t) {
-    this.llex.getNextToken();
-    if (t instanceof Array) {
-      var isIn = false, lex  = this.llex;
-      t.forEach(function(e) {
-        if (e == lex.current_token) {
-          isIn  = true;
-        }
-      });
-      if (!isIn) {
-        t_error(this.llex, this.llex.current_token, t);
-        return false;
-      }
-    } else if (this.llex.current_token !== t) {
-        t_error(this.llex, this.llex.current_token, t);
-        return false;
-    }
-    return this.llex.current_token;
-  };
-    
-  return {
-    Constructor: Parser,
-    run: function() {
-      if (this.llex.expr[this.llex.pointer] == '=') {
-        accept.call(this, tokens.T_EQUAL);
-      }
-      accept.call(this, tokens.T_IDENTIFIER);
-      this._identifier = this.llex.scanner;
-      accept.call(this, tokens.T_OPEN_PAREN);
-      var token;
-      do {
-        token = accept.call(this, [tokens.T_LABEL, tokens.T_LETTER, tokens.T_INTEGER, tokens.T_FLOAT]);
-        this._arguments.push({argument: this.llex.scanner, type: token_strings[token]});
-      } while(accept.call(this, [tokens.T_COMMA, tokens.T_CLOSE_PAREN]) == tokens.T_COMMA);
-
-      accept.call(this, tokens.T_EOL);
-    }
-  };
-})();
-
-module.exports = Parser;
-
-},{"./lexer":32}],26:[function(require,module,exports){
+},{"../board/functions/lexer":32}],26:[function(require,module,exports){
 var element = require('../board/element'),
     coords  = require('../helper/coords')();
 
@@ -7306,7 +7223,118 @@ module.exports = {
   angle: angle,
   area:  area
 };
-},{"../board/functions/functions":36,"../board/functions/parser":25,"../board/element":33}],32:[function(require,module,exports){
+},{"../board/functions/functions":36,"../board/functions/parser":22,"../board/element":33}],22:[function(require,module,exports){
+var Lexer = require('./lexer');
+
+/*
+ * Geometry Function Parser
+ */
+
+var Parser = function(expr) {
+  this.llex       = new Lexer(expr);
+  this._arguments = [];
+  this._identifier;
+  Object.defineProperty(this, "arguments", {
+    get: function() { return this._arguments; }
+  });
+  Object.defineProperty(this, "identifier", {
+    get: function() { return this._identifier; }
+  });
+  Object.defineProperty(this, "object", {
+    get: function() {return {
+        'identifier': this._identifier, 
+        'arguments':  this._arguments
+      };
+    }
+  });
+};
+
+Parser.prototype = (function() {
+  var tokens = Object.freeze({
+    T_UNKNOWN:     1,
+    T_INTEGER:     2,
+    T_FLOAT:       3,
+    T_LETTER:      4,
+    T_OPEN_PAREN:  5,
+    T_CLOSE_PAREN: 6,
+    T_COMMA:       7,
+    T_IDENTIFIER:  8,
+    T_EQUAL:       9,
+    T_LABEL:       10,
+    T_EOL:         11
+  });
+
+  var token_strings = Object.freeze({
+    1:     "unknown",
+    2:     "integer",
+    3:       "float",
+    4:      "letter",
+    5:           "(",
+    6:           ")",
+    7:           ",",
+    8:  "identifier",
+    9:           "=",
+    10:      "label",
+    11:        "EOL"
+  });
+
+  var t_error = function(llex, token, expected) {
+    if (expected instanceof Array) {
+      expected = expected[0];
+    }
+    var unexpected = (token_strings[token] == "unknown") ?
+      llex.scanner : token_strings[token];    
+    var msg = ["Unexpected token: '",
+      unexpected,
+      "', expected ",
+      token_strings[expected]
+    ].join('');
+    throw new Error(msg);
+  };
+
+  var accept  = function(t) {
+    this.llex.getNextToken();
+    if (t instanceof Array) {
+      var isIn = false, lex  = this.llex;
+      t.forEach(function(e) {
+        if (e == lex.current_token) {
+          isIn  = true;
+        }
+      });
+      if (!isIn) {
+        t_error(this.llex, this.llex.current_token, t);
+        return false;
+      }
+    } else if (this.llex.current_token !== t) {
+        t_error(this.llex, this.llex.current_token, t);
+        return false;
+    }
+    return this.llex.current_token;
+  };
+    
+  return {
+    Constructor: Parser,
+    run: function() {
+      if (this.llex.expr[this.llex.pointer] == '=') {
+        accept.call(this, tokens.T_EQUAL);
+      }
+      accept.call(this, tokens.T_IDENTIFIER);
+      this._identifier = this.llex.scanner;
+      accept.call(this, tokens.T_OPEN_PAREN);
+      var token;
+      do {
+        token = accept.call(this, [tokens.T_LABEL, tokens.T_LETTER, tokens.T_INTEGER, tokens.T_FLOAT]);
+        this._arguments.push({argument: this.llex.scanner, type: token_strings[token]});
+      } while(accept.call(this, [tokens.T_COMMA, tokens.T_CLOSE_PAREN]) == tokens.T_COMMA);
+
+      accept.call(this, tokens.T_EOL);
+    }
+  };
+})();
+
+module.exports = Parser;
+
+},{"./lexer":32}],32:[function(require,module,exports){
 /*
  * Geometry Function Tokenizer
  */
@@ -7426,6 +7454,20 @@ Lexer.prototype = (function() {
 })();
 
 module.exports = Lexer;
+},{}],34:[function(require,module,exports){
+module.exports = function() {
+  jQuery.fn.coord = function() {
+    if (this.val()) {
+      if (this.val().indexOf(',') !== -1) {
+        return this.val().split(',')
+          .map(function(e) {
+            return parseFloat(e);
+          });
+      }
+    }
+  };
+};
+
 },{}],35:[function(require,module,exports){
 /*
   BoardTransform Factory
@@ -7568,20 +7610,6 @@ BoardTransform.prototype = (function() {
 })();
 
 module.exports = BoardTransform;
-},{}],34:[function(require,module,exports){
-module.exports = function() {
-  jQuery.fn.coord = function() {
-    if (this.val()) {
-      if (this.val().indexOf(',') !== -1) {
-        return this.val().split(',')
-          .map(function(e) {
-            return parseFloat(e);
-          });
-      }
-    }
-  };
-};
-
 },{}],36:[function(require,module,exports){
 /* GeometryFunction Factory */
 

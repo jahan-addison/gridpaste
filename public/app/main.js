@@ -24,16 +24,16 @@ $(function() {
     board.axx    = board.create('axis',[[0,0],[1,0]]);
     board.axy    = board.create('axis',[[0,0],[0,1]]);
     if (!$paste) {
-      /* Show coordinates at mouse */
+      /* Show coordinates at cursor */
       require('./helper/mouse')(board);
-      /* keyboard bindings */
-      require('./helper/bindings')();
     }
     board.unsuspendUpdate();    
   })();
   if (!$('#application').hasClass('paste')) {
     /* Subscribe to application */
     var App = require('./subscribe')(board);
+    /* keyboard bindings */
+    require('./helper/bindings')(App);
     // prevent 'dirty board'
     require('./helper/dirty')(App);
   } else {

@@ -65,7 +65,7 @@ module.exports = function(App) {
       return;
     }
     if (App.length > 0) {
-      $('.button.delete_').css('display', 'block');
+      $('.button.delete_').removeClass('hidden')
       $('.button.undo').addClass('visible');
     }
     $('.close-slider').click();
