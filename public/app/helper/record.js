@@ -7,6 +7,10 @@ module.exports = function(App) {
       $(this).unbind();
     });
     $('.end-record').click(function() {
+      if (!App.isRecording) {
+        return;
+      }
+      $('.share').removeClass('hidden');
       App.stopRecording();
       $('#application').addClass('off'); // turn subscriptions off 
       $(this)
@@ -16,6 +20,7 @@ module.exports = function(App) {
         .html('Start Record');
       $(this).unbind();
       Object.freeze(App); // we're done
+      $('.delete_').addClass('hidden');
       $('.undo').removeClass('visible');
       $('.reset').show();
       $('.reset').click(function() {

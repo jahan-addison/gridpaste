@@ -165,7 +165,9 @@ BoardElement.prototype = (function() {
       vertices.push(new point(this.board, this.options[i]).add());
     }
     vertices.push(vertices);
-    return new shape(this.board, "polygon", vertices).add();
+    var polygon = new shape(this.board, "polygon", vertices).add();
+    polygon.hasInnerPoints  = true;
+    return polygon;
   };
 
   //-----------------------------------------------------------------------

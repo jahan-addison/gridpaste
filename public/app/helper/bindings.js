@@ -1,6 +1,7 @@
+var command = require('../events/run');
 require('../../components/mousetrap/mousetrap.min');
 
-module.exports = function() {
+module.exports = function(App) {
   var drawBindLimit      = 9,
       transformBindLimit = 5,
       i;
@@ -12,6 +13,24 @@ module.exports = function() {
     Mousetrap.bind('f', function() { setTimeout(function() { $('.function').focus(); },200); });
     /* Undo */
     Mousetrap.bind('ctrl+z', function() { $('.undo').click(); });    
+    /* Repeat last command */
+    Mousetrap.bind('ctrl+enter', function() {
+      if (!App.length) {
+        return;
+      }
+      var target   = App.last.toString.split('.'),
+          $command = {
+            targetOperation: target[0],
+            targetCommand:   target[1],
+            command:         command[target[0]][target[1]] 
+          };
+      try {
+        App.storeAndExecute($command, App.last.arguments);
+      } catch(e) {
+        alert("Warning: " + e.message.replace("JSXGraph: ", ''));
+        return;
+      }
+    });
     /* Clear */
     Mousetrap.bind('m c', function() { $('.clear').click(); });
     /* Start recording */

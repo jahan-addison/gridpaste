@@ -3,7 +3,6 @@ $(function() {
   'use strict';
   var board;
   (function() {
-    var $paste = $('#application').hasClass('paste');
     var xx =  $(window).width()  / 17,
         yy =  $(window).height() / 15.7;   
     /* Board Options */
@@ -11,7 +10,7 @@ $(function() {
     JXG.Options.angle.radius        = 25;
     JXG.Options.polygon.fillOpacity = 0.46;
     JXG.Options.polygon.fillColor   = "#0ece16";
-    JXG.Options.elements.fixed      = true;
+    JXG.Options.elements.fixed      = false;
     board  = JXG.JSXGraph.initBoard('grid', {
       boundingbox:     [-xx,yy,xx,-yy],
       keepaspectratio: true,
@@ -24,19 +23,13 @@ $(function() {
     board.yy     = yy;
     board.axx    = board.create('axis',[[0,0],[1,0]]);
     board.axy    = board.create('axis',[[0,0],[0,1]]);
-    if (!$paste) {
-      /* Show coordinates at mouse */
-      require('./helper/mouse')(board);
-      /* keyboard bindings */
-      require('./helper/bindings')();
-    }
     board.unsuspendUpdate();    
   })();
   if (!$('#application').hasClass('paste')) {
     /* Subscribe to application */
     var App = require('./subscribe')(board);
-    // prevent 'dirty board'
-    require('./helper/dirty')(App);
+    require('./helper/helpers')  (App, board);  /* various UI helpers */
+    require('./decorators/mouse')(App);         /* dragging decoration */
   } else {
     /* Play Paste */
     require('./helper/play')($AppPaste, board);
@@ -51,58 +44,17 @@ $(function() {
     });
   }
 }); 
-},{"./helper/mouse":2,"./helper/bindings":3,"./subscribe":4,"./helper/dirty":5,"./helper/play":6}],2:[function(require,module,exports){
-module.exports = function(board) {
-  var getMouseCoords = function(e, i) {
-    var cPos = board.getCoordsTopLeftCorner(e, i),
-      absPos = JXG.getPosition(e, i),
-      dx = absPos[0]-cPos[0],
-      dy = absPos[1]-cPos[1];
-    return new JXG.Coords(JXG.COORDS_BY_SCREEN, [dx, dy], board);
-  }, i, still;
-  board.on("mousemove", function(evt) {
-    if (typeof still !== 'undefined') {
-      clearTimeout(still);
-      if (typeof board.usrAt !== 'undefined') {
-        board.removeObject(board.usrAt);
-      }
-    }
-    still = setTimeout(function() {
-      var coords = getMouseCoords(evt, i)
-        .usrCoords
-        .map(function(e) { 
-          return e.toFixed(2); 
-        });
-      board.usrAt = board.create("text", 
-        [parseFloat(coords[1] + 1.2), parseFloat(coords[2] + .5), // away from cursor
-        "(" + coords[1] + "," + coords[2] + ")"]
-      );
-    }, 1000);
-  });
-  $('#grid').mouseout(function() {
-    clearTimeout(still);
-  });
-};
-},{}],5:[function(require,module,exports){
+},{"./subscribe":2,"./helper/helpers":3,"./decorators/mouse":4,"./helper/play":5}],4:[function(require,module,exports){
 module.exports = function(App) {
-  $(window).on('beforeunload', function() {
-    if (!$('#application').hasClass('shared')) {
-      if (App.isRecording && App.length) {
-        return "You have an unsaved grid paste! Are you sure you want to leave?";
-      }
-    }
-  });
-};
-},{}],4:[function(require,module,exports){
+  MouseEvent.prototype.srcApp = App;
+}
+},{}],2:[function(require,module,exports){
 var execute    = require('./operation');
 
 module.exports = function(board) {
 
   // The application request object
   var operationExec = new execute(board);
-
-  require('./helper/helpers')(operationExec); // various UI helpers
-
 
   require('./subscriptions/board')    (operationExec); /* Board subscription */
 
@@ -114,56 +66,21 @@ module.exports = function(board) {
   return operationExec;
 };
 
-},{"./operation":7,"./helper/helpers":8,"./subscriptions/board":9,"./subscriptions/function":10,"./subscriptions/zoom":11}],3:[function(require,module,exports){
-require('../../components/mousetrap/mousetrap.min');
-
-module.exports = function() {
-  var drawBindLimit      = 9,
-      transformBindLimit = 5,
-      i;
-  $(function() {
-    /* Zoom in/out */
-    Mousetrap.bind('ctrl =', function() { $('.zoom.in').click(); });
-    Mousetrap.bind('ctrl -', function() { $('.zoom.out').click(); });
-    /* Function */
-    Mousetrap.bind('f', function() { setTimeout(function() { $('.function').focus(); },200); });
-    /* Undo */
-    Mousetrap.bind('ctrl+z', function() { $('.undo').click(); });    
-    /* Clear */
-    Mousetrap.bind('m c', function() { $('.clear').click(); });
-    /* Start recording */
-    Mousetrap.bind('tab', function() { $('.start-record').click(); return false; });    
-    /* Cancel query */
-    Mousetrap.bind('escape', function() { $('.close-slider').click(); });        
-
-    Mousetrap.stopCallback = function(e, element, combo) {
-      // if the element has the class "mousetrap" then no need to stop
-      if ((' ' + element.className + ' ').indexOf(' mousetrap ') > -1) {
-          return false;
-      }
-      // Allow escape while in queries
-      if ($(element).parent().parent().hasClass('slider') && combo.match(/esc|escape/)) {
-        return false;
-      }
-      // stop for input, select, and textarea
-      return element.tagName == 'INPUT' || element.tagName == 'SELECT' || element.tagName == 'TEXTAREA' || (element.contentEditable && element.contentEditable == 'true');
-    };
-    
-    /* Draw */
-    for(i = 0; i < drawBindLimit; i++) {
-      Mousetrap.bind('d ' + (i+1), 
-        new Function("$('#elements .button').not('.draw').not('.more').eq("+i+").click();")
-      ); 
-    }
-    /* Transform */
-    for(i = 0; i < transformBindLimit; i++) {
-      Mousetrap.bind('t ' + (i+1), 
-        new Function("$('#transform .button').not('.transform').not('.more').eq("+i+").click();")
-      ); 
-    }
-  });
+},{"./operation":6,"./subscriptions/board":7,"./subscriptions/function":8,"./subscriptions/zoom":9}],3:[function(require,module,exports){
+module.exports = function(App, board) {
+  require('./more')  ();           // attach event to "more" button for polygon construction
+  require('./undo')  (App);        // attach event to undo button
+  require('./record')(App);        // attach event to record button
+  require('./clear') (App);        // attach event to clear button
+  require('./drag')  (board);      // attach event to drag
+  require('./play')  (App, board); // attach event to UI play button after recording
+  require('./share')    (App)    // attach event to share button
+  require('./bindings') (App);   // attach keyboard bindings
+  require('./mouse')    (board); // show coordinates at cursor
+  require('./dirty')    (App);   // prevent 'dirty board' 
 };
-},{"../../components/mousetrap/mousetrap.min":12}],6:[function(require,module,exports){
+
+},{"./more":10,"./undo":11,"./record":12,"./clear":13,"./drag":14,"./play":5,"./share":15,"./bindings":16,"./mouse":17,"./dirty":18}],5:[function(require,module,exports){
 var iterator = require('../iterate'),
     command  = require('../events/run');
 
@@ -234,18 +151,108 @@ module.exports = function(App, board) {
     });
   }
 };
-},{"../iterate":13,"../events/run":14,"./position":15}],12:[function(require,module,exports){
-/* mousetrap v1.4.6 craig.is/killing/mice */
-(function(J,r,f){function s(a,b,d){a.addEventListener?a.addEventListener(b,d,!1):a.attachEvent("on"+b,d)}function A(a){if("keypress"==a.type){var b=String.fromCharCode(a.which);a.shiftKey||(b=b.toLowerCase());return b}return h[a.which]?h[a.which]:B[a.which]?B[a.which]:String.fromCharCode(a.which).toLowerCase()}function t(a){a=a||{};var b=!1,d;for(d in n)a[d]?b=!0:n[d]=0;b||(u=!1)}function C(a,b,d,c,e,v){var g,k,f=[],h=d.type;if(!l[a])return[];"keyup"==h&&w(a)&&(b=[a]);for(g=0;g<l[a].length;++g)if(k=
-l[a][g],!(!c&&k.seq&&n[k.seq]!=k.level||h!=k.action||("keypress"!=h||d.metaKey||d.ctrlKey)&&b.sort().join(",")!==k.modifiers.sort().join(","))){var m=c&&k.seq==c&&k.level==v;(!c&&k.combo==e||m)&&l[a].splice(g,1);f.push(k)}return f}function K(a){var b=[];a.shiftKey&&b.push("shift");a.altKey&&b.push("alt");a.ctrlKey&&b.push("ctrl");a.metaKey&&b.push("meta");return b}function x(a,b,d,c){m.stopCallback(b,b.target||b.srcElement,d,c)||!1!==a(b,d)||(b.preventDefault?b.preventDefault():b.returnValue=!1,b.stopPropagation?
-b.stopPropagation():b.cancelBubble=!0)}function y(a){"number"!==typeof a.which&&(a.which=a.keyCode);var b=A(a);b&&("keyup"==a.type&&z===b?z=!1:m.handleKey(b,K(a),a))}function w(a){return"shift"==a||"ctrl"==a||"alt"==a||"meta"==a}function L(a,b,d,c){function e(b){return function(){u=b;++n[a];clearTimeout(D);D=setTimeout(t,1E3)}}function v(b){x(d,b,a);"keyup"!==c&&(z=A(b));setTimeout(t,10)}for(var g=n[a]=0;g<b.length;++g){var f=g+1===b.length?v:e(c||E(b[g+1]).action);F(b[g],f,c,a,g)}}function E(a,b){var d,
-c,e,f=[];d="+"===a?["+"]:a.split("+");for(e=0;e<d.length;++e)c=d[e],G[c]&&(c=G[c]),b&&"keypress"!=b&&H[c]&&(c=H[c],f.push("shift")),w(c)&&f.push(c);d=c;e=b;if(!e){if(!p){p={};for(var g in h)95<g&&112>g||h.hasOwnProperty(g)&&(p[h[g]]=g)}e=p[d]?"keydown":"keypress"}"keypress"==e&&f.length&&(e="keydown");return{key:c,modifiers:f,action:e}}function F(a,b,d,c,e){q[a+":"+d]=b;a=a.replace(/\s+/g," ");var f=a.split(" ");1<f.length?L(a,f,b,d):(d=E(a,d),l[d.key]=l[d.key]||[],C(d.key,d.modifiers,{type:d.action},
-c,a,e),l[d.key][c?"unshift":"push"]({callback:b,modifiers:d.modifiers,action:d.action,seq:c,level:e,combo:a}))}var h={8:"backspace",9:"tab",13:"enter",16:"shift",17:"ctrl",18:"alt",20:"capslock",27:"esc",32:"space",33:"pageup",34:"pagedown",35:"end",36:"home",37:"left",38:"up",39:"right",40:"down",45:"ins",46:"del",91:"meta",93:"meta",224:"meta"},B={106:"*",107:"+",109:"-",110:".",111:"/",186:";",187:"=",188:",",189:"-",190:".",191:"/",192:"`",219:"[",220:"\\",221:"]",222:"'"},H={"~":"`","!":"1",
-"@":"2","#":"3",$:"4","%":"5","^":"6","&":"7","*":"8","(":"9",")":"0",_:"-","+":"=",":":";",'"':"'","<":",",">":".","?":"/","|":"\\"},G={option:"alt",command:"meta","return":"enter",escape:"esc",mod:/Mac|iPod|iPhone|iPad/.test(navigator.platform)?"meta":"ctrl"},p,l={},q={},n={},D,z=!1,I=!1,u=!1;for(f=1;20>f;++f)h[111+f]="f"+f;for(f=0;9>=f;++f)h[f+96]=f;s(r,"keypress",y);s(r,"keydown",y);s(r,"keyup",y);var m={bind:function(a,b,d){a=a instanceof Array?a:[a];for(var c=0;c<a.length;++c)F(a[c],b,d);return this},
-unbind:function(a,b){return m.bind(a,function(){},b)},trigger:function(a,b){if(q[a+":"+b])q[a+":"+b]({},a);return this},reset:function(){l={};q={};return this},stopCallback:function(a,b){return-1<(" "+b.className+" ").indexOf(" mousetrap ")?!1:"INPUT"==b.tagName||"SELECT"==b.tagName||"TEXTAREA"==b.tagName||b.isContentEditable},handleKey:function(a,b,d){var c=C(a,b,d),e;b={};var f=0,g=!1;for(e=0;e<c.length;++e)c[e].seq&&(f=Math.max(f,c[e].level));for(e=0;e<c.length;++e)c[e].seq?c[e].level==f&&(g=!0,
-b[c[e].seq]=1,x(c[e].callback,d,c[e].combo,c[e].seq)):g||x(c[e].callback,d,c[e].combo);c="keypress"==d.type&&I;d.type!=u||w(a)||c||t(b);I=g&&"keydown"==d.type}};J.Mousetrap=m;"function"===typeof define&&define.amd&&define(m)})(window,document);
-
-},{}],13:[function(require,module,exports){
+},{"../iterate":19,"../events/run":20,"./position":21}],10:[function(require,module,exports){
+module.exports = function() {
+  $(function() {
+    var points = 3;
+    $('#application').on('click', '.more', function() {
+      if ($(this).parent().find('.inside').length == 3) {
+        points = 3;
+      }
+      points++;
+      var more = '<label for="point'+ points + '">Point ' + points + ' (x,y):</label><input type="text" name="point'+ points +'" class="inside" value="0.0,0.0" />';
+      $(this).before(more);
+    });
+  });
+};
+},{}],11:[function(require,module,exports){
+module.exports = function(App) {
+  $(function() {
+    $('.button.undo').click(function() {
+      App.undoLastExecute();
+      if(App.length === 0) {
+        $(this).removeClass('visible');
+      }
+    });
+  });
+};
+},{}],12:[function(require,module,exports){
+module.exports = function(App) {
+  $(function() {
+    $('.start-record').click(function() {
+      $('.clear').click();
+      App.startRecording();
+      $(this).html('Recording').addClass('dim');
+      $(this).unbind();
+    });
+    $('.end-record').click(function() {
+      if (!App.isRecording) {
+        return;
+      }
+      $('.share').removeClass('hidden');
+      App.stopRecording();
+      $('#application').addClass('off'); // turn subscriptions off 
+      $(this)
+        .html('Finished')
+        .addClass('finished')
+        .prev()
+        .html('Start Record');
+      $(this).unbind();
+      Object.freeze(App); // we're done
+      $('.delete_').addClass('hidden');
+      $('.undo').removeClass('visible');
+      $('.reset').show();
+      $('.reset').click(function() {
+        window.location.reload();
+      });
+      $('.clear').hide()
+        .prev().show();
+    });
+  });
+};
+},{}],17:[function(require,module,exports){
+module.exports = function(board) {
+  var getMouseCoords = function(e, i) {
+    var cPos = board.getCoordsTopLeftCorner(e, i),
+      absPos = JXG.getPosition(e, i),
+      dx = absPos[0]-cPos[0],
+      dy = absPos[1]-cPos[1];
+    return new JXG.Coords(JXG.COORDS_BY_SCREEN, [dx, dy], board);
+  }, i, still;
+  board.on("mousemove", function(evt) {
+    if (typeof still !== 'undefined') {
+      clearTimeout(still);
+      if (typeof board.usrAt !== 'undefined') {
+        board.removeObject(board.usrAt);
+      }
+    }
+    still = setTimeout(function() {
+      var coords = getMouseCoords(evt, i)
+        .usrCoords
+        .map(function(e) { 
+          return e.toFixed(2); 
+        });
+      board.usrAt = board.create("text", 
+        [parseFloat(coords[1] + 1.2), parseFloat(coords[2] + .5), // away from cursor
+        "(" + coords[1] + "," + coords[2] + ")"]
+      );
+    }, 1000);
+  });
+  $('#grid').mouseout(function() {
+    clearTimeout(still);
+  });
+};
+},{}],18:[function(require,module,exports){
+module.exports = function(App) {
+  $(window).on('beforeunload', function() {
+    if (!$('#application').hasClass('shared')) {
+      if (App.isRecording && App.length) {
+        return "You have an unsaved grid paste! Are you sure you want to leave?";
+      }
+    }
+  });
+};
+},{}],19:[function(require,module,exports){
 /* The Iterator */
 
 var Iterator = function(List) {
@@ -270,7 +277,7 @@ Iterator.prototype.prev    = function() {
 };
 
 module.exports = Iterator;
-},{}],15:[function(require,module,exports){
+},{}],21:[function(require,module,exports){
 module.exports = function(args, board) {
   var translateX   = false,
       translateY   = false,
@@ -353,7 +360,7 @@ module.exports = function(args, board) {
     }    
   }
 };
-},{}],7:[function(require,module,exports){
+},{}],6:[function(require,module,exports){
 /* The Invoker */
 
 var Operation = function(board) {
@@ -366,8 +373,21 @@ Object.defineProperty(Operation.prototype, "length", {
   get: function() { return this.commands.length }
 });
 
-Operation.prototype.storeAndExecute = function(command) {
-  var $command =  new command.command(this.board),
+Object.defineProperty(Operation.prototype, "last", {
+  get: function() { return this.commands[this.length-1] }
+});
+
+Operation.prototype.store = function(command, args) {
+  var $command =  new command.command(this.board, args);
+  this.commands.push({
+    arguments:   args,
+    'command':   $command,
+    'toString':  command.targetOperation + '.' + command.targetCommand
+  });
+}
+
+Operation.prototype.storeAndExecute = function(command, args) {
+  var $command =  new command.command(this.board, args),
       args     =  $command.execute();
   this.commands.push({
     arguments:   args,
@@ -389,17 +409,7 @@ Operation.prototype.undoLastExecute = function() {
   require("./decorators/recording")(Operation);
 
 module.exports = Operation;
-},{"./decorators/recording":16}],8:[function(require,module,exports){
-module.exports = function(App) {
-  require('./more')  ();               // attach event to "more" button for polygon construction
-  require('./undo')  (App);            // attach event to undo button
-  require('./record')(App);            // attach event to record button
-  require('./clear') (App);            // attach event to clear button
-  require('./play')  (App, App.board); // attach event to UI play button after recording
-  require('./share') (App)             // attach event to share button
-};
-
-},{"./more":17,"./undo":18,"./record":19,"./clear":20,"./play":6,"./share":21}],9:[function(require,module,exports){
+},{"./decorators/recording":22}],7:[function(require,module,exports){
 var command    = require('../events/run'),
     slider     = require('../helper/slider'),
     validate   = require('../helper/validate')(),
@@ -467,7 +477,7 @@ module.exports = function(App) {
       return;
     }
     if (App.length > 0) {
-      $('.button.delete_').css('display', 'block');
+      $('.button.delete_').removeClass('hidden')
       $('.button.undo').addClass('visible');
     }
     $('.close-slider').click();
@@ -476,7 +486,7 @@ module.exports = function(App) {
       console.log("Error: %s", e.message);
     });
 };
-},{"../events/run":14,"../helper/validate":22,"../helper/slider":23,"../../components/rxjs/rx.lite":24}],10:[function(require,module,exports){
+},{"../events/run":20,"../helper/slider":23,"../helper/validate":24,"../../components/rxjs/rx.lite":25}],8:[function(require,module,exports){
 var command    = require('../events/run'),
     Parser     = require('../board/functions/parser'),
     Rx         = require('../../components/rxjs/rx.lite').Rx;
@@ -528,7 +538,7 @@ module.exports = function(App) {
     console.log("Error: %s", e.message);
   });
 };
-},{"../events/run":14,"../board/functions/parser":25,"../../components/rxjs/rx.lite":24}],11:[function(require,module,exports){
+},{"../events/run":20,"../board/functions/parser":26,"../../components/rxjs/rx.lite":25}],9:[function(require,module,exports){
 var command    = require('../events/run'),
     Rx         = require('../../components/rxjs/rx.lite').Rx;
 
@@ -564,7 +574,221 @@ module.exports = function(App, board) {
   });
 
 }
-},{"../events/run":14,"../../components/rxjs/rx.lite":24}],14:[function(require,module,exports){
+},{"../events/run":20,"../../components/rxjs/rx.lite":25}],13:[function(require,module,exports){
+var execute = require('../operation');
+
+module.exports = function(App) {
+  $(function() {
+    var board = App.board;
+    $('.button.clear').click(function() {
+      for(point in board.points) {
+        if (board.points.hasOwnProperty(point)) {
+          board.removeObject(board.points[point]);
+        }
+      }
+      board.points = {};
+      var size = board.shapes.length;
+      for (var i = 0; i < size; i++) {
+        board.removeObject(board.shapes[i]);
+      }
+      board.shapes = [];
+      $('.function').val('');
+      $('.undo').removeClass('visible');
+      board.zoom100();
+      board.update();
+
+      App.clearCommandList();
+
+      // Reset recording UI
+      require('./record')(App); // reattach record events   
+      $('.start-record').removeClass('dim').html('Start Record');
+      $('.end-record').removeClass('dim').html('End Record');
+    })
+  });
+};
+},{"../operation":6,"./record":12}],14:[function(require,module,exports){
+var transform = require('../events/transform');
+var last = [],
+  initialX,
+  initialY,
+  initial;
+module.exports = function(e) {
+  if($('#application').hasClass('paste')
+  || (this instanceof JXG.Point === false
+    && typeof this.usrSetCoords === 'undefined')) {
+    return false;
+  }
+  if (this instanceof JXG.Text === true) {
+    this.isDraggable = false;
+    return false;
+  }
+  // check the type of point
+  if (this instanceof JXG.Point === true) {
+    if (Object.keys(this.childElements).length > 1) {
+      this.isDraggable = false;
+      return false;
+    }
+  }
+  if (typeof this.usrSetCoords !== 'undefined') {
+    initialX = e.srcApp.board.points[this.usrSetCoords[0].name].X();
+    initialY = e.srcApp.board.points[this.usrSetCoords[0].name].Y();
+    initial  = this.usrSetCoords.map(function(m) {
+      return [e.srcApp.board.points[m.name].X(), e.srcApp.board.points[m.name].Y()];
+    });    
+  } else {
+    initialX = e.srcApp.board.points[this.name].X();
+    initialY = e.srcApp.board.points[this.name].Y();
+    initial  = [[initialX, initialY]];   
+  }
+  this.on('drag', function(e) { 
+    e.preventDefault();
+  });
+  this.on("mouseup", function(e) {
+    if (last.length === 0) {
+      last = [e.x,e.y];
+    } else {
+      if (e.x == last[0] && e.y == last[1]) {
+        return;
+      } else {
+        last = [e.x, e.y];
+      }
+    }
+    var distanceX,
+        distanceY;
+    if (typeof this.X !== 'function') {
+      distanceX = this.usrSetCoords[0].X() - initialX;
+      distanceY = this.usrSetCoords[0].Y() - initialY;
+    } else {
+      distanceX = this.X()  - initialX;
+      distanceY = this.Y()  - initialY;      
+    }
+
+    var drag = transform.drag;
+    e.srcApp.store({
+      targetOperation: 'transform',
+      targetCommand:   'drag',
+      command:          drag
+    }, {
+      figure: this.name,
+      initial: initial,
+      values: [distanceX, distanceY]
+    });
+  });
+};
+},{"../events/transform":27}],15:[function(require,module,exports){
+var slider = require('./slider');
+
+module.exports = function(App) {
+  var $html;
+  $(function() {
+    $('.share').click(function() {
+      if (Object.isFrozen(App)) {
+        var done;
+        if (typeof $html !== 'undefined') {
+          slider($html, 230, 'auto', '#application', $('#transform'));           
+          return;
+        }
+        slider($(this).next().html(), 230, 'auto', '#application', $('#transform')); 
+        $('#application').on('click', '.submit', function() {
+          var $paste = App.getRecorded.map(function(e) {
+            delete e.command; // we no longer need constructors
+            return e;
+          });
+          var data   = {
+            title: $('input.title:last').val(),
+            paste: $paste
+          };
+          $('.close-slider').click();
+          $.ajax({
+            url: '/paste',
+            type: 'POST',
+            data: JSON.stringify(data),
+            contentType: "application/json",
+            complete: function(token) {
+              $html = ['<div class="misc-done">',
+                '<label for="url">The URL!</label><input type="text" name="url" class="inside url" value="',
+                document.location.href + token.responseJSON.token,
+                '" />',
+                '</div>'
+              ].join('');
+              $('#application').addClass('shared');
+              slider($html, 250, 'auto', '#application', $('#transform'));
+            }
+          });
+        });
+      }
+    })
+  });
+}
+},{"./slider":23}],16:[function(require,module,exports){
+var command = require('../events/run');
+require('../../components/mousetrap/mousetrap.min');
+
+module.exports = function(App) {
+  var drawBindLimit      = 9,
+      transformBindLimit = 5,
+      i;
+  $(function() {
+    /* Zoom in/out */
+    Mousetrap.bind('ctrl =', function() { $('.zoom.in').click(); });
+    Mousetrap.bind('ctrl -', function() { $('.zoom.out').click(); });
+    /* Function */
+    Mousetrap.bind('f', function() { setTimeout(function() { $('.function').focus(); },200); });
+    /* Undo */
+    Mousetrap.bind('ctrl+z', function() { $('.undo').click(); });    
+    /* Repeat last command */
+    Mousetrap.bind('ctrl+enter', function() {
+      if (!App.length) {
+        return;
+      }
+      var target   = App.last.toString.split('.'),
+          $command = {
+            targetOperation: target[0],
+            targetCommand:   target[1],
+            command:         command[target[0]][target[1]] 
+          };
+      try {
+        App.storeAndExecute($command, App.last.arguments);
+      } catch(e) {
+        alert("Warning: " + e.message.replace("JSXGraph: ", ''));
+        return;
+      }
+    });
+    /* Clear */
+    Mousetrap.bind('m c', function() { $('.clear').click(); });
+    /* Start recording */
+    Mousetrap.bind('tab', function() { $('.start-record').click(); return false; });    
+    /* Cancel query */
+    Mousetrap.bind('escape', function() { $('.close-slider').click(); });        
+
+    Mousetrap.stopCallback = function(e, element, combo) {
+      // if the element has the class "mousetrap" then no need to stop
+      if ((' ' + element.className + ' ').indexOf(' mousetrap ') > -1) {
+          return false;
+      }
+      // Allow escape while in queries
+      if ($(element).parent().parent().hasClass('slider') && combo.match(/esc|escape/)) {
+        return false;
+      }
+      // stop for input, select, and textarea
+      return element.tagName == 'INPUT' || element.tagName == 'SELECT' || element.tagName == 'TEXTAREA' || (element.contentEditable && element.contentEditable == 'true');
+    };
+    
+    /* Draw */
+    for(i = 0; i < drawBindLimit; i++) {
+      Mousetrap.bind('d ' + (i+1), 
+        new Function("$('#elements .button').not('.draw').not('.more').eq("+i+").click();")
+      ); 
+    }
+    /* Transform */
+    for(i = 0; i < transformBindLimit; i++) {
+      Mousetrap.bind('t ' + (i+1), 
+        new Function("$('#transform .button').not('.transform').not('.more').eq("+i+").click();")
+      ); 
+    }
+  });
+};
+},{"../events/run":20,"../../components/mousetrap/mousetrap.min":28}],20:[function(require,module,exports){
 
 module.exports = {
   draw:      require('./draw'),
@@ -575,7 +799,7 @@ module.exports = {
 };
 
 
-},{"./draw":26,"./transform":27,"./zoom":28,"./function":29,"./misc":30}],16:[function(require,module,exports){
+},{"./draw":29,"./transform":27,"./zoom":30,"./function":31,"./misc":32}],22:[function(require,module,exports){
 /*
   OperationDecorator
 */
@@ -608,6 +832,15 @@ module.exports = function(Operation) {
       recorded.push(this.commands[this.commands.length - 1]);
     }
   };
+  
+  var store = Operation.prototype.store;
+  // proxy
+  Operation.prototype.store = function() {
+    store.apply(this, arguments);
+    if (recording) {
+      recorded.push(this.commands[this.commands.length - 1]);
+    }
+  };
 
   var remove = Operation.prototype.undoLastExecute;
   // proxy
@@ -628,60 +861,6 @@ module.exports = function(Operation) {
   }; 
 };
 
-},{}],17:[function(require,module,exports){
-module.exports = function() {
-  $(function() {
-    var points = 3;
-    $('#application').on('click', '.more', function() {
-      if ($(this).parent().find('.inside').length == 3) {
-        points = 3;
-      }
-      points++;
-      var more = '<label for="point'+ points + '">Point ' + points + ' (x,y):</label><input type="text" name="point'+ points +'" class="inside" value="0.0,0.0" />';
-      $(this).before(more);
-    });
-  });
-};
-},{}],18:[function(require,module,exports){
-module.exports = function(App) {
-  $(function() {
-    $('.button.undo').click(function() {
-      App.undoLastExecute();
-      if(App.length === 0) {
-        $(this).removeClass('visible');
-      }
-    });
-  });
-};
-},{}],19:[function(require,module,exports){
-module.exports = function(App) {
-  $(function() {
-    $('.start-record').click(function() {
-      $('.clear').click();
-      App.startRecording();
-      $(this).html('Recording').addClass('dim');
-      $(this).unbind();
-    });
-    $('.end-record').click(function() {
-      App.stopRecording();
-      $('#application').addClass('off'); // turn subscriptions off 
-      $(this)
-        .html('Finished')
-        .addClass('finished')
-        .prev()
-        .html('Start Record');
-      $(this).unbind();
-      Object.freeze(App); // we're done
-      $('.undo').removeClass('visible');
-      $('.reset').show();
-      $('.reset').click(function() {
-        window.location.reload();
-      });
-      $('.clear').hide()
-        .prev().show();
-    });
-  });
-};
 },{}],23:[function(require,module,exports){
 module.exports = function(content, width, height, source, top) {
   $block = $('<div class="slider"> <div class="close-slider">x</div> </div>');
@@ -721,7 +900,7 @@ module.exports = function(content, width, height, source, top) {
     });
   });
 };
-},{}],31:[function(require,module,exports){
+},{}],33:[function(require,module,exports){
 // shim for using process in browser
 
 var process = module.exports = {};
@@ -776,7 +955,7 @@ process.chdir = function (dir) {
     throw new Error('process.chdir is not supported');
 };
 
-},{}],24:[function(require,module,exports){
+},{}],25:[function(require,module,exports){
 (function(process,global){// Copyright (c) Microsoft Open Technologies, Inc. All rights reserved. See License.txt in the project root for license information.
 
 ;(function (undefined) {
@@ -6254,7 +6433,18 @@ process.chdir = function (dir) {
     }
 }.call(this));
 })(require("__browserify_process"),window)
-},{"__browserify_process":31}],28:[function(require,module,exports){
+},{"__browserify_process":33}],28:[function(require,module,exports){
+/* mousetrap v1.4.6 craig.is/killing/mice */
+(function(J,r,f){function s(a,b,d){a.addEventListener?a.addEventListener(b,d,!1):a.attachEvent("on"+b,d)}function A(a){if("keypress"==a.type){var b=String.fromCharCode(a.which);a.shiftKey||(b=b.toLowerCase());return b}return h[a.which]?h[a.which]:B[a.which]?B[a.which]:String.fromCharCode(a.which).toLowerCase()}function t(a){a=a||{};var b=!1,d;for(d in n)a[d]?b=!0:n[d]=0;b||(u=!1)}function C(a,b,d,c,e,v){var g,k,f=[],h=d.type;if(!l[a])return[];"keyup"==h&&w(a)&&(b=[a]);for(g=0;g<l[a].length;++g)if(k=
+l[a][g],!(!c&&k.seq&&n[k.seq]!=k.level||h!=k.action||("keypress"!=h||d.metaKey||d.ctrlKey)&&b.sort().join(",")!==k.modifiers.sort().join(","))){var m=c&&k.seq==c&&k.level==v;(!c&&k.combo==e||m)&&l[a].splice(g,1);f.push(k)}return f}function K(a){var b=[];a.shiftKey&&b.push("shift");a.altKey&&b.push("alt");a.ctrlKey&&b.push("ctrl");a.metaKey&&b.push("meta");return b}function x(a,b,d,c){m.stopCallback(b,b.target||b.srcElement,d,c)||!1!==a(b,d)||(b.preventDefault?b.preventDefault():b.returnValue=!1,b.stopPropagation?
+b.stopPropagation():b.cancelBubble=!0)}function y(a){"number"!==typeof a.which&&(a.which=a.keyCode);var b=A(a);b&&("keyup"==a.type&&z===b?z=!1:m.handleKey(b,K(a),a))}function w(a){return"shift"==a||"ctrl"==a||"alt"==a||"meta"==a}function L(a,b,d,c){function e(b){return function(){u=b;++n[a];clearTimeout(D);D=setTimeout(t,1E3)}}function v(b){x(d,b,a);"keyup"!==c&&(z=A(b));setTimeout(t,10)}for(var g=n[a]=0;g<b.length;++g){var f=g+1===b.length?v:e(c||E(b[g+1]).action);F(b[g],f,c,a,g)}}function E(a,b){var d,
+c,e,f=[];d="+"===a?["+"]:a.split("+");for(e=0;e<d.length;++e)c=d[e],G[c]&&(c=G[c]),b&&"keypress"!=b&&H[c]&&(c=H[c],f.push("shift")),w(c)&&f.push(c);d=c;e=b;if(!e){if(!p){p={};for(var g in h)95<g&&112>g||h.hasOwnProperty(g)&&(p[h[g]]=g)}e=p[d]?"keydown":"keypress"}"keypress"==e&&f.length&&(e="keydown");return{key:c,modifiers:f,action:e}}function F(a,b,d,c,e){q[a+":"+d]=b;a=a.replace(/\s+/g," ");var f=a.split(" ");1<f.length?L(a,f,b,d):(d=E(a,d),l[d.key]=l[d.key]||[],C(d.key,d.modifiers,{type:d.action},
+c,a,e),l[d.key][c?"unshift":"push"]({callback:b,modifiers:d.modifiers,action:d.action,seq:c,level:e,combo:a}))}var h={8:"backspace",9:"tab",13:"enter",16:"shift",17:"ctrl",18:"alt",20:"capslock",27:"esc",32:"space",33:"pageup",34:"pagedown",35:"end",36:"home",37:"left",38:"up",39:"right",40:"down",45:"ins",46:"del",91:"meta",93:"meta",224:"meta"},B={106:"*",107:"+",109:"-",110:".",111:"/",186:";",187:"=",188:",",189:"-",190:".",191:"/",192:"`",219:"[",220:"\\",221:"]",222:"'"},H={"~":"`","!":"1",
+"@":"2","#":"3",$:"4","%":"5","^":"6","&":"7","*":"8","(":"9",")":"0",_:"-","+":"=",":":";",'"':"'","<":",",">":".","?":"/","|":"\\"},G={option:"alt",command:"meta","return":"enter",escape:"esc",mod:/Mac|iPod|iPhone|iPad/.test(navigator.platform)?"meta":"ctrl"},p,l={},q={},n={},D,z=!1,I=!1,u=!1;for(f=1;20>f;++f)h[111+f]="f"+f;for(f=0;9>=f;++f)h[f+96]=f;s(r,"keypress",y);s(r,"keydown",y);s(r,"keyup",y);var m={bind:function(a,b,d){a=a instanceof Array?a:[a];for(var c=0;c<a.length;++c)F(a[c],b,d);return this},
+unbind:function(a,b){return m.bind(a,function(){},b)},trigger:function(a,b){if(q[a+":"+b])q[a+":"+b]({},a);return this},reset:function(){l={};q={};return this},stopCallback:function(a,b){return-1<(" "+b.className+" ").indexOf(" mousetrap ")?!1:"INPUT"==b.tagName||"SELECT"==b.tagName||"TEXTAREA"==b.tagName||b.isContentEditable},handleKey:function(a,b,d){var c=C(a,b,d),e;b={};var f=0,g=!1;for(e=0;e<c.length;++e)c[e].seq&&(f=Math.max(f,c[e].level));for(e=0;e<c.length;++e)c[e].seq?c[e].level==f&&(g=!0,
+b[c[e].seq]=1,x(c[e].callback,d,c[e].combo,c[e].seq)):g||x(c[e].callback,d,c[e].combo);c="keypress"==d.type&&I;d.type!=u||w(a)||c||t(b);I=g&&"keydown"==d.type}};J.Mousetrap=m;"function"===typeof define&&define.amd&&define(m)})(window,document);
+
+},{}],30:[function(require,module,exports){
 /* Commands */
 
 /*--
@@ -6296,7 +6486,7 @@ module.exports = {
   zoomIn: zoomIn,
   zoomOut: zoomOut
 };
-},{}],30:[function(require,module,exports){
+},{}],32:[function(require,module,exports){
 /* Commands */
 
 /*--
@@ -6355,84 +6545,7 @@ var delete_ = function(board, args) {
 module.exports = {
   delete_: delete_
 };
-},{}],20:[function(require,module,exports){
-var execute = require('../operation');
-
-module.exports = function(App) {
-  $(function() {
-    var board = App.board;
-    $('.button.clear').click(function() {
-      for(point in board.points) {
-        if (board.points.hasOwnProperty(point)) {
-          board.removeObject(board.points[point]);
-        }
-      }
-      board.points = {};
-      var size = board.shapes.length;
-      for (var i = 0; i < size; i++) {
-        board.removeObject(board.shapes[i]);
-      }
-      board.shapes = [];
-      $('.function').val('');
-      $('.undo').removeClass('visible');
-      board.zoom100();
-      board.update();
-
-      App.clearCommandList();
-
-      // Reset recording UI
-      require('./record')(App); // reattach record events   
-      $('.start-record').removeClass('dim').html('Start Record');
-      $('.end-record').removeClass('dim').html('End Record');
-    })
-  });
-};
-},{"../operation":7,"./record":19}],21:[function(require,module,exports){
-var slider = require('./slider');
-
-module.exports = function(App) {
-  var $html;
-  $(function() {
-    $('.share').click(function() {
-      if (Object.isFrozen(App)) {
-        var done;
-        if (typeof $html !== 'undefined') {
-          slider($html, 230, 'auto', '#application', $('#transform'));           
-          return;
-        }
-        slider($(this).next().html(), 230, 'auto', '#application', $('#transform')); 
-        $('#application').on('click', '.submit', function() {
-          var $paste = App.getRecorded.map(function(e) {
-            delete e.command; // we no longer need constructors
-            return e;
-          });
-          var data   = {
-            title: $('input.title:last').val(),
-            paste: $paste
-          };
-          $('.close-slider').click();
-          $.ajax({
-            url: '/paste',
-            type: 'POST',
-            data: JSON.stringify(data),
-            contentType: "application/json",
-            complete: function(token) {
-              $html = ['<div class="misc-done">',
-                '<label for="url">The URL!</label><input type="text" name="url" class="inside url" value="',
-                document.location.href + token.responseJSON.token,
-                '" />',
-                '</div>'
-              ].join('');
-              $('#application').addClass('shared');
-              slider($html, 250, 'auto', '#application', $('#transform'));
-            }
-          });
-        });
-      }
-    })
-  });
-}
-},{"./slider":23}],22:[function(require,module,exports){
+},{}],24:[function(require,module,exports){
 var Lexer = require('../board/functions/lexer');
 
 module.exports = function() {
@@ -6500,7 +6613,7 @@ module.exports = function() {
     }
   });
 };
-},{"../board/functions/lexer":32}],25:[function(require,module,exports){
+},{"../board/functions/lexer":34}],26:[function(require,module,exports){
 var Lexer = require('./lexer');
 
 /*
@@ -6611,7 +6724,332 @@ Parser.prototype = (function() {
 
 module.exports = Parser;
 
-},{"./lexer":32}],26:[function(require,module,exports){
+},{"./lexer":34}],27:[function(require,module,exports){
+var transform = require('../board/transform'),
+    coords    = require('../helper/coords')();
+
+/* Commands */
+
+/*--
+Interface Command {
+  public void   constructor(JSXGraph board, Object Arguments)
+  public void   remove()
+  public object execute()
+}
+--*/
+
+var rotate = function(board, args) {
+  var args   = args || {
+    figure:  $('input[name="figure"]:last').val(),
+    center:  $('input[name="point"]:last').val(),
+    degrees: parseInt($('input[name="degrees"]:last').val()),
+  },
+    usrPoints = this.points = {};  
+  var transformArgs = {};
+  for (arg in args) {
+    if (args.hasOwnProperty(arg)) {
+      transformArgs[arg] = args[arg];
+    }
+  }
+  transformArgs.points = [];
+  board.shapes.forEach(function(shape) {
+    if (shape.name == transformArgs.figure) {
+      transformArgs.points = shape.usrSetCoords;
+    }
+  });
+  delete transformArgs.figure;
+  this.rotate = new transform(board, "rotate", transformArgs);
+  this.remove = function() {
+    for (p in this.points) {
+      if (this.points.hasOwnProperty(p)) {
+        board.points[p].update();
+        board.points[p].setPosition(JXG.COORDS_BY_USER, this.points[p]);
+        board.update();
+      }
+    }
+  };
+  this.execute = function() {
+    transformArgs.points.forEach(function(p) {
+      Object.defineProperty(usrPoints, p.name, {
+        value: [
+          board.points[p.name].coords.usrCoords[1],
+          board.points[p.name].coords.usrCoords[2]
+        ],
+        enumerable: true
+      });
+    });
+    this.rotate.apply();
+    return args;
+  };
+};
+
+var reflect = function(board, args) {
+  var args   = args || {
+    figure:  $('input[name="figure"]:last').val(),
+    line:    $('input[name="axis"]:last').val(),
+  },
+    usrPoints = this.points = {};  
+  var transformArgs = {};
+  for (arg in args) {
+    if (args.hasOwnProperty(arg)) {
+      transformArgs[arg] = args[arg];
+    }
+  }
+  this.line = transformArgs.line;
+  transformArgs.points = [];
+  if (transformArgs.line.toLowerCase() == "x") {
+    transformArgs.line = board.axx;
+  } else {
+    transformArgs.line = board.axy;
+  }
+  board.shapes.forEach(function(shape) {
+    if (shape.name == transformArgs.figure) {
+      transformArgs.points = shape.usrSetCoords;
+    }
+  });
+  // a single point
+  if (!transformArgs.points.length) {
+    for(p in board.points) {
+      if (board.points.hasOwnProperty(p)) {
+        if (board.points[p].name + '0' == transformArgs.figure) {
+          transformArgs.points = [board.points[p]];
+        }
+      }
+    }
+  }
+  delete transformArgs.figure;
+
+  this.reflect = new transform(board, "reflect", transformArgs);
+  this.remove = function() {
+    for (p in this.points) {
+      if (this.points.hasOwnProperty(p)) {
+        board.points[p].setPosition(JXG.COORDS_BY_USER, this.points[p]);
+        board.update();
+      }
+    }
+  };
+  this.execute = function() {
+    transformArgs.points.forEach(function(p) {
+      Object.defineProperty(usrPoints, p.name, {
+        value: [
+          board.points[p.name].coords.usrCoords[1],
+          board.points[p.name].coords.usrCoords[2]
+        ],
+        enumerable: true
+      });
+    });
+    this.reflect.apply();
+    return args;
+  };
+};
+
+var shear = function(board, args) {
+  var args   = args || {
+    figure:  $('input[name="figure"]:last').val(),
+    degrees: parseInt($('input[name="degrees"]:last').val()),
+  },
+    usrPoints = this.points = {};  
+  var transformArgs = {};
+  for (arg in args) {
+    if (args.hasOwnProperty(arg)) {
+      transformArgs[arg] = args[arg];
+    }
+  }
+  transformArgs.points = [];
+
+  board.shapes.forEach(function(shape) {
+    if (shape.name == transformArgs.figure) {
+      transformArgs.points = shape.usrSetCoords;
+    }
+  });
+  delete transformArgs.figure;
+  this.shear = new transform(board, "shear", transformArgs);
+  this.remove = function() {
+    for (p in this.points) {
+      if (this.points.hasOwnProperty(p)) {
+        board.points[p].setPosition(JXG.COORDS_BY_USER, this.points[p]);
+        board.update();
+      }
+    }
+  };
+  this.execute = function() {
+    transformArgs.points.forEach(function(p) {
+      Object.defineProperty(usrPoints, p.name, {
+        value: [
+          board.points[p.name].coords.usrCoords[1],
+          board.points[p.name].coords.usrCoords[2]
+        ],
+        enumerable: true
+      });
+    });
+    this.shear.apply();
+    return args;
+  };
+};
+
+var translate = function(board, args) {
+  var args   = args || {
+    figure:  $('input[name="figure"]:last').val(),
+    values:  $('input[name="values"]:last').coord(),
+  },
+    usrPoints = this.points = {};  
+  var transformArgs = {};
+  for (arg in args) {
+    if (args.hasOwnProperty(arg)) {
+      transformArgs[arg] = args[arg];
+    }
+  }
+  transformArgs.points = [];
+  board.shapes.forEach(function(shape) {
+    if (shape.name == transformArgs.figure) {
+      transformArgs.points = shape.usrSetCoords;
+    }
+  });
+  // a single point
+  if (!transformArgs.points.length) {
+    for(p in board.points) {
+      if (board.points.hasOwnProperty(p)) {
+        if (board.points[p].name + '0' == transformArgs.figure) {
+          transformArgs.points = [board.points[p]];
+        }
+      }
+    }
+  }
+  delete transformArgs.figure;
+  this.translate = new transform(board, "translate", transformArgs);
+  this.remove    = function() {
+    for (p in this.points) {
+      if (this.points.hasOwnProperty(p)) {
+        board.points[p].setPosition(JXG.COORDS_BY_USER, this.points[p]);
+        board.update();
+      }
+    }
+  };
+  this.execute = function() {
+    transformArgs.points.forEach(function(p) {
+      Object.defineProperty(usrPoints, p.name, {
+        value: [
+          board.points[p.name].coords.usrCoords[1],
+          board.points[p.name].coords.usrCoords[2]
+        ],
+        enumerable: true
+      });
+    });
+    this.translate.apply();
+    return args;
+  };
+};
+
+var drag = function(board, args) {
+  var args     = args,
+    usrPoints  = this.points = {}; 
+  var transformArgs = {};
+  for (arg in args) {
+    if (args.hasOwnProperty(arg)) {
+      transformArgs[arg] = args[arg];
+    }
+  }
+  transformArgs = $.extend(true, {}, args);
+  transformArgs.points = [];
+  board.shapes.forEach(function(shape) {
+    if (shape.name == transformArgs.figure) {
+      transformArgs.points = shape.usrSetCoords;
+    }
+  });
+  if (!this.initial) {
+    this.initial = transformArgs.initial;
+  }
+  // a single point
+  if (!transformArgs.points.length) {
+    transformArgs.points.push(board.points[transformArgs.figure]);
+  }
+  delete transformArgs.figure;
+  delete transformArgs.initial;
+  this.translate = new transform(board, "translate", transformArgs);
+  this.apply = function(p, where) {
+    var c, len, i;
+    if (!p instanceof Array) {
+      p = [p];
+    }
+    len = p.length;
+    for (i = 0; i < len; i++) {
+      c = where.pop();
+      p[i].moveTo(c);
+     board.update();
+   }
+  };
+  this.remove    = function() {
+    this.apply(transformArgs.points, this.initial);
+  };
+  this.execute = function() {
+    transformArgs.points.forEach(function(p) {
+      Object.defineProperty(usrPoints, p.name, {
+        value: [
+          board.points[p.name].coords.usrCoords[1],
+          board.points[p.name].coords.usrCoords[2]
+        ],
+        enumerable: true
+      });
+    });
+    this.translate.apply();
+    return args;
+  };
+};
+
+
+var scale = function(board, args) {
+  var args   = args || {
+    figure:  $('input[name="figure"]:last').val(),
+    values:  $('input[name="values"]:last').coord(),
+  },
+    usrPoints = this.points = {};  
+  var transformArgs = {};
+  for (arg in args) {
+    if (args.hasOwnProperty(arg)) {
+      transformArgs[arg] = args[arg];
+    }
+  }
+  transformArgs.points = [];
+
+  board.shapes.forEach(function(shape) {
+    if (shape.name == transformArgs.figure) {
+      transformArgs.points = shape.usrSetCoords;
+    }
+  });
+  delete transformArgs.figure;
+  this.scale = new transform(board, "scale", transformArgs);
+  this.remove    = function() {
+    for (p in this.points) {
+      if (this.points.hasOwnProperty(p)) {
+        board.points[p].setPosition(JXG.COORDS_BY_USER, this.points[p]);
+        board.update();
+      }
+    }
+  };
+  this.execute = function() {
+    transformArgs.points.forEach(function(p) {
+      Object.defineProperty(usrPoints, p.name, {
+        value: [
+          board.points[p.name].coords.usrCoords[1],
+          board.points[p.name].coords.usrCoords[2]
+        ],
+        enumerable: true
+      });
+    });
+    this.scale.apply();
+    return args
+  };
+};
+
+module.exports = {
+  rotate:    rotate,
+  reflect:   reflect,
+  shear:     shear,
+  drag:      drag,
+  translate: translate,
+  scale:     scale
+};
+},{"../board/transform":35,"../helper/coords":36}],29:[function(require,module,exports){
 var element = require('../board/element'),
     coords  = require('../helper/coords')();
 
@@ -6822,275 +7260,7 @@ module.exports = {
   point: point,
   text: text
 };
-},{"../board/element":33,"../helper/coords":34}],27:[function(require,module,exports){
-var transform = require('../board/transform'),
-    coords    = require('../helper/coords')();
-
-/* Commands */
-
-/*--
-Interface Command {
-  public void   constructor(JSXGraph board, Object Arguments)
-  public void   remove()
-  public object execute()
-}
---*/
-
-var rotate = function(board, args) {
-  var args   = args || {
-    figure:  $('input[name="figure"]:last').val(),
-    center:  $('input[name="point"]:last').val(),
-    degrees: parseInt($('input[name="degrees"]:last').val()),
-  },
-    usrPoints = this.points = {};  
-  var transformArgs = {};
-  for (arg in args) {
-    if (args.hasOwnProperty(arg)) {
-      transformArgs[arg] = args[arg];
-    }
-  }
-  transformArgs.points = [];
-  board.shapes.forEach(function(shape) {
-    if (shape.name == transformArgs.figure) {
-      transformArgs.points = shape.usrSetCoords;
-    }
-  });
-  delete transformArgs.figure;
-  this.rotate = new transform(board, "rotate", transformArgs);
-  this.remove = function() {
-    for (p in this.points) {
-      if (this.points.hasOwnProperty(p)) {
-        board.points[p].update();
-        board.points[p].setPosition(JXG.COORDS_BY_USER, this.points[p]);
-        board.update();
-      }
-    }
-  };
-  this.execute = function() {
-    transformArgs.points.forEach(function(p) {
-      Object.defineProperty(usrPoints, p.name, {
-        value: [
-          board.points[p.name].coords.usrCoords[1],
-          board.points[p.name].coords.usrCoords[2]
-        ],
-        enumerable: true
-      });
-    });
-    this.rotate.apply();
-    return args;
-  };
-};
-
-var reflect = function(board, args) {
-  var args   = args || {
-    figure:  $('input[name="figure"]:last').val(),
-    line:    $('input[name="axis"]:last').val(),
-  },
-    usrPoints = this.points = {};  
-  var transformArgs = {};
-  for (arg in args) {
-    if (args.hasOwnProperty(arg)) {
-      transformArgs[arg] = args[arg];
-    }
-  }
-  this.line = transformArgs.line;
-  transformArgs.points = [];
-  if (transformArgs.line.toLowerCase() == "x") {
-    transformArgs.line = board.axx;
-  } else {
-    transformArgs.line = board.axy;
-  }
-  board.shapes.forEach(function(shape) {
-    if (shape.name == transformArgs.figure) {
-      transformArgs.points = shape.usrSetCoords;
-    }
-  });
-  // a single point
-  if (!transformArgs.points.length) {
-    for(p in board.points) {
-      if (board.points.hasOwnProperty(p)) {
-        if (board.points[p].name + '0' == transformArgs.figure) {
-          transformArgs.points = [board.points[p]];
-        }
-      }
-    }
-  }
-  delete transformArgs.figure;
-
-  this.reflect = new transform(board, "reflect", transformArgs);
-  this.remove = function() {
-    for (p in this.points) {
-      if (this.points.hasOwnProperty(p)) {
-        board.points[p].setPosition(JXG.COORDS_BY_USER, this.points[p]);
-        board.update();
-      }
-    }
-  };
-  this.execute = function() {
-    transformArgs.points.forEach(function(p) {
-      Object.defineProperty(usrPoints, p.name, {
-        value: [
-          board.points[p.name].coords.usrCoords[1],
-          board.points[p.name].coords.usrCoords[2]
-        ],
-        enumerable: true
-      });
-    });
-    this.reflect.apply();
-    return args;
-  };
-};
-
-var shear = function(board, args) {
-  var args   = args || {
-    figure:  $('input[name="figure"]:last').val(),
-    degrees: parseInt($('input[name="degrees"]:last').val()),
-  },
-    usrPoints = this.points = {};  
-  var transformArgs = {};
-  for (arg in args) {
-    if (args.hasOwnProperty(arg)) {
-      transformArgs[arg] = args[arg];
-    }
-  }
-  transformArgs.points = [];
-
-  board.shapes.forEach(function(shape) {
-    if (shape.name == transformArgs.figure) {
-      transformArgs.points = shape.usrSetCoords;
-    }
-  });
-  delete transformArgs.figure;
-  this.shear = new transform(board, "shear", transformArgs);
-  this.remove = function() {
-    for (p in this.points) {
-      if (this.points.hasOwnProperty(p)) {
-        board.points[p].setPosition(JXG.COORDS_BY_USER, this.points[p]);
-        board.update();
-      }
-    }
-  };
-  this.execute = function() {
-    transformArgs.points.forEach(function(p) {
-      Object.defineProperty(usrPoints, p.name, {
-        value: [
-          board.points[p.name].coords.usrCoords[1],
-          board.points[p.name].coords.usrCoords[2]
-        ],
-        enumerable: true
-      });
-    });
-    this.shear.apply();
-    return args;
-  };
-};
-
-var translate = function(board, args) {
-  var args   = args || {
-    figure:  $('input[name="figure"]:last').val(),
-    values:  $('input[name="values"]:last').coord(),
-  },
-    usrPoints = this.points = {};  
-  var transformArgs = {};
-  for (arg in args) {
-    if (args.hasOwnProperty(arg)) {
-      transformArgs[arg] = args[arg];
-    }
-  }
-  transformArgs.points = [];
-
-  board.shapes.forEach(function(shape) {
-    if (shape.name == transformArgs.figure) {
-      transformArgs.points = shape.usrSetCoords;
-    }
-  });
-  // a single point
-  if (!transformArgs.points.length) {
-    for(p in board.points) {
-      if (board.points.hasOwnProperty(p)) {
-        if (board.points[p].name + '0' == transformArgs.figure) {
-          transformArgs.points = [board.points[p]];
-        }
-      }
-    }
-  }
-  delete transformArgs.figure;
-  this.translate = new transform(board, "translate", transformArgs);
-  this.remove    = function() {
-    for (p in this.points) {
-      if (this.points.hasOwnProperty(p)) {
-        board.points[p].setPosition(JXG.COORDS_BY_USER, this.points[p]);
-        board.update();
-      }
-    }
-  };
-  this.execute = function() {
-    transformArgs.points.forEach(function(p) {
-      Object.defineProperty(usrPoints, p.name, {
-        value: [
-          board.points[p.name].coords.usrCoords[1],
-          board.points[p.name].coords.usrCoords[2]
-        ],
-        enumerable: true
-      });
-    });
-    this.translate.apply();
-    return args;
-  };
-};
-
-var scale = function(board, args) {
-  var args   = args || {
-    figure:  $('input[name="figure"]:last').val(),
-    values:  $('input[name="values"]:last').coord(),
-  },
-    usrPoints = this.points = {};  
-  var transformArgs = {};
-  for (arg in args) {
-    if (args.hasOwnProperty(arg)) {
-      transformArgs[arg] = args[arg];
-    }
-  }
-  transformArgs.points = [];
-
-  board.shapes.forEach(function(shape) {
-    if (shape.name == transformArgs.figure) {
-      transformArgs.points = shape.usrSetCoords;
-    }
-  });
-  delete transformArgs.figure;
-  this.scale = new transform(board, "scale", transformArgs);
-  this.remove    = function() {
-    for (p in this.points) {
-      if (this.points.hasOwnProperty(p)) {
-        board.points[p].setPosition(JXG.COORDS_BY_USER, this.points[p]);
-        board.update();
-      }
-    }
-  };
-  this.execute = function() {
-    transformArgs.points.forEach(function(p) {
-      Object.defineProperty(usrPoints, p.name, {
-        value: [
-          board.points[p.name].coords.usrCoords[1],
-          board.points[p.name].coords.usrCoords[2]
-        ],
-        enumerable: true
-      });
-    });
-    this.scale.apply();
-    return args
-  };
-};
-
-module.exports = {
-  rotate:    rotate,
-  reflect:   reflect,
-  shear:     shear,
-  translate: translate,
-  scale:     scale
-};
-},{"../board/transform":35,"../helper/coords":34}],29:[function(require,module,exports){
+},{"../board/element":37,"../helper/coords":36}],31:[function(require,module,exports){
 var func    = require('../board/functions/functions'),
     Parser  = require('../board/functions/parser'),
     element = require('../board/element');  
@@ -7306,7 +7476,7 @@ module.exports = {
   angle: angle,
   area:  area
 };
-},{"../board/functions/functions":36,"../board/functions/parser":25,"../board/element":33}],32:[function(require,module,exports){
+},{"../board/functions/functions":38,"../board/functions/parser":26,"../board/element":37}],34:[function(require,module,exports){
 /*
  * Geometry Function Tokenizer
  */
@@ -7568,7 +7738,7 @@ BoardTransform.prototype = (function() {
 })();
 
 module.exports = BoardTransform;
-},{}],34:[function(require,module,exports){
+},{}],36:[function(require,module,exports){
 module.exports = function() {
   jQuery.fn.coord = function() {
     if (this.val()) {
@@ -7582,7 +7752,7 @@ module.exports = function() {
   };
 };
 
-},{}],36:[function(require,module,exports){
+},{}],38:[function(require,module,exports){
 /* GeometryFunction Factory */
 
 var GeometryFunction = function(JXG, func, options) {
@@ -7710,7 +7880,7 @@ GeometryFunction.prototype = (function() {
 })();
 
 module.exports = GeometryFunction;
-},{}],33:[function(require,module,exports){
+},{}],37:[function(require,module,exports){
 var point = require('./point'),
     shape = require('./shape')
 
@@ -7878,7 +8048,9 @@ BoardElement.prototype = (function() {
       vertices.push(new point(this.board, this.options[i]).add());
     }
     vertices.push(vertices);
-    return new shape(this.board, "polygon", vertices).add();
+    var polygon = new shape(this.board, "polygon", vertices).add();
+    polygon.hasInnerPoints  = true;
+    return polygon;
   };
 
   //-----------------------------------------------------------------------
@@ -7942,7 +8114,7 @@ BoardElement.prototype = (function() {
 })();
 
 module.exports = BoardElement; 
-},{"./point":37,"./shape":38}],37:[function(require,module,exports){
+},{"./point":39,"./shape":40}],39:[function(require,module,exports){
 var Point = function(board, coords) {
   this.board  = board;
   this.coords = coords;
@@ -7974,6 +8146,9 @@ Point.prototype = (function() {
           {value: p,
            enumerable:   true,
            configurable: true});
+        // prevent dilation
+        p.on("mousedown", (require("../helper/drag")));
+        p.on("mouseout",  function(e) { this.isDraggable = true; });
         return p;
       } else {
         return point;
@@ -7984,7 +8159,7 @@ Point.prototype = (function() {
 })();
 
 module.exports = Point;
-},{}],38:[function(require,module,exports){
+},{"../helper/drag":14}],40:[function(require,module,exports){
 var Shape = function(board, shape, parents, options) {
   this.board   = board;
   this.shape   = shape;
@@ -8001,11 +8176,13 @@ Shape.prototype = (function() {
   return {
     Constructor: Shape,
     add: function() {
-      this.options.name      = this.options.name || createShapeLabel.call(this);
-      this.options.withLabel = true;
+      this.options.name           = this.options.name || createShapeLabel.call(this);
+      this.options.withLabel      = true;
+      this.options.hasInnerPoints = true;
       var points = this.parents.pop(), // full list of points 
           s      = this.board.create(this.shape, this.parents, this.options);
       s.usrSetCoords = points;
+      s.on("mouseover", (require("../helper/drag")));
       this.board.shapes.push(s);
       return s;
     }
@@ -8014,5 +8191,5 @@ Shape.prototype = (function() {
 
 
 module.exports = Shape;
-},{}]},{},[1])
+},{"../helper/drag":14}]},{},[1])
 ;
