@@ -30,6 +30,15 @@ module.exports = function(Operation) {
       recorded.push(this.commands[this.commands.length - 1]);
     }
   };
+  
+  var store = Operation.prototype.store;
+  // proxy
+  Operation.prototype.store = function() {
+    store.apply(this, arguments);
+    if (recording) {
+      recorded.push(this.commands[this.commands.length - 1]);
+    }
+  };
 
   var remove = Operation.prototype.undoLastExecute;
   // proxy

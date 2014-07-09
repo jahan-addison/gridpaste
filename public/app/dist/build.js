@@ -27,9 +27,9 @@ $(function() {
   })();
   if (!$('#application').hasClass('paste')) {
     /* Subscribe to application */
-    var App = window.App = require('./subscribe')(board);
+    var App = require('./subscribe')(board);
     require('./helper/helpers')  (App, board);  /* various UI helpers */
-    require('./decorators/mouse')(App);         /* drag decoration */
+    require('./decorators/mouse')(App);         /* dragging decoration */
   } else {
     /* Play Paste */
     require('./helper/play')($AppPaste, board);
@@ -151,7 +151,7 @@ module.exports = function(App, board) {
     });
   }
 };
-},{"../events/run":19,"../iterate":20,"./position":21}],10:[function(require,module,exports){
+},{"../iterate":19,"../events/run":20,"./position":21}],10:[function(require,module,exports){
 module.exports = function() {
   $(function() {
     var points = 3;
@@ -252,7 +252,7 @@ module.exports = function(App) {
     }
   });
 };
-},{}],20:[function(require,module,exports){
+},{}],19:[function(require,module,exports){
 /* The Iterator */
 
 var Iterator = function(List) {
@@ -379,7 +379,6 @@ Object.defineProperty(Operation.prototype, "last", {
 
 Operation.prototype.store = function(command, args) {
   var $command =  new command.command(this.board, args);
-  $command.execute();
   this.commands.push({
     arguments:   args,
     'command':   $command,
@@ -487,7 +486,7 @@ module.exports = function(App) {
       console.log("Error: %s", e.message);
     });
 };
-},{"../events/run":19,"../helper/slider":23,"../helper/validate":24,"../../components/rxjs/rx.lite":25}],8:[function(require,module,exports){
+},{"../events/run":20,"../helper/slider":23,"../helper/validate":24,"../../components/rxjs/rx.lite":25}],8:[function(require,module,exports){
 var command    = require('../events/run'),
     Parser     = require('../board/functions/parser'),
     Rx         = require('../../components/rxjs/rx.lite').Rx;
@@ -539,7 +538,7 @@ module.exports = function(App) {
     console.log("Error: %s", e.message);
   });
 };
-},{"../events/run":19,"../board/functions/parser":26,"../../components/rxjs/rx.lite":25}],9:[function(require,module,exports){
+},{"../events/run":20,"../board/functions/parser":26,"../../components/rxjs/rx.lite":25}],9:[function(require,module,exports){
 var command    = require('../events/run'),
     Rx         = require('../../components/rxjs/rx.lite').Rx;
 
@@ -575,7 +574,7 @@ module.exports = function(App, board) {
   });
 
 }
-},{"../events/run":19,"../../components/rxjs/rx.lite":25}],13:[function(require,module,exports){
+},{"../events/run":20,"../../components/rxjs/rx.lite":25}],13:[function(require,module,exports){
 var execute = require('../operation');
 
 module.exports = function(App) {
@@ -619,6 +618,10 @@ module.exports = function(e) {
     && typeof this.usrSetCoords === 'undefined')) {
     return false;
   }
+  if (this instanceof JXG.Text === true) {
+    this.isDraggable = false;
+    return false;
+  }
   // check the type of point
   if (this instanceof JXG.Point === true) {
     if (Object.keys(this.childElements).length > 1) {
@@ -626,37 +629,49 @@ module.exports = function(e) {
       return false;
     }
   }
-  initialX = e.srcApp.board.points[this.usrSetCoords[0].name].X();
-  initialY = e.srcApp.board.points[this.usrSetCoords[0].name].Y();
-  initial  = this.usrSetCoords.map(function(m) {
-    return [e.srcApp.board.points[m.name].X(), e.srcApp.board.points[m.name].Y()];
-  });
-  console.log(initial);
+  if (typeof this.usrSetCoords !== 'undefined') {
+    initialX = e.srcApp.board.points[this.usrSetCoords[0].name].X();
+    initialY = e.srcApp.board.points[this.usrSetCoords[0].name].Y();
+    initial  = this.usrSetCoords.map(function(m) {
+      return [e.srcApp.board.points[m.name].X(), e.srcApp.board.points[m.name].Y()];
+    });    
+  } else {
+    initialX = e.srcApp.board.points[this.name].X();
+    initialY = e.srcApp.board.points[this.name].Y();
+    initial  = [[initialX, initialY]];   
+  }
   this.on('drag', function(e) { 
     e.preventDefault();
-    this.on("mouseup", function(e) {
-      if (last.length === 0) {
-        last = [e.x,e.y];
+  });
+  this.on("mouseup", function(e) {
+    if (last.length === 0) {
+      last = [e.x,e.y];
+    } else {
+      if (e.x == last[0] && e.y == last[1]) {
+        return;
       } else {
-        if (e.x == last[0] && e.y == last[1]) {
-          return;
-        } else {
-          last = [e.x, e.y];
-        }
+        last = [e.x, e.y];
       }
-     // console.log(initialX, this.usrSetCoords[0].X());
-      var distanceX = this.X() || this.usrSetCoords[0].X() - initialX,
-          distanceY = this.Y() || this.usrSetCoords[0].Y() - initialY;
-      var drag = transform.drag;
-      e.srcApp.store({
-        targetOperation: 'transform',
-        targetCommand:   'drag',
-        command:          drag
-      }, {
-        figure: this.name,
-        initial: initial,
-        values: [distanceX, distanceY]
-      });
+    }
+    var distanceX,
+        distanceY;
+    if (typeof this.X !== 'function') {
+      distanceX = this.usrSetCoords[0].X() - initialX;
+      distanceY = this.usrSetCoords[0].Y() - initialY;
+    } else {
+      distanceX = this.X()  - initialX;
+      distanceY = this.Y()  - initialY;      
+    }
+
+    var drag = transform.drag;
+    e.srcApp.store({
+      targetOperation: 'transform',
+      targetCommand:   'drag',
+      command:          drag
+    }, {
+      figure: this.name,
+      initial: initial,
+      values: [distanceX, distanceY]
     });
   });
 };
@@ -773,7 +788,7 @@ module.exports = function(App) {
     }
   });
 };
-},{"../events/run":19,"../../components/mousetrap/mousetrap.min":28}],19:[function(require,module,exports){
+},{"../events/run":20,"../../components/mousetrap/mousetrap.min":28}],20:[function(require,module,exports){
 
 module.exports = {
   draw:      require('./draw'),
@@ -813,6 +828,15 @@ module.exports = function(Operation) {
   // proxy
   Operation.prototype.storeAndExecute = function() {
     execute.apply(this, arguments);
+    if (recording) {
+      recorded.push(this.commands[this.commands.length - 1]);
+    }
+  };
+  
+  var store = Operation.prototype.store;
+  // proxy
+  Operation.prototype.store = function() {
+    store.apply(this, arguments);
     if (recording) {
       recorded.push(this.commands[this.commands.length - 1]);
     }
@@ -6925,42 +6949,42 @@ var drag = function(board, args) {
       transformArgs[arg] = args[arg];
     }
   }
+  transformArgs = $.extend(true, {}, args);
   transformArgs.points = [];
   board.shapes.forEach(function(shape) {
     if (shape.name == transformArgs.figure) {
       transformArgs.points = shape.usrSetCoords;
     }
   });
+  if (!this.initial) {
+    this.initial = transformArgs.initial;
+  }
   // a single point
   if (!transformArgs.points.length) {
-    for(p in board.points) {
-      if (board.points.hasOwnProperty(p)) {
-        if (board.points[p].name + '0' == transformArgs.figure) {
-          transformArgs.points = [board.points[p]];
-        }
-      }
-    }
+    transformArgs.points.push(board.points[transformArgs.figure]);
   }
-  this.distance = args.values;
   delete transformArgs.figure;
+  delete transformArgs.initial;
   this.translate = new transform(board, "translate", transformArgs);
-  this.apply = function(p, distance, t) {
+  this.apply = function(p, where) {
     var c, len, i;
+    console.log(where);
     if (!p instanceof Array) {
       p = [p];
     }
     len = p.length;
     for (i = 0; i < len; i++) {
-    board.update();
-      p[i].moveTo([p[i].coords.usrCoords[1] - (distance[0] * 2), p[i].coords.usrCoords[2] - (distance[1] * 2)]);
-    }
-    board.update();
+      c = where.pop();
+      p[i].moveTo(c);
+     board.update();
+   }
   };
   this.remove    = function() {
-    this.apply(transformArgs.points, this.distance);
+    this.apply(transformArgs.points, this.initial);
   };
   this.execute = function() {
-     transformArgs.points.forEach(function(p) {
+  console.log(transformArgs);
+    transformArgs.points.forEach(function(p) {
       Object.defineProperty(usrPoints, p.name, {
         value: [
           board.points[p.name].coords.usrCoords[1],
