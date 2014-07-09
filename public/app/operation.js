@@ -16,7 +16,6 @@ Object.defineProperty(Operation.prototype, "last", {
 
 Operation.prototype.store = function(command, args) {
   var $command =  new command.command(this.board, args);
-  $command.execute();
   this.commands.push({
     arguments:   args,
     'command':   $command,
