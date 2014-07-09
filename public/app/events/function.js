@@ -60,6 +60,8 @@ var angle = function(board, args) {
   };
 };
 
+//-----------------------------------------------------------------------
+
 var area = function(board, args) {
   var parse;
   if (typeof args === 'undefined') {
@@ -94,6 +96,9 @@ var area = function(board, args) {
     throw new Error("unrecognized structure to compute area");
   }
 };
+
+//-----------------------------------------------------------------------
+
 
 var CircleArea  = function(board, args) {
   if (typeof args === 'undefined') {
@@ -208,6 +213,8 @@ var PolygonArea = function(board, args) {
       board.shapes.pop();
   }; 
 };
+
+//-----------------------------------------------------------------------
 
 module.exports = {
   angle: angle,

@@ -21,6 +21,8 @@ var zoomIn = function(board, args) {
   }
 };
 
+//-----------------------------------------------------------------------
+
 var zoomOut = function(board, args) {
   this.remove = function() {
     board.zoomIn();

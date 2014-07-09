@@ -6471,6 +6471,8 @@ var zoomIn = function(board, args) {
   }
 };
 
+//-----------------------------------------------------------------------
+
 var zoomOut = function(board, args) {
   this.remove = function() {
     board.zoomIn();
@@ -6786,6 +6788,8 @@ var rotate = function(board, args) {
   };
 };
 
+//-----------------------------------------------------------------------
+
 var reflect = function(board, args) {
   var args   = args || {
     figure:  $('input[name="figure"]:last').val(),
@@ -6846,6 +6850,8 @@ var reflect = function(board, args) {
   };
 };
 
+//-----------------------------------------------------------------------
+
 var shear = function(board, args) {
   var args   = args || {
     figure:  $('input[name="figure"]:last').val(),
@@ -6889,6 +6895,8 @@ var shear = function(board, args) {
     return args;
   };
 };
+
+//-----------------------------------------------------------------------
 
 var translate = function(board, args) {
   var args   = args || {
@@ -6942,6 +6950,8 @@ var translate = function(board, args) {
     return args;
   };
 };
+
+//-----------------------------------------------------------------------
 
 var drag = function(board, args) {
   var args     = args,
@@ -6999,6 +7009,7 @@ var drag = function(board, args) {
   };
 };
 
+//-----------------------------------------------------------------------
 
 var scale = function(board, args) {
   var args   = args || {
@@ -7085,6 +7096,9 @@ var circle = function(board, args) {
   };
 };
 
+//-----------------------------------------------------------------------
+
+
 var angle = function(board, args) {
   var args = args || {
     point1: $('input[name="point1"]:last').coord(),
@@ -7108,6 +7122,8 @@ var angle = function(board, args) {
     return args;
   };
 };
+
+//-----------------------------------------------------------------------
 
 var arc = function(board, args) {
   var args = args || {
@@ -7133,6 +7149,8 @@ var arc = function(board, args) {
    };
 };
 
+//-----------------------------------------------------------------------
+
 var ellipse = function(board, args) {
   var args = args ||  {
     point1: $('input[name="point1"]:last').coord(),
@@ -7155,6 +7173,8 @@ var ellipse = function(board, args) {
   };
 };
 
+//-----------------------------------------------------------------------
+
 var segment = function(board, args) {
   var args = args || {
     point1: $('input[name="point1"]:last').coord(),
@@ -7175,6 +7195,8 @@ var segment = function(board, args) {
   };
 };
 
+//-----------------------------------------------------------------------
+
 var line = function(board, args) {
   var args = args || {
     point1: $('input[name="point1"]:last').coord(),
@@ -7194,6 +7216,8 @@ var line = function(board, args) {
     return args;
   };
 };
+
+//-----------------------------------------------------------------------
 
 var polygon = function(board, args) {
   var points   = 3,
@@ -7219,6 +7243,8 @@ var polygon = function(board, args) {
   };
 };
 
+//-----------------------------------------------------------------------
+
 var point = function(board, args) {
   var args = args || {
     point: $('input[name="point"]:last').coord(),
@@ -7233,6 +7259,8 @@ var point = function(board, args) {
     return args;
   };
 };
+
+//-----------------------------------------------------------------------
 
 var text = function(board, args) {
   var args = args || {
@@ -7326,6 +7354,8 @@ var angle = function(board, args) {
   };
 };
 
+//-----------------------------------------------------------------------
+
 var area = function(board, args) {
   var parse;
   if (typeof args === 'undefined') {
@@ -7360,6 +7390,9 @@ var area = function(board, args) {
     throw new Error("unrecognized structure to compute area");
   }
 };
+
+//-----------------------------------------------------------------------
+
 
 var CircleArea  = function(board, args) {
   if (typeof args === 'undefined') {
@@ -7474,6 +7507,8 @@ var PolygonArea = function(board, args) {
       board.shapes.pop();
   }; 
 };
+
+//-----------------------------------------------------------------------
 
 module.exports = {
   angle: angle,
@@ -7644,6 +7679,8 @@ BoardTransform.prototype = (function() {
     this.board.update();
   };
 
+  //-----------------------------------------------------------------------
+
   /*
   Options: {
     line:   Line line
@@ -7665,6 +7702,8 @@ BoardTransform.prototype = (function() {
     this.board.update();
   };
 
+  //-----------------------------------------------------------------------
+
   /*
   Options: {
     degrees: signed int
@@ -7684,6 +7723,8 @@ BoardTransform.prototype = (function() {
     transform.applyOnce(this.options.points);
     this.board.update();
   };
+
+  //-----------------------------------------------------------------------
 
   /*
   Options: {
@@ -7705,6 +7746,7 @@ BoardTransform.prototype = (function() {
     this.board.update();
   };
 
+  //-----------------------------------------------------------------------
 
   /*
   Options: {
