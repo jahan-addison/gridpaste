@@ -613,9 +613,12 @@ var last = [],
   initialY,
   initial;
 module.exports = function(e) {
-  if($('#application').hasClass('paste')
-  || (this instanceof JXG.Point === false
-    && typeof this.usrSetCoords === 'undefined')) {
+  if ($('#application').hasClass('paste')) {
+    this.isDraggable = false;
+    return false;
+  }
+  if(this instanceof JXG.Point === false
+    && typeof this.usrSetCoords === 'undefined') {
     return false;
   }
   if (this instanceof JXG.Text === true) {
