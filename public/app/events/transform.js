@@ -241,7 +241,6 @@ var drag = function(board, args) {
   this.translate = new transform(board, "translate", transformArgs);
   this.apply = function(p, where) {
     var c, len, i;
-    console.log(where);
     if (!p instanceof Array) {
       p = [p];
     }
@@ -256,7 +255,6 @@ var drag = function(board, args) {
     this.apply(transformArgs.points, this.initial);
   };
   this.execute = function() {
-  console.log(transformArgs);
     transformArgs.points.forEach(function(p) {
       Object.defineProperty(usrPoints, p.name, {
         value: [
