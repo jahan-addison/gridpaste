@@ -14,11 +14,13 @@ Shape.prototype = (function() {
   return {
     Constructor: Shape,
     add: function() {
-      this.options.name      = this.options.name || createShapeLabel.call(this);
-      this.options.withLabel = true;
+      this.options.name           = this.options.name || createShapeLabel.call(this);
+      this.options.withLabel      = true;
+      this.options.hasInnerPoints = true;
       var points = this.parents.pop(), // full list of points 
           s      = this.board.create(this.shape, this.parents, this.options);
       s.usrSetCoords = points;
+      s.on("mouseover", (require("../helper/drag")));
       this.board.shapes.push(s);
       return s;
     }

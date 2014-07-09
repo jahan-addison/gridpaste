@@ -29,6 +29,9 @@ Point.prototype = (function() {
           {value: p,
            enumerable:   true,
            configurable: true});
+        // prevent dilation
+        p.on("mousedown", (require("../helper/drag")));
+        p.on("mouseout",  function(e) { this.isDraggable = true; });
         return p;
       } else {
         return point;

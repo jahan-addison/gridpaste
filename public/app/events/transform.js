@@ -173,7 +173,6 @@ var translate = function(board, args) {
     }
   }
   transformArgs.points = [];
-
   board.shapes.forEach(function(shape) {
     if (shape.name == transformArgs.figure) {
       transformArgs.points = shape.usrSetCoords;
@@ -213,6 +212,65 @@ var translate = function(board, args) {
     return args;
   };
 };
+
+var drag = function(board, args) {
+  var args     = args,
+    usrPoints  = this.points = {}; 
+  var transformArgs = {};
+  for (arg in args) {
+    if (args.hasOwnProperty(arg)) {
+      transformArgs[arg] = args[arg];
+    }
+  }
+  transformArgs.points = [];
+  board.shapes.forEach(function(shape) {
+    if (shape.name == transformArgs.figure) {
+      transformArgs.points = shape.usrSetCoords;
+    }
+  });
+  // a single point
+  if (!transformArgs.points.length) {
+    for(p in board.points) {
+      if (board.points.hasOwnProperty(p)) {
+        if (board.points[p].name + '0' == transformArgs.figure) {
+          transformArgs.points = [board.points[p]];
+        }
+      }
+    }
+  }
+  this.distance = args.values;
+  delete transformArgs.figure;
+  this.translate = new transform(board, "translate", transformArgs);
+  this.apply = function(p, distance, t) {
+    var c, len, i;
+    if (!p instanceof Array) {
+      p = [p];
+    }
+    len = p.length;
+    for (i = 0; i < len; i++) {
+    board.update();
+      p[i].moveTo([p[i].coords.usrCoords[1] - (distance[0] * 2), p[i].coords.usrCoords[2] - (distance[1] * 2)]);
+    }
+    board.update();
+  };
+  this.remove    = function() {
+    this.apply(transformArgs.points, this.distance);
+  };
+  this.execute = function() {
+     transformArgs.points.forEach(function(p) {
+      Object.defineProperty(usrPoints, p.name, {
+        value: [
+          board.points[p.name].coords.usrCoords[1],
+          board.points[p.name].coords.usrCoords[2]
+        ],
+        enumerable: true
+      });
+    });
+    this.translate.apply();
+    return args;
+  };
+};
+
 
 var scale = function(board, args) {
   var args   = args || {
@@ -262,6 +320,7 @@ module.exports = {
   rotate:    rotate,
   reflect:   reflect,
   shear:     shear,
+  drag:      drag,
   translate: translate,
   scale:     scale
 };

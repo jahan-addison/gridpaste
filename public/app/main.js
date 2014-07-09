@@ -2,7 +2,6 @@ $(function() {
   'use strict';
   var board;
   (function() {
-    var $paste = $('#application').hasClass('paste');
     var xx =  $(window).width()  / 17,
         yy =  $(window).height() / 15.7;   
     /* Board Options */
@@ -10,7 +9,7 @@ $(function() {
     JXG.Options.angle.radius        = 25;
     JXG.Options.polygon.fillOpacity = 0.46;
     JXG.Options.polygon.fillColor   = "#0ece16";
-    JXG.Options.elements.fixed      = true;
+    JXG.Options.elements.fixed      = false;
     board  = JXG.JSXGraph.initBoard('grid', {
       boundingbox:     [-xx,yy,xx,-yy],
       keepaspectratio: true,
@@ -23,19 +22,13 @@ $(function() {
     board.yy     = yy;
     board.axx    = board.create('axis',[[0,0],[1,0]]);
     board.axy    = board.create('axis',[[0,0],[0,1]]);
-    if (!$paste) {
-      /* Show coordinates at cursor */
-      require('./helper/mouse')(board);
-    }
     board.unsuspendUpdate();    
   })();
   if (!$('#application').hasClass('paste')) {
     /* Subscribe to application */
-    var App = require('./subscribe')(board);
-    /* keyboard bindings */
-    require('./helper/bindings')(App);
-    // prevent 'dirty board'
-    require('./helper/dirty')(App);
+    var App = window.App = require('./subscribe')(board);
+    require('./helper/helpers')  (App, board);  /* various UI helpers */
+    require('./decorators/mouse')(App);         /* drag decoration */
   } else {
     /* Play Paste */
     require('./helper/play')($AppPaste, board);
