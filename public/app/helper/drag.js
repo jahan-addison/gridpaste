@@ -9,6 +9,10 @@ module.exports = function(e) {
     && typeof this.usrSetCoords === 'undefined')) {
     return false;
   }
+  if (this instanceof JXG.Text === true) {
+    this.isDraggable = false;
+    return false;
+  }
   // check the type of point
   if (this instanceof JXG.Point === true) {
     if (Object.keys(this.childElements).length > 1) {
@@ -16,37 +20,49 @@ module.exports = function(e) {
       return false;
     }
   }
-  initialX = e.srcApp.board.points[this.usrSetCoords[0].name].X();
-  initialY = e.srcApp.board.points[this.usrSetCoords[0].name].Y();
-  initial  = this.usrSetCoords.map(function(m) {
-    return [e.srcApp.board.points[m.name].X(), e.srcApp.board.points[m.name].Y()];
-  });
-  console.log(initial);
+  if (typeof this.usrSetCoords !== 'undefined') {
+    initialX = e.srcApp.board.points[this.usrSetCoords[0].name].X();
+    initialY = e.srcApp.board.points[this.usrSetCoords[0].name].Y();
+    initial  = this.usrSetCoords.map(function(m) {
+      return [e.srcApp.board.points[m.name].X(), e.srcApp.board.points[m.name].Y()];
+    });    
+  } else {
+    initialX = e.srcApp.board.points[this.name].X();
+    initialY = e.srcApp.board.points[this.name].Y();
+    initial  = [[initialX, initialY]];   
+  }
   this.on('drag', function(e) { 
     e.preventDefault();
-    this.on("mouseup", function(e) {
-      if (last.length === 0) {
-        last = [e.x,e.y];
+  });
+  this.on("mouseup", function(e) {
+    if (last.length === 0) {
+      last = [e.x,e.y];
+    } else {
+      if (e.x == last[0] && e.y == last[1]) {
+        return;
       } else {
-        if (e.x == last[0] && e.y == last[1]) {
-          return;
-        } else {
-          last = [e.x, e.y];
-        }
+        last = [e.x, e.y];
       }
-     // console.log(initialX, this.usrSetCoords[0].X());
-      var distanceX = this.X() || this.usrSetCoords[0].X() - initialX,
-          distanceY = this.Y() || this.usrSetCoords[0].Y() - initialY;
-      var drag = transform.drag;
-      e.srcApp.store({
-        targetOperation: 'transform',
-        targetCommand:   'drag',
-        command:          drag
-      }, {
-        figure: this.name,
-        initial: initial,
-        values: [distanceX, distanceY]
-      });
+    }
+    var distanceX,
+        distanceY;
+    if (typeof this.X !== 'function') {
+      distanceX = this.usrSetCoords[0].X() - initialX;
+      distanceY = this.usrSetCoords[0].Y() - initialY;
+    } else {
+      distanceX = this.X()  - initialX;
+      distanceY = this.Y()  - initialY;      
+    }
+
+    var drag = transform.drag;
+    e.srcApp.store({
+      targetOperation: 'transform',
+      targetCommand:   'drag',
+      command:          drag
+    }, {
+      figure: this.name,
+      initial: initial,
+      values: [distanceX, distanceY]
     });
   });
 };

@@ -222,42 +222,42 @@ var drag = function(board, args) {
       transformArgs[arg] = args[arg];
     }
   }
+  transformArgs = $.extend(true, {}, args);
   transformArgs.points = [];
   board.shapes.forEach(function(shape) {
     if (shape.name == transformArgs.figure) {
       transformArgs.points = shape.usrSetCoords;
     }
   });
+  if (!this.initial) {
+    this.initial = transformArgs.initial;
+  }
   // a single point
   if (!transformArgs.points.length) {
-    for(p in board.points) {
-      if (board.points.hasOwnProperty(p)) {
-        if (board.points[p].name + '0' == transformArgs.figure) {
-          transformArgs.points = [board.points[p]];
-        }
-      }
-    }
+    transformArgs.points.push(board.points[transformArgs.figure]);
   }
-  this.distance = args.values;
   delete transformArgs.figure;
+  delete transformArgs.initial;
   this.translate = new transform(board, "translate", transformArgs);
-  this.apply = function(p, distance, t) {
+  this.apply = function(p, where) {
     var c, len, i;
+    console.log(where);
     if (!p instanceof Array) {
       p = [p];
     }
     len = p.length;
     for (i = 0; i < len; i++) {
-    board.update();
-      p[i].moveTo([p[i].coords.usrCoords[1] - (distance[0] * 2), p[i].coords.usrCoords[2] - (distance[1] * 2)]);
-    }
-    board.update();
+      c = where.pop();
+      p[i].moveTo(c);
+     board.update();
+   }
   };
   this.remove    = function() {
-    this.apply(transformArgs.points, this.distance);
+    this.apply(transformArgs.points, this.initial);
   };
   this.execute = function() {
-     transformArgs.points.forEach(function(p) {
+  console.log(transformArgs);
+    transformArgs.points.forEach(function(p) {
       Object.defineProperty(usrPoints, p.name, {
         value: [
           board.points[p.name].coords.usrCoords[1],
