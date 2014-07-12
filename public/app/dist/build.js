@@ -744,12 +744,15 @@ module.exports = function(App) {
       if (!App.length) {
         return;
       }
-      var target   = App.last.toString.split('.'),
-          $command = {
-            targetOperation: target[0],
-            targetCommand:   target[1],
-            command:         command[target[0]][target[1]] 
-          };
+      var target   = App.last.toString.split('.');
+      if (target[1] == 'drag') {
+        return false;
+      }
+      var $command = {
+        targetOperation: target[0],
+        targetCommand:   target[1],
+        command:         command[target[0]][target[1]] 
+      };
       try {
         App.storeAndExecute($command, App.last.arguments);
       } catch(e) {
