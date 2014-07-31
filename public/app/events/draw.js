@@ -30,6 +30,9 @@ var circle = function(board, args) {
   };
 };
 
+//-----------------------------------------------------------------------
+
+
 var angle = function(board, args) {
   var args = args || {
     point1: $('input[name="point1"]:last').coord(),
@@ -53,6 +56,8 @@ var angle = function(board, args) {
     return args;
   };
 };
+
+//-----------------------------------------------------------------------
 
 var arc = function(board, args) {
   var args = args || {
@@ -78,6 +83,8 @@ var arc = function(board, args) {
    };
 };
 
+//-----------------------------------------------------------------------
+
 var ellipse = function(board, args) {
   var args = args ||  {
     point1: $('input[name="point1"]:last').coord(),
@@ -100,6 +107,8 @@ var ellipse = function(board, args) {
   };
 };
 
+//-----------------------------------------------------------------------
+
 var segment = function(board, args) {
   var args = args || {
     point1: $('input[name="point1"]:last').coord(),
@@ -120,6 +129,8 @@ var segment = function(board, args) {
   };
 };
 
+//-----------------------------------------------------------------------
+
 var line = function(board, args) {
   var args = args || {
     point1: $('input[name="point1"]:last').coord(),
@@ -139,6 +150,8 @@ var line = function(board, args) {
     return args;
   };
 };
+
+//-----------------------------------------------------------------------
 
 var polygon = function(board, args) {
   var points   = 3,
@@ -164,6 +177,8 @@ var polygon = function(board, args) {
   };
 };
 
+//-----------------------------------------------------------------------
+
 var point = function(board, args) {
   var args = args || {
     point: $('input[name="point"]:last').coord(),
@@ -178,6 +193,8 @@ var point = function(board, args) {
     return args;
   };
 };
+
+//-----------------------------------------------------------------------
 
 var text = function(board, args) {
   var args = args || {

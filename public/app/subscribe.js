@@ -5,9 +5,6 @@ module.exports = function(board) {
   // The application request object
   var operationExec = new execute(board);
 
-  require('./helper/helpers')(operationExec); // various UI helpers
-
-
   require('./subscriptions/board')    (operationExec); /* Board subscription */
 
   require('./subscriptions/function') (operationExec); /* Function subscription */

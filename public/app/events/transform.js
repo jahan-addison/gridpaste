@@ -56,6 +56,8 @@ var rotate = function(board, args) {
   };
 };
 
+//-----------------------------------------------------------------------
+
 var reflect = function(board, args) {
   var args   = args || {
     figure:  $('input[name="figure"]:last').val(),
@@ -116,6 +118,8 @@ var reflect = function(board, args) {
   };
 };
 
+//-----------------------------------------------------------------------
+
 var shear = function(board, args) {
   var args   = args || {
     figure:  $('input[name="figure"]:last').val(),
@@ -160,6 +164,8 @@ var shear = function(board, args) {
   };
 };
 
+//-----------------------------------------------------------------------
+
 var translate = function(board, args) {
   var args   = args || {
     figure:  $('input[name="figure"]:last').val(),
@@ -173,7 +179,6 @@ var translate = function(board, args) {
     }
   }
   transformArgs.points = [];
-
   board.shapes.forEach(function(shape) {
     if (shape.name == transformArgs.figure) {
       transformArgs.points = shape.usrSetCoords;
@@ -213,6 +218,66 @@ var translate = function(board, args) {
     return args;
   };
 };
+
+//-----------------------------------------------------------------------
+
+var drag = function(board, args) {
+  var args     = args,
+    usrPoints  = this.points = {}; 
+  var transformArgs = {};
+  for (arg in args) {
+    if (args.hasOwnProperty(arg)) {
+      transformArgs[arg] = args[arg];
+    }
+  }
+  transformArgs = $.extend(true, {}, args);
+  transformArgs.points = [];
+  board.shapes.forEach(function(shape) {
+    if (shape.name == transformArgs.figure) {
+      transformArgs.points = shape.usrSetCoords;
+    }
+  });
+  if (!this.initial) {
+    this.initial = transformArgs.initial;
+  }
+  // a single point
+  if (!transformArgs.points.length) {
+    transformArgs.points.push(board.points[transformArgs.figure]);
+  }
+  delete transformArgs.figure;
+  delete transformArgs.initial;
+  this.translate = new transform(board, "translate", transformArgs);
+  this.apply = function(p, where) {
+    var c, len, i;
+    if (!p instanceof Array) {
+      p = [p];
+    }
+    len = p.length;
+    for (i = 0; i < len; i++) {
+      c = where.pop();
+      p[i].moveTo(c);
+     board.update();
+   }
+  };
+  this.remove    = function() {
+    this.apply(transformArgs.points, this.initial);
+  };
+  this.execute = function() {
+    transformArgs.points.forEach(function(p) {
+      Object.defineProperty(usrPoints, p.name, {
+        value: [
+          board.points[p.name].coords.usrCoords[1],
+          board.points[p.name].coords.usrCoords[2]
+        ],
+        enumerable: true
+      });
+    });
+    this.translate.apply();
+    return args;
+  };
+};
+
+//-----------------------------------------------------------------------
 
 var scale = function(board, args) {
   var args   = args || {
@@ -262,6 +327,7 @@ module.exports = {
   rotate:    rotate,
   reflect:   reflect,
   shear:     shear,
+  drag:      drag,
   translate: translate,
   scale:     scale
 };

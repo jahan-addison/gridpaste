@@ -42,6 +42,8 @@ BoardTransform.prototype = (function() {
     this.board.update();
   };
 
+  //-----------------------------------------------------------------------
+
   /*
   Options: {
     line:   Line line
@@ -63,6 +65,8 @@ BoardTransform.prototype = (function() {
     this.board.update();
   };
 
+  //-----------------------------------------------------------------------
+
   /*
   Options: {
     degrees: signed int
@@ -82,6 +86,8 @@ BoardTransform.prototype = (function() {
     transform.applyOnce(this.options.points);
     this.board.update();
   };
+
+  //-----------------------------------------------------------------------
 
   /*
   Options: {
@@ -103,6 +109,7 @@ BoardTransform.prototype = (function() {
     this.board.update();
   };
 
+  //-----------------------------------------------------------------------
 
   /*
   Options: {
