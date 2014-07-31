@@ -611,6 +611,7 @@ var transform = require('../events/transform');
 var last = [],
   initialX,
   initialY,
+  dragged,
   initial;
 module.exports = function(e) {
   if ($('#application').hasClass('paste')) {
@@ -644,38 +645,39 @@ module.exports = function(e) {
     initial  = [[initialX, initialY]];   
   }
   this.on('drag', function(e) { 
+    dragged = this;
     e.preventDefault();
-  });
-  this.on("mouseup", function(e) {
-    if (last.length === 0) {
-      last = [e.x,e.y];
-    } else {
-      if (e.x == last[0] && e.y == last[1]) {
-        return;
+    this.on("mouseup", function(e) {
+      if (last.length === 0) {
+        last = [e.x,e.y];
       } else {
-        last = [e.x, e.y];
+        if (e.x == last[0] && e.y == last[1]) {
+          return;
+        } else {
+          last = [e.x, e.y];
+        }
       }
-    }
-    var distanceX,
-        distanceY;
-    if (typeof this.X !== 'function') {
-      distanceX = this.usrSetCoords[0].X() - initialX;
-      distanceY = this.usrSetCoords[0].Y() - initialY;
-    } else {
-      distanceX = this.X()  - initialX;
-      distanceY = this.Y()  - initialY;      
-    }
+      var distanceX,
+          distanceY;
+      if (typeof this.X !== 'function') {
+        distanceX = this.usrSetCoords[0].X() - initialX;
+        distanceY = this.usrSetCoords[0].Y() - initialY;
+      } else {
+        distanceX = this.X()  - initialX;
+        distanceY = this.Y()  - initialY;      
+      }
 
-    var drag = transform.drag;
-    e.srcApp.store({
-      targetOperation: 'transform',
-      targetCommand:   'drag',
-      command:          drag
-    }, {
-      figure: this.name,
-      initial: initial,
-      values: [distanceX, distanceY]
-    });
+      var drag = transform.drag;
+      e.srcApp.store({
+        targetOperation: 'transform',
+        targetCommand:   'drag',
+        command:          drag
+      }, {
+        figure: this.name,
+        initial: initial,
+        values: [distanceX, distanceY]
+      });
+    }.bind(dragged));
   });
 };
 },{"../events/transform":27}],15:[function(require,module,exports){
