@@ -14,6 +14,9 @@ module.exports = function(e) {
     return false;
   }
   if (this instanceof JXG.Text === true) {
+    // delegate to text event
+    require('./text.js')(e.srcApp.board, this);
+    // prevent drag
     this.isDraggable = false;
     return false;
   }

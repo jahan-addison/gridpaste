@@ -11,6 +11,7 @@ $(function() {
     JXG.Options.polygon.fillOpacity = 0.46;
     JXG.Options.polygon.fillColor   = "#0ece16";
     JXG.Options.elements.fixed      = false;
+    JXG.Options.text.parse          = false;
     board  = JXG.JSXGraph.initBoard('grid', {
       boundingbox:     [-xx,yy,xx,-yy],
       keepaspectratio: true,
@@ -623,6 +624,9 @@ module.exports = function(e) {
     return false;
   }
   if (this instanceof JXG.Text === true) {
+    // delegate to text event
+    require('./text.js')(e.srcApp.board, this);
+    // prevent drag
     this.isDraggable = false;
     return false;
   }
@@ -680,7 +684,7 @@ module.exports = function(e) {
     }.bind(dragged));
   });
 };
-},{"../events/transform":27}],15:[function(require,module,exports){
+},{"./text.js":27,"../events/transform":28}],15:[function(require,module,exports){
 var slider = require('./slider');
 
 module.exports = function(App) {
@@ -796,7 +800,7 @@ module.exports = function(App) {
     }
   });
 };
-},{"../events/run":20,"../../components/mousetrap/mousetrap.min":28}],20:[function(require,module,exports){
+},{"../events/run":20,"../../components/mousetrap/mousetrap.min":29}],20:[function(require,module,exports){
 
 module.exports = {
   draw:      require('./draw'),
@@ -807,7 +811,7 @@ module.exports = {
 };
 
 
-},{"./draw":29,"./transform":27,"./zoom":30,"./function":31,"./misc":32}],22:[function(require,module,exports){
+},{"./draw":30,"./transform":28,"./zoom":31,"./function":32,"./misc":33}],22:[function(require,module,exports){
 /*
   OperationDecorator
 */
@@ -908,7 +912,26 @@ module.exports = function(content, width, height, source, top) {
     });
   });
 };
-},{}],33:[function(require,module,exports){
+},{}],27:[function(require,module,exports){
+var still;
+module.exports = function(board, text) {
+    still = setTimeout(function() {
+      board.labelAt = board.create("text", 
+        [text.X() - 5, text.Y(), // away from cursor
+        text.name]
+      );
+      setTimeout(function() {
+        if (typeof still !== 'undefined') {
+          clearTimeout(still);
+          if (typeof board.labelAt !== 'undefined') {
+            board.removeObject(board.labelAt);
+          }
+        }        
+      }, 1000);
+    }, 300);
+
+};
+},{}],34:[function(require,module,exports){
 // shim for using process in browser
 
 var process = module.exports = {};
@@ -6441,7 +6464,7 @@ process.chdir = function (dir) {
     }
 }.call(this));
 })(require("__browserify_process"),window)
-},{"__browserify_process":33}],28:[function(require,module,exports){
+},{"__browserify_process":34}],29:[function(require,module,exports){
 /* mousetrap v1.4.6 craig.is/killing/mice */
 (function(J,r,f){function s(a,b,d){a.addEventListener?a.addEventListener(b,d,!1):a.attachEvent("on"+b,d)}function A(a){if("keypress"==a.type){var b=String.fromCharCode(a.which);a.shiftKey||(b=b.toLowerCase());return b}return h[a.which]?h[a.which]:B[a.which]?B[a.which]:String.fromCharCode(a.which).toLowerCase()}function t(a){a=a||{};var b=!1,d;for(d in n)a[d]?b=!0:n[d]=0;b||(u=!1)}function C(a,b,d,c,e,v){var g,k,f=[],h=d.type;if(!l[a])return[];"keyup"==h&&w(a)&&(b=[a]);for(g=0;g<l[a].length;++g)if(k=
 l[a][g],!(!c&&k.seq&&n[k.seq]!=k.level||h!=k.action||("keypress"!=h||d.metaKey||d.ctrlKey)&&b.sort().join(",")!==k.modifiers.sort().join(","))){var m=c&&k.seq==c&&k.level==v;(!c&&k.combo==e||m)&&l[a].splice(g,1);f.push(k)}return f}function K(a){var b=[];a.shiftKey&&b.push("shift");a.altKey&&b.push("alt");a.ctrlKey&&b.push("ctrl");a.metaKey&&b.push("meta");return b}function x(a,b,d,c){m.stopCallback(b,b.target||b.srcElement,d,c)||!1!==a(b,d)||(b.preventDefault?b.preventDefault():b.returnValue=!1,b.stopPropagation?
@@ -6452,7 +6475,7 @@ c,a,e),l[d.key][c?"unshift":"push"]({callback:b,modifiers:d.modifiers,action:d.a
 unbind:function(a,b){return m.bind(a,function(){},b)},trigger:function(a,b){if(q[a+":"+b])q[a+":"+b]({},a);return this},reset:function(){l={};q={};return this},stopCallback:function(a,b){return-1<(" "+b.className+" ").indexOf(" mousetrap ")?!1:"INPUT"==b.tagName||"SELECT"==b.tagName||"TEXTAREA"==b.tagName||b.isContentEditable},handleKey:function(a,b,d){var c=C(a,b,d),e;b={};var f=0,g=!1;for(e=0;e<c.length;++e)c[e].seq&&(f=Math.max(f,c[e].level));for(e=0;e<c.length;++e)c[e].seq?c[e].level==f&&(g=!0,
 b[c[e].seq]=1,x(c[e].callback,d,c[e].combo,c[e].seq)):g||x(c[e].callback,d,c[e].combo);c="keypress"==d.type&&I;d.type!=u||w(a)||c||t(b);I=g&&"keydown"==d.type}};J.Mousetrap=m;"function"===typeof define&&define.amd&&define(m)})(window,document);
 
-},{}],30:[function(require,module,exports){
+},{}],31:[function(require,module,exports){
 /* Commands */
 
 /*--
@@ -6496,7 +6519,7 @@ module.exports = {
   zoomIn: zoomIn,
   zoomOut: zoomOut
 };
-},{}],32:[function(require,module,exports){
+},{}],33:[function(require,module,exports){
 /* Commands */
 
 /*--
@@ -6623,7 +6646,7 @@ module.exports = function() {
     }
   });
 };
-},{"../board/functions/lexer":34}],26:[function(require,module,exports){
+},{"../board/functions/lexer":35}],26:[function(require,module,exports){
 var Lexer = require('./lexer');
 
 /*
@@ -6734,7 +6757,7 @@ Parser.prototype = (function() {
 
 module.exports = Parser;
 
-},{"./lexer":34}],27:[function(require,module,exports){
+},{"./lexer":35}],28:[function(require,module,exports){
 var transform = require('../board/transform'),
     coords    = require('../helper/coords')();
 
@@ -7068,7 +7091,7 @@ module.exports = {
   translate: translate,
   scale:     scale
 };
-},{"../board/transform":35,"../helper/coords":36}],29:[function(require,module,exports){
+},{"../board/transform":36,"../helper/coords":37}],30:[function(require,module,exports){
 var element = require('../board/element'),
     coords  = require('../helper/coords')();
 
@@ -7296,7 +7319,7 @@ module.exports = {
   point: point,
   text: text
 };
-},{"../board/element":37,"../helper/coords":36}],31:[function(require,module,exports){
+},{"../board/element":38,"../helper/coords":37}],32:[function(require,module,exports){
 var func    = require('../board/functions/functions'),
     Parser  = require('../board/functions/parser'),
     element = require('../board/element');  
@@ -7519,7 +7542,7 @@ module.exports = {
   angle: angle,
   area:  area
 };
-},{"../board/functions/functions":38,"../board/functions/parser":26,"../board/element":37}],34:[function(require,module,exports){
+},{"../board/functions/functions":39,"../board/functions/parser":26,"../board/element":38}],35:[function(require,module,exports){
 /*
  * Geometry Function Tokenizer
  */
@@ -7639,7 +7662,7 @@ Lexer.prototype = (function() {
 })();
 
 module.exports = Lexer;
-},{}],35:[function(require,module,exports){
+},{}],36:[function(require,module,exports){
 /*
   BoardTransform Factory
   */
@@ -7788,7 +7811,7 @@ BoardTransform.prototype = (function() {
 })();
 
 module.exports = BoardTransform;
-},{}],36:[function(require,module,exports){
+},{}],37:[function(require,module,exports){
 module.exports = function() {
   jQuery.fn.coord = function() {
     if (this.val()) {
@@ -7802,7 +7825,7 @@ module.exports = function() {
   };
 };
 
-},{}],38:[function(require,module,exports){
+},{}],39:[function(require,module,exports){
 /* GeometryFunction Factory */
 
 var GeometryFunction = function(JXG, func, options) {
@@ -7930,7 +7953,7 @@ GeometryFunction.prototype = (function() {
 })();
 
 module.exports = GeometryFunction;
-},{}],37:[function(require,module,exports){
+},{}],38:[function(require,module,exports){
 var point = require('./point'),
     shape = require('./shape')
 
@@ -8164,7 +8187,7 @@ BoardElement.prototype = (function() {
 })();
 
 module.exports = BoardElement; 
-},{"./point":39,"./shape":40}],39:[function(require,module,exports){
+},{"./point":40,"./shape":41}],40:[function(require,module,exports){
 var Point = function(board, coords) {
   this.board  = board;
   this.coords = coords;
@@ -8209,7 +8232,7 @@ Point.prototype = (function() {
 })();
 
 module.exports = Point;
-},{"../helper/drag":14}],40:[function(require,module,exports){
+},{"../helper/drag":14}],41:[function(require,module,exports){
 var Shape = function(board, shape, parents, options) {
   this.board   = board;
   this.shape   = shape;
