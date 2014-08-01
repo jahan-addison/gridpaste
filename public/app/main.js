@@ -10,6 +10,7 @@ $(function() {
     JXG.Options.polygon.fillOpacity = 0.46;
     JXG.Options.polygon.fillColor   = "#0ece16";
     JXG.Options.elements.fixed      = false;
+    JXG.Options.text.parse          = false;
     board  = JXG.JSXGraph.initBoard('grid', {
       boundingbox:     [-xx,yy,xx,-yy],
       keepaspectratio: true,
