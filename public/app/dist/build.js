@@ -915,21 +915,24 @@ module.exports = function(content, width, height, source, top) {
 },{}],27:[function(require,module,exports){
 var still;
 module.exports = function(board, text) {
+  if (typeof text.labelAt !== 'undefined') {
+    return false;
+  }
     still = setTimeout(function() {
-      board.labelAt = board.create("text", 
+      text.labelAt = board.create("text", 
         [text.X() - 5, text.Y(), // away from cursor
         text.name]
       );
       setTimeout(function() {
-        if (typeof still !== 'undefined') {
+        if (typeof text.labelAt !== 'undefined') {
           clearTimeout(still);
-          if (typeof board.labelAt !== 'undefined') {
-            board.removeObject(board.labelAt);
+          if (typeof text.labelAt !== 'undefined') {
+            board.removeObject(text.labelAt);
+            delete text.labelAt;
           }
         }        
       }, 1000);
     }, 300);
-
 };
 },{}],34:[function(require,module,exports){
 // shim for using process in browser
