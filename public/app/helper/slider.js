@@ -1,17 +1,25 @@
-module.exports = function(content, width, height, source, top) {
-  $block = $('<div class="slider"> <div class="close-slider">x</div> </div>');
-  $block.append(content)
-    .appendTo(source || 'body')
-    .css({
+module.exports = function(content, width, height, source, top, slide) {
+  var animate = {};
+  var $block = $('<div class="slider"> <div class="close-slider">x</div> </div>');
+  console.log(slide);
+  var slideCSS = (slide && slide == 'top') ? {
+      width:  width  || 230,
+      height: height || 200,
+      position: 'absolute',
+      top: -height || -200,
+      right: width
+    } : {
       width:  width  || 230,
       height: height || 200,
       position: 'absolute',
       top: top.offset().top  || $('#elements').offset().top,
       left: -width   || -230
-    })
-  $block.animate({
-    left: 0
-  }, 320, function() {
+    };
+  $block.append(content)
+    .appendTo(source || 'body')
+    .css(slideCSS)
+  animate[slide || 'left'] = 0;
+  $block.animate(animate, 370, function() {
     $block.find('input:first').focus();
   });
   $('.slider input').keydown( function(e) {
@@ -29,9 +37,8 @@ module.exports = function(content, width, height, source, top) {
     $(this).parent()
       .find('*')
       .unbind('click');
-    $block.animate({
-      left: -width || -230
-    }, 320, function() {
+     animate[slide || 'left'] = (slide == 'top') ? -height || -230 : -width || -230;
+    $block.animate(animate, 370, function() {
       $(this).remove();
     });
   });
