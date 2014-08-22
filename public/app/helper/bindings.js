@@ -1,4 +1,6 @@
-var command = require('../events/run');
+var command = require('../events/run'),
+    slider     = require('../helper/slider');
+
 require('../../components/mousetrap/mousetrap.min');
 
 module.exports = function(App) {
@@ -66,5 +68,11 @@ module.exports = function(App) {
         new Function("$('#transform .button').not('.transform').not('.more').eq("+i+").click();")
       ); 
     }
+  // Keyboard helper box
+    $('.keyboard-hints').click(function() {
+      if (!$('.slider').length) {
+        slider($('.keyboard-helper').html(), 200, 460, '#application', 'body', 'top');      
+      }
+    })
   });
 };
