@@ -56,6 +56,8 @@ var rotate = function(board, args) {
   };
 };
 
+//-----------------------------------------------------------------------
+
 var reflect = function(board, args) {
   var args   = args || {
     figure:  $('input[name="figure"]:last').val(),
@@ -116,6 +118,8 @@ var reflect = function(board, args) {
   };
 };
 
+//-----------------------------------------------------------------------
+
 var shear = function(board, args) {
   var args   = args || {
     figure:  $('input[name="figure"]:last').val(),
@@ -159,6 +163,8 @@ var shear = function(board, args) {
     return args;
   };
 };
+
+//-----------------------------------------------------------------------
 
 var translate = function(board, args) {
   var args   = args || {
@@ -212,6 +218,8 @@ var translate = function(board, args) {
     return args;
   };
 };
+
+//-----------------------------------------------------------------------
 
 var drag = function(board, args) {
   var args     = args,
@@ -269,6 +277,7 @@ var drag = function(board, args) {
   };
 };
 
+//-----------------------------------------------------------------------
 
 var scale = function(board, args) {
   var args   = args || {

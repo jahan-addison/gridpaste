@@ -11,6 +11,7 @@ $(function() {
     JXG.Options.polygon.fillOpacity = 0.46;
     JXG.Options.polygon.fillColor   = "#0ece16";
     JXG.Options.elements.fixed      = false;
+    JXG.Options.text.parse          = false;
     board  = JXG.JSXGraph.initBoard('grid', {
       boundingbox:     [-xx,yy,xx,-yy],
       keepaspectratio: true,
@@ -611,6 +612,7 @@ var transform = require('../events/transform');
 var last = [],
   initialX,
   initialY,
+  dragged,
   initial;
 module.exports = function(e) {
   if ($('#application').hasClass('paste')) {
@@ -622,6 +624,9 @@ module.exports = function(e) {
     return false;
   }
   if (this instanceof JXG.Text === true) {
+    // delegate to text event
+    require('./text.js')(e.srcApp.board, this);
+    // prevent drag
     this.isDraggable = false;
     return false;
   }
@@ -644,41 +649,42 @@ module.exports = function(e) {
     initial  = [[initialX, initialY]];   
   }
   this.on('drag', function(e) { 
+    dragged = this;
     e.preventDefault();
-  });
-  this.on("mouseup", function(e) {
-    if (last.length === 0) {
-      last = [e.x,e.y];
-    } else {
-      if (e.x == last[0] && e.y == last[1]) {
-        return;
+    this.on("mouseup", function(e) {
+      if (last.length === 0) {
+        last = [e.x,e.y];
       } else {
-        last = [e.x, e.y];
+        if (e.x == last[0] && e.y == last[1]) {
+          return;
+        } else {
+          last = [e.x, e.y];
+        }
       }
-    }
-    var distanceX,
-        distanceY;
-    if (typeof this.X !== 'function') {
-      distanceX = this.usrSetCoords[0].X() - initialX;
-      distanceY = this.usrSetCoords[0].Y() - initialY;
-    } else {
-      distanceX = this.X()  - initialX;
-      distanceY = this.Y()  - initialY;      
-    }
+      var distanceX,
+          distanceY;
+      if (typeof this.X !== 'function') {
+        distanceX = this.usrSetCoords[0].X() - initialX;
+        distanceY = this.usrSetCoords[0].Y() - initialY;
+      } else {
+        distanceX = this.X()  - initialX;
+        distanceY = this.Y()  - initialY;      
+      }
 
-    var drag = transform.drag;
-    e.srcApp.store({
-      targetOperation: 'transform',
-      targetCommand:   'drag',
-      command:          drag
-    }, {
-      figure: this.name,
-      initial: initial,
-      values: [distanceX, distanceY]
-    });
+      var drag = transform.drag;
+      e.srcApp.store({
+        targetOperation: 'transform',
+        targetCommand:   'drag',
+        command:          drag
+      }, {
+        figure: this.name,
+        initial: initial,
+        values: [distanceX, distanceY]
+      });
+    }.bind(dragged));
   });
 };
-},{"../events/transform":27}],15:[function(require,module,exports){
+},{"./text.js":27,"../events/transform":28}],15:[function(require,module,exports){
 var slider = require('./slider');
 
 module.exports = function(App) {
@@ -724,7 +730,9 @@ module.exports = function(App) {
   });
 }
 },{"./slider":23}],16:[function(require,module,exports){
-var command = require('../events/run');
+var command = require('../events/run'),
+    slider     = require('../helper/slider');
+
 require('../../components/mousetrap/mousetrap.min');
 
 module.exports = function(App) {
@@ -744,12 +752,15 @@ module.exports = function(App) {
       if (!App.length) {
         return;
       }
-      var target   = App.last.toString.split('.'),
-          $command = {
-            targetOperation: target[0],
-            targetCommand:   target[1],
-            command:         command[target[0]][target[1]] 
-          };
+      var target   = App.last.toString.split('.');
+      if (target[1] == 'drag') {
+        return false;
+      }
+      var $command = {
+        targetOperation: target[0],
+        targetCommand:   target[1],
+        command:         command[target[0]][target[1]] 
+      };
       try {
         App.storeAndExecute($command, App.last.arguments);
       } catch(e) {
@@ -789,9 +800,15 @@ module.exports = function(App) {
         new Function("$('#transform .button').not('.transform').not('.more').eq("+i+").click();")
       ); 
     }
+  // Keyboard helper box
+    $('.keyboard-hints').click(function() {
+      if (!$('.slider').length) {
+        slider($('.keyboard-helper').html(), 200, 460, '#application', 'body', 'top');      
+      }
+    })
   });
 };
-},{"../events/run":20,"../../components/mousetrap/mousetrap.min":28}],20:[function(require,module,exports){
+},{"../events/run":20,"../helper/slider":23,"../../components/mousetrap/mousetrap.min":29}],20:[function(require,module,exports){
 
 module.exports = {
   draw:      require('./draw'),
@@ -802,7 +819,7 @@ module.exports = {
 };
 
 
-},{"./draw":29,"./transform":27,"./zoom":30,"./function":31,"./misc":32}],22:[function(require,module,exports){
+},{"./draw":30,"./transform":28,"./zoom":31,"./function":32,"./misc":33}],22:[function(require,module,exports){
 /*
   OperationDecorator
 */
@@ -865,20 +882,28 @@ module.exports = function(Operation) {
 };
 
 },{}],23:[function(require,module,exports){
-module.exports = function(content, width, height, source, top) {
-  $block = $('<div class="slider"> <div class="close-slider">x</div> </div>');
-  $block.append(content)
-    .appendTo(source || 'body')
-    .css({
+module.exports = function(content, width, height, source, top, slide) {
+  var animate = {};
+  var $block = $('<div class="slider"> <div class="close-slider">x</div> </div>');
+  console.log(slide);
+  var slideCSS = (slide && slide == 'top') ? {
+      width:  width  || 230,
+      height: height || 200,
+      position: 'absolute',
+      top: -height || -200,
+      right: width
+    } : {
       width:  width  || 230,
       height: height || 200,
       position: 'absolute',
       top: top.offset().top  || $('#elements').offset().top,
       left: -width   || -230
-    })
-  $block.animate({
-    left: 0
-  }, 320, function() {
+    };
+  $block.append(content)
+    .appendTo(source || 'body')
+    .css(slideCSS)
+  animate[slide || 'left'] = 0;
+  $block.animate(animate, 370, function() {
     $block.find('input:first').focus();
   });
   $('.slider input').keydown( function(e) {
@@ -896,14 +921,35 @@ module.exports = function(content, width, height, source, top) {
     $(this).parent()
       .find('*')
       .unbind('click');
-    $block.animate({
-      left: -width || -230
-    }, 320, function() {
+     animate[slide || 'left'] = (slide == 'top') ? -height || -230 : -width || -230;
+    $block.animate(animate, 370, function() {
       $(this).remove();
     });
   });
 };
-},{}],33:[function(require,module,exports){
+},{}],27:[function(require,module,exports){
+var still;
+module.exports = function(board, text) {
+  if (typeof text.labelAt !== 'undefined') {
+    return false;
+  }
+    still = setTimeout(function() {
+      text.labelAt = board.create("text", 
+        [text.X() - 5, text.Y(), // away from cursor
+        text.name]
+      );
+      setTimeout(function() {
+        if (typeof text.labelAt !== 'undefined') {
+          clearTimeout(still);
+          if (typeof text.labelAt !== 'undefined') {
+            board.removeObject(text.labelAt);
+            delete text.labelAt;
+          }
+        }        
+      }, 1000);
+    }, 300);
+};
+},{}],34:[function(require,module,exports){
 // shim for using process in browser
 
 var process = module.exports = {};
@@ -6436,7 +6482,7 @@ process.chdir = function (dir) {
     }
 }.call(this));
 })(require("__browserify_process"),window)
-},{"__browserify_process":33}],28:[function(require,module,exports){
+},{"__browserify_process":34}],29:[function(require,module,exports){
 /* mousetrap v1.4.6 craig.is/killing/mice */
 (function(J,r,f){function s(a,b,d){a.addEventListener?a.addEventListener(b,d,!1):a.attachEvent("on"+b,d)}function A(a){if("keypress"==a.type){var b=String.fromCharCode(a.which);a.shiftKey||(b=b.toLowerCase());return b}return h[a.which]?h[a.which]:B[a.which]?B[a.which]:String.fromCharCode(a.which).toLowerCase()}function t(a){a=a||{};var b=!1,d;for(d in n)a[d]?b=!0:n[d]=0;b||(u=!1)}function C(a,b,d,c,e,v){var g,k,f=[],h=d.type;if(!l[a])return[];"keyup"==h&&w(a)&&(b=[a]);for(g=0;g<l[a].length;++g)if(k=
 l[a][g],!(!c&&k.seq&&n[k.seq]!=k.level||h!=k.action||("keypress"!=h||d.metaKey||d.ctrlKey)&&b.sort().join(",")!==k.modifiers.sort().join(","))){var m=c&&k.seq==c&&k.level==v;(!c&&k.combo==e||m)&&l[a].splice(g,1);f.push(k)}return f}function K(a){var b=[];a.shiftKey&&b.push("shift");a.altKey&&b.push("alt");a.ctrlKey&&b.push("ctrl");a.metaKey&&b.push("meta");return b}function x(a,b,d,c){m.stopCallback(b,b.target||b.srcElement,d,c)||!1!==a(b,d)||(b.preventDefault?b.preventDefault():b.returnValue=!1,b.stopPropagation?
@@ -6447,7 +6493,7 @@ c,a,e),l[d.key][c?"unshift":"push"]({callback:b,modifiers:d.modifiers,action:d.a
 unbind:function(a,b){return m.bind(a,function(){},b)},trigger:function(a,b){if(q[a+":"+b])q[a+":"+b]({},a);return this},reset:function(){l={};q={};return this},stopCallback:function(a,b){return-1<(" "+b.className+" ").indexOf(" mousetrap ")?!1:"INPUT"==b.tagName||"SELECT"==b.tagName||"TEXTAREA"==b.tagName||b.isContentEditable},handleKey:function(a,b,d){var c=C(a,b,d),e;b={};var f=0,g=!1;for(e=0;e<c.length;++e)c[e].seq&&(f=Math.max(f,c[e].level));for(e=0;e<c.length;++e)c[e].seq?c[e].level==f&&(g=!0,
 b[c[e].seq]=1,x(c[e].callback,d,c[e].combo,c[e].seq)):g||x(c[e].callback,d,c[e].combo);c="keypress"==d.type&&I;d.type!=u||w(a)||c||t(b);I=g&&"keydown"==d.type}};J.Mousetrap=m;"function"===typeof define&&define.amd&&define(m)})(window,document);
 
-},{}],30:[function(require,module,exports){
+},{}],31:[function(require,module,exports){
 /* Commands */
 
 /*--
@@ -6471,6 +6517,8 @@ var zoomIn = function(board, args) {
   }
 };
 
+//-----------------------------------------------------------------------
+
 var zoomOut = function(board, args) {
   this.remove = function() {
     board.zoomIn();
@@ -6489,7 +6537,7 @@ module.exports = {
   zoomIn: zoomIn,
   zoomOut: zoomOut
 };
-},{}],32:[function(require,module,exports){
+},{}],33:[function(require,module,exports){
 /* Commands */
 
 /*--
@@ -6616,7 +6664,7 @@ module.exports = function() {
     }
   });
 };
-},{"../board/functions/lexer":34}],26:[function(require,module,exports){
+},{"../board/functions/lexer":35}],26:[function(require,module,exports){
 var Lexer = require('./lexer');
 
 /*
@@ -6727,7 +6775,7 @@ Parser.prototype = (function() {
 
 module.exports = Parser;
 
-},{"./lexer":34}],27:[function(require,module,exports){
+},{"./lexer":35}],28:[function(require,module,exports){
 var transform = require('../board/transform'),
     coords    = require('../helper/coords')();
 
@@ -6785,6 +6833,8 @@ var rotate = function(board, args) {
     return args;
   };
 };
+
+//-----------------------------------------------------------------------
 
 var reflect = function(board, args) {
   var args   = args || {
@@ -6846,6 +6896,8 @@ var reflect = function(board, args) {
   };
 };
 
+//-----------------------------------------------------------------------
+
 var shear = function(board, args) {
   var args   = args || {
     figure:  $('input[name="figure"]:last').val(),
@@ -6889,6 +6941,8 @@ var shear = function(board, args) {
     return args;
   };
 };
+
+//-----------------------------------------------------------------------
 
 var translate = function(board, args) {
   var args   = args || {
@@ -6942,6 +6996,8 @@ var translate = function(board, args) {
     return args;
   };
 };
+
+//-----------------------------------------------------------------------
 
 var drag = function(board, args) {
   var args     = args,
@@ -6999,6 +7055,7 @@ var drag = function(board, args) {
   };
 };
 
+//-----------------------------------------------------------------------
 
 var scale = function(board, args) {
   var args   = args || {
@@ -7052,7 +7109,7 @@ module.exports = {
   translate: translate,
   scale:     scale
 };
-},{"../board/transform":35,"../helper/coords":36}],29:[function(require,module,exports){
+},{"../board/transform":36,"../helper/coords":37}],30:[function(require,module,exports){
 var element = require('../board/element'),
     coords  = require('../helper/coords')();
 
@@ -7085,6 +7142,9 @@ var circle = function(board, args) {
   };
 };
 
+//-----------------------------------------------------------------------
+
+
 var angle = function(board, args) {
   var args = args || {
     point1: $('input[name="point1"]:last').coord(),
@@ -7108,6 +7168,8 @@ var angle = function(board, args) {
     return args;
   };
 };
+
+//-----------------------------------------------------------------------
 
 var arc = function(board, args) {
   var args = args || {
@@ -7133,6 +7195,8 @@ var arc = function(board, args) {
    };
 };
 
+//-----------------------------------------------------------------------
+
 var ellipse = function(board, args) {
   var args = args ||  {
     point1: $('input[name="point1"]:last').coord(),
@@ -7155,6 +7219,8 @@ var ellipse = function(board, args) {
   };
 };
 
+//-----------------------------------------------------------------------
+
 var segment = function(board, args) {
   var args = args || {
     point1: $('input[name="point1"]:last').coord(),
@@ -7175,6 +7241,8 @@ var segment = function(board, args) {
   };
 };
 
+//-----------------------------------------------------------------------
+
 var line = function(board, args) {
   var args = args || {
     point1: $('input[name="point1"]:last').coord(),
@@ -7194,6 +7262,8 @@ var line = function(board, args) {
     return args;
   };
 };
+
+//-----------------------------------------------------------------------
 
 var polygon = function(board, args) {
   var points   = 3,
@@ -7219,6 +7289,8 @@ var polygon = function(board, args) {
   };
 };
 
+//-----------------------------------------------------------------------
+
 var point = function(board, args) {
   var args = args || {
     point: $('input[name="point"]:last').coord(),
@@ -7233,6 +7305,8 @@ var point = function(board, args) {
     return args;
   };
 };
+
+//-----------------------------------------------------------------------
 
 var text = function(board, args) {
   var args = args || {
@@ -7263,7 +7337,7 @@ module.exports = {
   point: point,
   text: text
 };
-},{"../board/element":37,"../helper/coords":36}],31:[function(require,module,exports){
+},{"../board/element":38,"../helper/coords":37}],32:[function(require,module,exports){
 var func    = require('../board/functions/functions'),
     Parser  = require('../board/functions/parser'),
     element = require('../board/element');  
@@ -7326,6 +7400,8 @@ var angle = function(board, args) {
   };
 };
 
+//-----------------------------------------------------------------------
+
 var area = function(board, args) {
   var parse;
   if (typeof args === 'undefined') {
@@ -7360,6 +7436,9 @@ var area = function(board, args) {
     throw new Error("unrecognized structure to compute area");
   }
 };
+
+//-----------------------------------------------------------------------
+
 
 var CircleArea  = function(board, args) {
   if (typeof args === 'undefined') {
@@ -7475,11 +7554,13 @@ var PolygonArea = function(board, args) {
   }; 
 };
 
+//-----------------------------------------------------------------------
+
 module.exports = {
   angle: angle,
   area:  area
 };
-},{"../board/functions/functions":38,"../board/functions/parser":26,"../board/element":37}],34:[function(require,module,exports){
+},{"../board/functions/functions":39,"../board/functions/parser":26,"../board/element":38}],35:[function(require,module,exports){
 /*
  * Geometry Function Tokenizer
  */
@@ -7599,7 +7680,7 @@ Lexer.prototype = (function() {
 })();
 
 module.exports = Lexer;
-},{}],35:[function(require,module,exports){
+},{}],36:[function(require,module,exports){
 /*
   BoardTransform Factory
   */
@@ -7644,6 +7725,8 @@ BoardTransform.prototype = (function() {
     this.board.update();
   };
 
+  //-----------------------------------------------------------------------
+
   /*
   Options: {
     line:   Line line
@@ -7665,6 +7748,8 @@ BoardTransform.prototype = (function() {
     this.board.update();
   };
 
+  //-----------------------------------------------------------------------
+
   /*
   Options: {
     degrees: signed int
@@ -7684,6 +7769,8 @@ BoardTransform.prototype = (function() {
     transform.applyOnce(this.options.points);
     this.board.update();
   };
+
+  //-----------------------------------------------------------------------
 
   /*
   Options: {
@@ -7705,6 +7792,7 @@ BoardTransform.prototype = (function() {
     this.board.update();
   };
 
+  //-----------------------------------------------------------------------
 
   /*
   Options: {
@@ -7741,7 +7829,7 @@ BoardTransform.prototype = (function() {
 })();
 
 module.exports = BoardTransform;
-},{}],36:[function(require,module,exports){
+},{}],37:[function(require,module,exports){
 module.exports = function() {
   jQuery.fn.coord = function() {
     if (this.val()) {
@@ -7755,7 +7843,7 @@ module.exports = function() {
   };
 };
 
-},{}],38:[function(require,module,exports){
+},{}],39:[function(require,module,exports){
 /* GeometryFunction Factory */
 
 var GeometryFunction = function(JXG, func, options) {
@@ -7883,7 +7971,7 @@ GeometryFunction.prototype = (function() {
 })();
 
 module.exports = GeometryFunction;
-},{}],37:[function(require,module,exports){
+},{}],38:[function(require,module,exports){
 var point = require('./point'),
     shape = require('./shape')
 
@@ -8117,7 +8205,7 @@ BoardElement.prototype = (function() {
 })();
 
 module.exports = BoardElement; 
-},{"./point":39,"./shape":40}],39:[function(require,module,exports){
+},{"./point":40,"./shape":41}],40:[function(require,module,exports){
 var Point = function(board, coords) {
   this.board  = board;
   this.coords = coords;
@@ -8162,7 +8250,7 @@ Point.prototype = (function() {
 })();
 
 module.exports = Point;
-},{"../helper/drag":14}],40:[function(require,module,exports){
+},{"../helper/drag":14}],41:[function(require,module,exports){
 var Shape = function(board, shape, parents, options) {
   this.board   = board;
   this.shape   = shape;
