@@ -43,6 +43,8 @@
     "karma-browserifast": "~0.6.0",
     "grunt-karma": "~0.8.3",
     "karma-html2js-preprocessor": "~0.1.0",
-    "grunt-mocha-test": "~0.10.2"
+    "grunt-mocha-test": "~0.10.2",
+    "grunt-contrib-uglify": "~0.5.1",
+    "grunt-contrib-cssmin": "~0.10.0"
   }
 }

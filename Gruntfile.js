@@ -13,11 +13,25 @@ module.exports = function (grunt) {
 
   grunt.initConfig({
     pkg: grunt.file.readJSON('package.json'),
+    uglify: {
+      my_target: {
+        files: {
+          './public/app/dist/main.min.js': ['./public/app/dist/build.js']
+        }
+      }
+    },
     compass: {
       dist: {
         options: {
           sassDir: 'public/css',
           cssDir: 'public/css/build'
+        }
+      }
+    },
+    cssmin: {
+      combine: {
+        files: {
+          './public/css/build/main.min.css': ['./public/css/build/main.css']
         }
       }
     },
@@ -27,11 +41,11 @@ module.exports = function (grunt) {
         compile: './public/app/dist/build.js',
         beforeHook: function(bundle) {
           shim(bundle, {
-            RxJS: {
+            Mousetrap: {
               path: './public/components/mousetrap/mousetrap.min',
               exports: 'Mousetrap'
             },
-            Mousetrap: {
+            RxJS: {
               path: './public/components/rxjs/rx.lite,js',
               exports: 'Rx'              
             }
@@ -131,5 +145,6 @@ module.exports = function (grunt) {
     grunt.task.run('karma');
   });
 
+  grunt.registerTask('deploy', ['compass', 'browserify2:compile', 'cssmin', 'uglify']);
   grunt.registerTask('default', ['develop', 'compass', 'browserify2:compile', 'watch']);
 };

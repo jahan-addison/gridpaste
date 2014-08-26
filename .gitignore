@@ -1,3 +1,5 @@
 node_modules/
 config.js
+public/app/dist/*.js
+public/css/build/*.css
 .sass_cache/
