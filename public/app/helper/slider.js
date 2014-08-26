@@ -1,13 +1,12 @@
 module.exports = function(content, width, height, source, top, slide) {
   var animate = {};
   var $block = $('<div class="slider"> <div class="close-slider">x</div> </div>');
-  console.log(slide);
   var slideCSS = (slide && slide == 'top') ? {
       width:  width  || 230,
       height: height || 200,
       position: 'absolute',
       top: -height || -200,
-      right: width
+      right: width / 1.35
     } : {
       width:  width  || 230,
       height: height || 200,
