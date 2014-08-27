@@ -42,4 +42,4 @@ Hints
 
 ![](http://puu.sh/balB7/4904e384f8.png)
 
-* Keep in mind that zooming in or out on the board are recorded (and undoable) which can become quite handy for large structures
+* Keep in mind that zooming in or out on the board is recorded (and undoable) which can become quite handy for large structures
