@@ -34,14 +34,16 @@ Hints
 -----
   
   
-* You may transform a single point or vector on the plane by giving the point's identifier (.e.g. 'A') with the number 0 as the label, e.g.:
+1. You may transform a single point or vector on the plane by giving the point's identifier (.e.g. 'A') with the number 0 as the label, e.g.:
 
 ![](http://puu.sh/balhW/323233045c.png)
 
-* There are times when you may want to delete previously placed text and need the identifier of the text on the board, this is possible by hovering the text like so:
+2. There are times when you may want to delete previously placed text and need the identifier of the text on the board, this is possible by hovering the text like so:
 
 ![](http://puu.sh/balB7/4904e384f8.png)
 
-* Keep in mind that zooming in or out on the board is recorded (and undoable) which can become quite handy for large structures
+3. Keep in mind that zooming in or out on the board is recorded (and undoable) which can become quite handy for large structures
 
-* Gridpaste works on tablets that are the size of the ipad or Galaxy Note 10.1!
+4. Gridpaste works on tablets that are the size of the ipad or Galaxy Note 10.1!
+
+5. Structures on the plane may be drag-and-dropped to any location on the board. They are undoable and saved as a special case of the translation mapping.
