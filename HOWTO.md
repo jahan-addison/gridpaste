@@ -17,7 +17,7 @@ After you have finished your work complete the paste by pressing "End Record," y
 
 ![](http://puu.sh/bajOW/b577c06632.png)
 
-Here, clear has been replaced wih "reset" which will delete your current recording and start the board anew. You may preview your paste once before saving and sharing by pressing the "play" button. Once you are ready to save and share press the "Share" button and you will be asked to give a title to your grid paste.
+Here, clear has been replaced wih "reset" which will delete your current paste and start the board anew. You may preview your paste once before saving and sharing by pressing the "play" button. Once you are ready to save and share press the "Share" button and you will be asked to give a title to your grid paste.
 
 ![](http://puu.sh/bakqT/b2e99796b5.png)
   
