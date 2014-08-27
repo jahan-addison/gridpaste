@@ -43,3 +43,5 @@ Hints
 ![](http://puu.sh/balB7/4904e384f8.png)
 
 * Keep in mind that zooming in or out on the board is recorded (and undoable) which can become quite handy for large structures
+
+* Gridpaste works on tablets that are the size of the ipad or Galaxy Note 10.1!
