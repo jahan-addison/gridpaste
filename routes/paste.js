@@ -21,6 +21,24 @@ exports.show = function(req, res) {
 };
 
 /*
+ * GET examples
+ */
+
+exports.examples = function(req, res) {
+  Paste.paginate({ user: 'examples'  }, req.query.page, req.query.limit, function(error, pageCount, paginatedResults, itemCount) {
+    if (error) return next(error);
+    res.render('examples.html', {
+      host:      req.get('host'),
+      req:       req,
+      pastes:    paginatedResults,
+      pageCount: pageCount,
+      itemCount: itemCount
+    });
+  }, {sortBy: {_id: -1}});
+};
+
+
+/*
  * POST action
  */
 

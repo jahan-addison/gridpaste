@@ -49,6 +49,7 @@ app.get('/',           routes.index);
 app.get('/login',      routes.login);
 app.get('/logout',     routes.logout);
 app.get('/register',   routes.register);
+app.get('/examples',   paste.examples);
 app.get('/pastes',     paste.list);
 app.get('/delete/:id', paste.remove)
 app.get('/:id',        paste.show);

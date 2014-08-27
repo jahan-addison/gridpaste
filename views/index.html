@@ -24,7 +24,7 @@
             {% endif %}
           </section>
           <section id="run-function">
-            <span id="f">f</span> <input type="text" class="function" name="run" value="" />
+            <span id="f">f</span> <input type="text" class="function" name="run" value="" /> <span data-tip="This is an interpreter to run computations on structures; currently the functions available are area(LABEL) and angle(POINT,POINT,POINT). More coming soon.">?</span>
           </section>
           <h2>Elements</h2>
           <section id="elements">
@@ -213,13 +213,14 @@
           <p><span>f</span><span> Run a function</span></p>
           <p><span>CTRL + z</span> <span>Undo last operation</span></p>
           <p><span>CTRL + ENTER </span><span>Repeat last operation</span></p>
-          <p><span>m , c</span> <span>Clear board</span></p>
+          <p><span>m , c</span> <span>Clear board; reset</span></p>
           <p><span>TAB</span><span> Start recording</span></p>
-          <p><span>ESC</span><span> Cancel command query</span></p>
+          <p><span>ESC</span><span> Cancel command query; close</span></p>
           <p><span>d , [1 - 9]</span><span>Draw command corresponding to its element placement</span></p>
           <p><span>t , [1 - 5]</span><span>Transform command corresponding to its element placement</span></p>
         </div>
         <div class="keyboard-hints"><img src="/images/keyboard.png" alt="keyboard" /></div>
+        <div class="demo-examples"><a href="/examples">Examples</a></div>
         <div class="zoom out"><span class="out">_</span></div>
         <section id="grid">
         </section>

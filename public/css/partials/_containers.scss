@@ -1,3 +1,4 @@
+
 html,body,#application {
   width: 100%;
   height:100%;
@@ -11,6 +12,17 @@ p {
 
 body {
   background: #F2F2F2;
+}
+
+%tooltip {
+  content:attr(data-tip);
+  position:absolute;
+  background:#fff;
+  font-size:13px;
+  border: rgba($oynx-brown, .5) 1px solid;
+  color:#000;
+  width:360px;
+  padding:25px;
 }
 
 .red {
@@ -37,6 +49,19 @@ a.edit {
 }
 
 #query {
+}
+
+input.function + span {
+  @include adelle(12px);
+  margin-top:-5px;
+  margin-left:3px;
+  &:hover {
+    cursor:pointer;
+    &:after {
+      @extend %tooltip;
+    }
+  }
+  color: rgba($off-white, .45);
 }
 
 [data-html] {
@@ -269,6 +294,24 @@ input.edit {
   display:block;
 }
 
+.demo-examples {
+  background: $pale-brown;
+  z-index:200;
+  position:absolute;
+  top:0px;
+  a, a:link, a:hover, a:visited {
+    color: $off-white;
+    font-weight:bold;
+    text-decoration:none;  
+  }
+  padding:3px;
+  text-align:center;
+  left:calc(100% - 85px);
+  height:18px;
+  overflow:hidden;
+  cursor: pointer;  
+}
+
 .keyboard-hints {
   background: $pale-brown;
   width:38px;
@@ -276,7 +319,7 @@ input.edit {
   position:absolute;
   top:0px;
   text-align:center;
-  left:calc(100% - 200px);
+  left:calc(100% - 145px);
   img {
     margin-top:2px;
     width:28px;
