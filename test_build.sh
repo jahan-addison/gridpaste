@@ -7,7 +7,7 @@ exports.sequelize = {
   user:     "travis",
   password: ""
 };
-
+  
 exports.mongo = {
   url: 'mongodb://localhost/gridpaste'
 };
