@@ -365,6 +365,8 @@ input.edit {
 }
 
 .button.undo {
+  position:relative;
+  left:3px;
   &.visible {
     display: block !important;
   }
