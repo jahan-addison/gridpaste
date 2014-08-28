@@ -19,10 +19,6 @@ Requirements
     -- Mozilla Firefox
 
 
-Live Demo
-=========
-A live video tutorial is coming soon to demonstrate how to use the application effectively.
-
 
 Contributing
 ===
@@ -69,9 +65,9 @@ You may edit the `karma.conf.js` and `Gruntfile.js` files to your personal pleas
 
 Notes
 ===
-As of now, this application has *not gone live* __yet__. Email me if you're interested in beta testing. Many thanks to the team over at [jsxgraph](http://jsxgraph.uni-bayreuth.de/wp/) for the SVG board library. My inspiration for this application was that there exists many mathematic online tools for analytical, LaTeX sharing such as [Mathb.in](http://mathb.in) but none for geometry.
+Many thanks to the team over at [jsxgraph](http://jsxgraph.uni-bayreuth.de/wp/) for the SVG board library. My inspiration for this application was that there exists many mathematic online tools for analytical, LaTeX sharing such as [Mathb.in](http://mathb.in) but none for geometry.
 
-For any questions or concerns please [open an issue](https://github.com/jahan-addison/gridpaste/issues?state=open) or send to me directly at jahan [dot] addison [at] jacata [dot] me.
+For any questions or concerns please [open an issue](https://github.com/jahan-addison/gridpaste/issues?state=open) or send to me directly at support [at] gridpaste [dot] io.
 
 License
 ===

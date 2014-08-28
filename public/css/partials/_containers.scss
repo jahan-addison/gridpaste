@@ -422,6 +422,22 @@ a {
   margin-left:8px;
 }
 
+
+.hosted {
+  font-family:Verdana;
+  color:$light-brown;
+  font-weight:bold;
+  position: relative;
+  top:-18px;
+  & + img {
+    @include opacity(.5);
+    position:relative;
+    top:15px;
+  }
+  margin-right:5px;
+  margin-left:15px;
+}
+
 address {
   color: $light-brown;
   font-size:1em;

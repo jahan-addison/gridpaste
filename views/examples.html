@@ -18,7 +18,7 @@
       <a href="/">
         <div class="button new">New</div>
       </a>
-      <a class="howto" href="#">See Howto</a>
+      <a class="howto" href="https://github.com/jahan-addison/gridpaste/blob/master/HOWTO.md">See Howto</a>
       <ol id="items">
       {% for paste in pastes %}
           <li data-id="{{paste.id|escape}}">
@@ -38,6 +38,7 @@
       </div>
       {% endif %}
     {% endif %}
+    <span class="hosted">Hosted by</span><img src="/images/packetfire-dark-final.png" style="max-width:93px" alt="packetfire" />
     <div class="back">
       <a href="javascript:void(0);" onclick="history.back(-1);return false;" >Go back</a>
     </div>
