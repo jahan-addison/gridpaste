@@ -38,6 +38,9 @@ and (orientation : landscape) {
    // display: none;
   }
   #bottom {
+    .button {
+      padding: 10px 15px !important;
+    }
     & > .col:first-child {
       margin-top:10px !important;
     }
