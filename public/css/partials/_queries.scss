@@ -29,3 +29,20 @@ and (orientation : landscape) {
     }
   }
 }
+
+@media screen and ( max-height: 768px ){
+  footer > p {
+    display: none;
+  }
+  #bottom {
+    & > .col:first-child {
+      margin-top:10px !important;
+    }
+    margin-top: 10px !important;
+  }
+  footer address {
+    position: relative;
+    top: 5px;
+  }
+  background: blue;
+}
