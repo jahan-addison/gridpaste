@@ -31,8 +31,11 @@ and (orientation : landscape) {
 }
 
 @media screen and ( max-height: 768px ){
+  #left-bar {
+    overflow: auto;
+  }
   footer > p {
-    display: none;
+   // display: none;
   }
   #bottom {
     & > .col:first-child {
@@ -40,9 +43,4 @@ and (orientation : landscape) {
     }
     margin-top: 10px !important;
   }
-  footer address {
-    position: relative;
-    top: 5px;
-  }
-  background: blue;
 }
