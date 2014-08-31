@@ -29,3 +29,18 @@ and (orientation : landscape) {
     }
   }
 }
+
+@media screen and ( max-height: 768px ){
+  #left-bar {
+    overflow: auto;
+  }
+  footer > p {
+   // display: none;
+  }
+  #bottom {
+    & > .col:first-child {
+      margin-top:10px !important;
+    }
+    margin-top: 10px !important;
+  }
+}
