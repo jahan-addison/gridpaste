@@ -5,6 +5,11 @@ var last = [],
   dragged,
   initial;
 module.exports = function(e) {
+  if (e.srcApp && Object.isFrozen(e.srcApp)) {
+    // the paste is complete
+    this.isDraggable = false;
+    return false;
+  }
   if ($('#application').hasClass('paste')) {
     this.isDraggable = false;
     return false;
