@@ -1,6 +1,6 @@
 { 
   "name": "gridpaste",
-  "version": "1.0.1",
+  "version": "1.0.1", 
   "ignore": [
     "**/.*",
     "node_modules",

@@ -1,7 +1,7 @@
-{
+{ 
   "name": "gridpaste",
   "version": "1.0.1",
-  "scripts": {
+  "scripts": { 
     "start": "grunt"
   },
   "dependencies": {
