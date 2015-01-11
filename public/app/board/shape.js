@@ -19,7 +19,7 @@ Shape.prototype = (function() {
       this.options.hasInnerPoints = true;
       var points = this.parents.pop(), // full list of points 
           s      = this.board.create(this.shape, this.parents, this.options);
-      s.usrSetCoords = points;
+      s.usrSetCoords = (typeof points == 'function') ? undefined : points;
       s.on("mouseover", (require("../helper/drag")));
       this.board.shapes.push(s);
       return s;
