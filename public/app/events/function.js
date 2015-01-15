@@ -216,7 +216,48 @@ var PolygonArea = function(board, args) {
 
 //-----------------------------------------------------------------------
 
+var plot = function(board, args) {
+  if (typeof args === 'undefined') {
+    var parse = new Parser($('input.function').val());
+    parse.run();
+    if (parse.arguments.length != 1) {
+      throw new SyntaxError("requires 1 argument");
+    }
+     var funcArgs = args = parse.arguments;
+     args = args[0].argument;
+  } else {
+    if (typeof args.args !== 'undefined') {
+      args = args.args;
+    }
+  }
+  var realArgs = {equation: args, board: board}
+  this.func = new func(JXG, "plot", realArgs);
+  this.execute = function() {
+    try {
+      var result = this.func.run();
+    } catch(e) {
+      alert("Expression Error: " + e.message);
+      return;
+    }
+    this.functionElement = new element(board, "func", [result,
+      function(){ 
+        var c = new JXG.Coords(JXG.COORDS_BY_SCREEN,[0,0],board);
+        return c.usrCoords[1];
+      },
+      function(){ 
+        var c = new JXG.Coords(JXG.COORDS_BY_SCREEN,[board.canvasWidth,0],board);
+        return c.usrCoords[1];
+      }]).draw();
+    return args;
+  };
+  this.remove = function() {
+    board.removeObject(this.functionElement);
+    board.shapes.pop();
+  };
+};
+
 module.exports = {
   angle: angle,
-  area:  area
+  area:  area,
+  plot:  plot,
 };

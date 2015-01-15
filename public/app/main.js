@@ -27,7 +27,7 @@ $(function() {
   })();
   if (!$('#application').hasClass('paste')) {
     /* Subscribe to application */
-    var App = require('./subscribe')(board);
+    var App = window.app = require('./subscribe')(board);
     require('./helper/helpers')  (App, board);  /* various UI helpers */
     require('./decorators/mouse')(App);         /* dragging decoration */
   } else {

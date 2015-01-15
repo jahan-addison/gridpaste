@@ -68,5 +68,11 @@ describe("GeometryFunction Factory", function() {
       });
       expect(area.run().toFixed(1)).to.equal("1963.5");
     });
-  })
+  });
+  describe("PlotFunction", function() {
+    it("should give coords of expression of x", function() {
+      var plot = new Func(JXG, "plot", {equation: "x+4"});
+      console.log(plot.run());
+    });
+  });
 });

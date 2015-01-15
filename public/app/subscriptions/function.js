@@ -21,7 +21,7 @@ module.exports = function(App) {
         return false;
       }
       var targetOperation = 'func',
-          targetCommand   = func.identifier;
+          targetCommand   = func.identifier || 'plot';
       if (targetCommand in command[targetOperation] === false) {
         alert("Warning: This GeometryFunction does not exist");
         return;        
