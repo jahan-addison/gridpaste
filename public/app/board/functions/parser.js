@@ -35,7 +35,8 @@ Parser.prototype = (function() {
     T_IDENTIFIER:  8,
     T_EQUAL:       9,
     T_LABEL:       10,
-    T_EOL:         11
+    T_EXPR:        11,
+    T_EOL:         12
   });
 
   var token_strings = Object.freeze({
@@ -49,7 +50,8 @@ Parser.prototype = (function() {
     8:  "identifier",
     9:           "=",
     10:      "label",
-    11:        "EOL"
+    11: "expression",
+    12:        "EOL"
   });
 
   var t_error = function(llex, token, expected) {
@@ -92,16 +94,19 @@ Parser.prototype = (function() {
       if (this.llex.expr[this.llex.pointer] == '=') {
         accept.call(this, tokens.T_EQUAL);
       }
-      accept.call(this, tokens.T_IDENTIFIER);
-      this._identifier = this.llex.scanner;
-      accept.call(this, tokens.T_OPEN_PAREN);
-      var token;
-      do {
-        token = accept.call(this, [tokens.T_LABEL, tokens.T_LETTER, tokens.T_INTEGER, tokens.T_FLOAT]);
-        this._arguments.push({argument: this.llex.scanner, type: token_strings[token]});
-      } while(accept.call(this, [tokens.T_COMMA, tokens.T_CLOSE_PAREN]) == tokens.T_COMMA);
-
-      accept.call(this, tokens.T_EOL);
+      accept.call(this, [tokens.T_EXPR, tokens.T_IDENTIFIER]);
+      if (this.llex.current_token == tokens.T_EXPR) {
+        this._arguments.push({argument: this.llex.scanner, type: token_strings[tokens.T_EXPR]});
+      } else {
+        this._identifier = this.llex.scanner;
+        accept.call(this, [tokens.T_OPEN_PAREN]);
+        var token;
+        do {
+          token = accept.call(this, [tokens.T_LABEL, tokens.T_LETTER, tokens.T_INTEGER, tokens.T_FLOAT]);
+          this._arguments.push({argument: this.llex.scanner, type: token_strings[token]});
+        } while(accept.call(this, [tokens.T_COMMA, tokens.T_CLOSE_PAREN]) == tokens.T_COMMA);
+      }
+    accept.call(this, tokens.T_EOL);
     }
   };
 })();
