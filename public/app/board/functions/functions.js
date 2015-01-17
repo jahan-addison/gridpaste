@@ -71,6 +71,22 @@ GeometryFunction.prototype = (function() {
     return Math.PI * Math.pow(this.options.radius, 2);    
   };
 
+
+  /*
+  Options:
+    board:    Object
+    equation: String
+  */
+
+  var PlotFunction = function(JXG, options) {
+    this.options = options;
+    this.jc      = options.board.jc // JessieCode
+  };
+
+  PlotFunction.prototype.run = function() {
+    return this.jc.snippet(this.options.equation, true, 'x,y', true);  
+  };
+
   /* @TODO: */
 
   /*
@@ -119,7 +135,8 @@ GeometryFunction.prototype = (function() {
     Constructor:  GeometryFunction,
     angle:        AngleFunction,
     polygon_area: polygonAreaFunction,
-    circle_area:  CircleAreaFunction
+    circle_area:  CircleAreaFunction,
+    plot:         PlotFunction
   };
 
 })();

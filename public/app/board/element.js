@@ -192,6 +192,29 @@ BoardElement.prototype = (function() {
 
   /*
   Options: {
+    options: [Function, X, Y]
+  }
+  */
+
+  var functionElement = function(board, options) {
+    this.options = options;
+    this.board   = board;
+  }
+
+  functionElement.prototype.draw = function() {
+    var curve = new shape(this.board, 'functiongraph', this.options.concat(this.options[0]), {
+      fixed: true,
+      strokewidth: 2
+    });
+    curve = curve.add();
+
+    return curve;
+  };
+
+  //-----------------------------------------------------------------------
+
+  /*
+  Options: {
     position: [float, float],
     size:     int,
     text:     string
@@ -222,6 +245,7 @@ BoardElement.prototype = (function() {
     arc:         arcElement,
     ellipse:     ellipseElement,
     segment:     segmentElement,
+    func:        functionElement,
     line:        lineElement,
     polygon:     polygonElement,
     point:       pointElement,

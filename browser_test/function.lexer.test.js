@@ -13,7 +13,8 @@ describe("Geometry Function Tokenizer", function() {
     T_IDENTIFIER:  8,
     T_EQUAL:       9,
     T_LABEL:       10,
-    T_EOL:         11
+    T_EXPR:        11,
+    T_EOL:         12
   });
   var llex_test;
 
@@ -32,6 +33,17 @@ describe("Geometry Function Tokenizer", function() {
         llex_test.getNextToken();
         expect(llex_test.scanner).to.equal('.');
       });
+    });
+    describe("T_EXPR", function() {
+      it('should return T_EXPR', function() {
+        llex_test = new Lexer("sin(x)");
+        expect(llex_test.getNextToken()).to.equal(tokens.T_EXPR);
+      });
+      it('should pass expression to scanner pointer', function() {
+        llex_test = new Lexer("sin(x)");
+        llex_test.getNextToken();
+        expect(llex_test.scanner).to.equal('sin(x)');
+      });        
     });
     describe("T_INTEGER", function() {
       it('should return T_INTEGER', function() {
@@ -143,7 +155,7 @@ describe("Geometry Function Tokenizer", function() {
     });
     describe("T_LABEL", function() {
       it('should return T_LABEL', function() {
-        llex_test = new Lexer("A12");
+        llex_test = new Lexer("A1");
         expect(llex_test.getNextToken()).to.equal(tokens.T_LABEL);
       });
       it('should pass label to scanner pointer', function() {

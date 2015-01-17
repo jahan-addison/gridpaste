@@ -44,15 +44,16 @@ module.exports = function() {
         lexer = new Lexer(value);
         // expect a letter and EOF.
         var tokens = [lexer.getNextToken(), lexer.getNextToken()];
-        if (tokens[0] != 4 || tokens[1] != 11) {
+        if (tokens[0] != 4 || tokens[1] != 12) {
           failed = Types[type];
         }
         break;        
       case 'figure':
         lexer = new Lexer(value);
         // expect a label and EOF.
+        console.log(lexer);
         var tokens = [lexer.getNextToken(), lexer.getNextToken()];
-        if (tokens[0] != 10 || tokens[1] != 11) {
+        if (tokens[0] != 10 || tokens[1] != 12) {
           failed = Types[type];
         }
         break;

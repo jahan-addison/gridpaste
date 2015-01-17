@@ -27,13 +27,14 @@ Lexer.prototype = (function() {
     T_IDENTIFIER:  8,
     T_EQUAL:       9,
     T_LABEL:       10,
-    T_EOL:         11
+    T_EXPR:        11,
+    T_EOL:         12
   });
   var skipWhitespace = function() {
     while(/[\s\t\n]/.test(this.expr[this._pointer])) {
       this._pointer++;
     }
-  }
+  };
   return {
     Constructor: Lexer,
     getNextToken: function() {
@@ -42,6 +43,12 @@ Lexer.prototype = (function() {
       // T_EOL
       if (this._pointer >= this.expr.length) {
         return this.current_token = tokens.T_EOL;
+      }
+      // T_EXPR
+      if (/^.*?\bx\b.*?$/.test(this.expr)) {
+        this._scanner = this.expr;
+        this._pointer = this._scanner.length;
+        return this.current_token = tokens.T_EXPR;
       }
       // T_IDENTIFIER
       if (/[a-z]/.test(this.expr[this._pointer])) {

@@ -5,11 +5,13 @@ describe("Geometry Function Parser", function() {
   var parse;
 
   describe("#run", function() {
-    it("should parse an identifier first", function() {
+    it("should try and parse an expression first", function() {
       parse = new Parser("");
-      expect(function() { parse.run(); }).to.throw("Unexpected token: 'EOL', expected identifier"); 
-      parse = new Parser("test(A)");
+      expect(function() { parse.run(); }).to.throw("Unexpected token: 'EOL', expected expression"); 
+      parse = new Parser("sin(x)");
       expect(function() { parse.run(); }).to.not.throw();
+      expect(parse.arguments[0].argument).to.equal('sin(x)');
+      expect(parse.arguments[0].type).to.equal('expression');
     });
     it("can parse '=' before an identifier", function() {
       parse = new Parser("=test(A)");

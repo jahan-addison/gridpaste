@@ -30,10 +30,13 @@ and (orientation : landscape) {
   }
 }
 
-@media screen and ( max-height: 768px ){
+@media screen and (max-height: 600) {
   #left-bar {
     overflow: auto;
-  }
+  }  
+}
+
+@media screen and ( max-height: 768px ){
   footer > p {
    // display: none;
   }
