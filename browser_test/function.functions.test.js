@@ -70,9 +70,9 @@ describe("GeometryFunction Factory", function() {
     });
   });
   describe("PlotFunction", function() {
-    it("should give coords of expression of x", function() {
-      var plot = new Func(JXG, "plot", {equation: "x+4"});
-      console.log(plot.run());
+    it("should compose a function on x", function() {
+      var plot = new Func(JXG, "plot", {equation: "x+4", board: brd});
+      expect(plot.run().toString()).to.equal(" function (x, y) {\n return (x + 4);\n}\n")
     });
   });
 });

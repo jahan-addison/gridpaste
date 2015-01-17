@@ -237,7 +237,7 @@ var plot = function(board, args) {
       var result = this.func.run();
     } catch(e) {
       alert("Expression Error: " + e.message);
-      return;
+      return {failed: true};
     }
     this.functionElement = new element(board, "func", [result,
       function(){ 

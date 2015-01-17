@@ -16,7 +16,6 @@ module.exports = function(App) {
         func.run(); // generate parse tree
       } catch(e) {
         // syntax error
-        console.log(e.message);
         alert("Syntax: " + e.message);
         return false;
       }
@@ -31,6 +30,15 @@ module.exports = function(App) {
         'targetCommand':   targetCommand,
         'command':         command[targetOperation][targetCommand]
       };
+      if (targetCommand === 'plot') {
+          // before storeAndExecute ensure the plot compiles
+          try {
+            App.board.jc.snippet(e.target.value, true, 'x,y', true);
+          } catch(e) {  
+            alert("Expression Error: " + e.message);           
+            return;
+          }
+      }
       try {
         App.storeAndExecute($command);
       } catch(e) {
@@ -38,9 +46,11 @@ module.exports = function(App) {
         return;
       }
       e.target.value = "";
-      
       if (App.length > 0) {
         $('.button.undo').addClass('visible');
+        if (targetCommand === 'plot') {
+          $('.button.delete_').removeClass('hidden')
+        }
       }
       $('.close-slider').click();
     }

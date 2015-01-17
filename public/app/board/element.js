@@ -8,7 +8,6 @@ var point = require('./point'),
 var BoardElement = function(board, element, options) {
   this.element = element;
   this.options = options;
-  console.log(element);
   return new this[element](board, options);
 }
 
@@ -208,6 +207,7 @@ BoardElement.prototype = (function() {
       strokewidth: 2
     });
     curve = curve.add();
+
     return curve;
   };
 

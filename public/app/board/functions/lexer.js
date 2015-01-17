@@ -34,7 +34,7 @@ Lexer.prototype = (function() {
     while(/[\s\t\n]/.test(this.expr[this._pointer])) {
       this._pointer++;
     }
-  }
+  };
   return {
     Constructor: Lexer,
     getNextToken: function() {
