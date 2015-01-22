@@ -30,7 +30,7 @@ and (orientation : landscape) {
   }
 }
 
-@media screen and (max-height: 600) {
+@media screen and (max-height: 600px) {
   #left-bar {
     overflow: auto;
   }  
