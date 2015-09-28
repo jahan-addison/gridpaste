@@ -17,7 +17,7 @@ module.exports = function(board) {
       var coords = getMouseCoords(evt, i)
         .usrCoords
         .map(function(e) { 
-          return e.toFixed(2); 
+          return e;
         });
       board.usrAt = board.create("text", 
         [parseFloat(coords[1] + 1.2), parseFloat(coords[2] + .5), // away from cursor
