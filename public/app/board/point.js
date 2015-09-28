@@ -24,7 +24,7 @@ Point.prototype = (function() {
       //var point = getPointIfExists.call(this);
       var point = false;
       if (!point) {
-        var p = this.board.create("point", this.coords);
+        var p = this.board.create("point", this.coords, { infoboxDigits: 'none'});
         Object.defineProperty(this.board.points, p.name, 
           {value: p,
            enumerable:   true,
