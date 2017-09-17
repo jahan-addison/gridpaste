@@ -25,7 +25,7 @@ exports.show = function(req, res) {
  */
 
 exports.examples = function(req, res) {
-  Paste.paginate({ user: 'examples'  }, req.query.page, req.query.limit, function(error, pageCount, paginatedResults, itemCount) {
+  Paste.paginate({ user: 'examples'  }, { page: req.query.page, limit: req.query.limit}, function(error, pageCount, paginatedResults, itemCount) {
     if (error) return next(error);
     res.render('examples.html', {
       host:      req.get('host'),
@@ -69,7 +69,7 @@ exports.list = function(req, res) {
   if (!req.session.loggedIn) {
     res.redirect('/');
   }
-  Paste.paginate({ user: req.session.user  }, req.query.page, req.query.limit, function(error, pageCount, paginatedResults, itemCount) {
+  Paste.paginate({ user: req.session.user  }, { page: req.query.page, limit: req.query.limit}, function(error, pageCount, paginatedResults, itemCount) {
     if (error) return next(error);
     res.render('pastes.html', {
       host:      req.get('host'),
