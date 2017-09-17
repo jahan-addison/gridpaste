@@ -16,22 +16,22 @@ module.exports = function (grunt) {
     uglify: {
       my_target: {
         files: {
-          './public/app/dist/main.min.js': ['./public/app/dist/build.js']
+          './public/javascripts/dist/main.min.js': ['./app/javascripts/dist/build.js']
         }
       }
     },
     compass: {
       dist: {
         options: {
-          sassDir: 'public/css',
-          cssDir: 'public/css/build'
+          sassDir: 'app/css',
+          cssDir: 'app/css/build'
         }
       }
     },
     cssmin: {
       combine: {
         files: {
-          './public/css/build/main.min.css': ['./public/css/build/main.css']
+          './public/css/build/main.min.css': ['./app/css/build/main.css']
         }
       }
     },
@@ -42,11 +42,11 @@ module.exports = function (grunt) {
         beforeHook: function(bundle) {
           shim(bundle, {
             Mousetrap: {
-              path: './public/components/mousetrap/mousetrap.min',
+              path: './app/components/mousetrap/mousetrap.min',
               exports: 'Mousetrap'
             },
             RxJS: {
-              path: './public/components/rxjs/rx.lite,js',
+              path: './app/components/rxjs/rx.lite,js',
               exports: 'Rx'              
             }
           });
@@ -87,27 +87,27 @@ module.exports = function (grunt) {
         tasks: ['develop', 'delayed-livereload']
       },
       js: {
-        files: ['routes/*.js', 'public/app/**/*.js', './Gruntfile.js'],
+        files: ['routes/*.js', 'app/javascripts/**/*.js', './Gruntfile.js'],
         options: {
           livereload: reloadPort
         }
       },
       sass: {
-        files: ['public/css/**/*.scss'],
+        files: ['app/css/**/*.scss'],
         tasks: ['compass'],
         options: {
           livereload: reloadPort
         }
       },
       browserify: {
-        files: ['public/app/**/*.js'],
+        files: ['app/javascripts/**/*.js'],
         tasks: ['browserify2:compile'],
         options: {
           livereload: reloadPort
         }
       },
       karma: {
-        files: ['public/app/**/*.js', 'browser_test/*.js'],
+        files: ['app/javascripts/**/*.js', 'browser_test/*.js'],
         tasks: ['karma'],
         options: {
           livereload: reloadPort
