@@ -45,11 +45,11 @@ $(function() {
     });
   }
 }); 
-},{"./helper/helpers":2,"./subscribe":3,"./decorators/mouse":4,"./helper/play":5}],4:[function(require,module,exports){
+},{"./subscribe":2,"./helper/helpers":3,"./decorators/mouse":4,"./helper/play":5}],4:[function(require,module,exports){
 module.exports = function(App) {
   MouseEvent.prototype.srcApp = App;
 }
-},{}],3:[function(require,module,exports){
+},{}],2:[function(require,module,exports){
 var execute    = require('./operation');
 
 module.exports = function(board) {
@@ -67,21 +67,7 @@ module.exports = function(board) {
   return operationExec;
 };
 
-},{"./operation":6,"./subscriptions/board":7,"./subscriptions/function":8,"./subscriptions/zoom":9}],2:[function(require,module,exports){
-module.exports = function(App, board) {
-  require('./more')  ();           // attach event to "more" button for polygon construction
-  require('./undo')  (App);        // attach event to undo button
-  require('./record')(App);        // attach event to record button
-  require('./clear') (App);        // attach event to clear button
-  require('./drag')  (board);      // attach event to drag
-  require('./play')  (App, board); // attach event to UI play button after recording
-  require('./share')    (App)    // attach event to share button
-  require('./bindings') (App);   // attach keyboard bindings
-  require('./mouse')    (board); // show coordinates at cursor
-  require('./dirty')    (App);   // prevent 'dirty board' 
-};
-
-},{"./undo":10,"./more":11,"./record":12,"./clear":13,"./drag":14,"./play":5,"./share":15,"./bindings":16,"./mouse":17,"./dirty":18}],5:[function(require,module,exports){
+},{"./operation":6,"./subscriptions/function":7,"./subscriptions/board":8,"./subscriptions/zoom":9}],5:[function(require,module,exports){
 var iterator = require('../iterate'),
     command  = require('../events/run');
 
@@ -152,7 +138,21 @@ module.exports = function(App, board) {
     });
   }
 };
-},{"../iterate":19,"../events/run":20,"./position":21}],11:[function(require,module,exports){
+},{"../events/run":10,"./position":11,"../iterate":12}],3:[function(require,module,exports){
+module.exports = function(App, board) {
+  require('./more')  ();           // attach event to "more" button for polygon construction
+  require('./undo')  (App);        // attach event to undo button
+  require('./record')(App);        // attach event to record button
+  require('./clear') (App);        // attach event to clear button
+  require('./drag')  (board);      // attach event to drag
+  require('./play')  (App, board); // attach event to UI play button after recording
+  require('./share')    (App)    // attach event to share button
+  require('./bindings') (App);   // attach keyboard bindings
+  require('./mouse')    (board); // show coordinates at cursor
+  require('./dirty')    (App);   // prevent 'dirty board' 
+};
+
+},{"./more":13,"./record":14,"./undo":15,"./clear":16,"./drag":17,"./play":5,"./share":18,"./bindings":19,"./mouse":20,"./dirty":21}],13:[function(require,module,exports){
 module.exports = function() {
   $(function() {
     var points = 3;
@@ -166,18 +166,7 @@ module.exports = function() {
     });
   });
 };
-},{}],10:[function(require,module,exports){
-module.exports = function(App) {
-  $(function() {
-    $('.button.undo').click(function() {
-      App.undoLastExecute();
-      if(App.length === 0) {
-        $(this).removeClass('visible');
-      }
-    });
-  });
-};
-},{}],12:[function(require,module,exports){
+},{}],14:[function(require,module,exports){
 module.exports = function(App) {
   $(function() {
     $('.start-record').click(function() {
@@ -211,7 +200,18 @@ module.exports = function(App) {
     });
   });
 };
-},{}],17:[function(require,module,exports){
+},{}],15:[function(require,module,exports){
+module.exports = function(App) {
+  $(function() {
+    $('.button.undo').click(function() {
+      App.undoLastExecute();
+      if(App.length === 0) {
+        $(this).removeClass('visible');
+      }
+    });
+  });
+};
+},{}],20:[function(require,module,exports){
 module.exports = function(board) {
   var getMouseCoords = function(e, i) {
     var cPos = board.getCoordsTopLeftCorner(e, i),
@@ -244,42 +244,7 @@ module.exports = function(board) {
   });
 };
 
-},{}],18:[function(require,module,exports){
-module.exports = function(App) {
-  $(window).on('beforeunload', function() {
-    if (!$('#application').hasClass('shared')) {
-      if (App.isRecording && App.length) {
-        return "You have an unsaved grid paste! Are you sure you want to leave?";
-      }
-    }
-  });
-};
-},{}],19:[function(require,module,exports){
-/* The Iterator */
-
-var Iterator = function(List) {
-  this.step = 0;
-  this.list = List;
-};
-
-Iterator.prototype.hasNext = function() {
-  return this.step < this.list.length;
-};
-
-Iterator.prototype.next    = function() {
-  return this.list[this.step++];
-};
-
-Iterator.prototype.hasPrev = function() {
-  return this.step > 0;
-};
-
-Iterator.prototype.prev    = function() {
-  return this.list[--this.step];
-};
-
-module.exports = Iterator;
-},{}],21:[function(require,module,exports){
+},{}],11:[function(require,module,exports){
 module.exports = function(args, board) {
   var translateX   = false,
       translateY   = false,
@@ -362,6 +327,41 @@ module.exports = function(args, board) {
     }    
   }
 };
+},{}],12:[function(require,module,exports){
+/* The Iterator */
+
+var Iterator = function(List) {
+  this.step = 0;
+  this.list = List;
+};
+
+Iterator.prototype.hasNext = function() {
+  return this.step < this.list.length;
+};
+
+Iterator.prototype.next    = function() {
+  return this.list[this.step++];
+};
+
+Iterator.prototype.hasPrev = function() {
+  return this.step > 0;
+};
+
+Iterator.prototype.prev    = function() {
+  return this.list[--this.step];
+};
+
+module.exports = Iterator;
+},{}],21:[function(require,module,exports){
+module.exports = function(App) {
+  $(window).on('beforeunload', function() {
+    if (!$('#application').hasClass('shared')) {
+      if (App.isRecording && App.length) {
+        return "You have an unsaved grid paste! Are you sure you want to leave?";
+      }
+    }
+  });
+};
 },{}],6:[function(require,module,exports){
 /* The Invoker */
 
@@ -412,6 +412,104 @@ Operation.prototype.undoLastExecute = function() {
 
 module.exports = Operation;
 },{"./decorators/recording":22}],7:[function(require,module,exports){
+var command    = require('../events/run'),
+    Parser     = require('../board/functions/parser'),
+    Rx         = require('../../components/rxjs/rx.lite').Rx;
+
+module.exports = function(App) {
+  var $sources = $('.function'),
+      $source  = Rx.Observable.fromEvent($sources, "keypress");
+  // Filter when the application is 'off'
+  $source      = $source.filter(function() {
+    return !$('#application').hasClass('off');
+  });
+  var $functionSubscription = $source.subscribe(function(e) {
+    if (e.keyCode == 13) {
+      var func = new Parser(e.target.value);
+      try {
+        func.run(); // generate parse tree
+      } catch(e) {
+        // syntax error
+        alert("Syntax: " + e.message);
+        return false;
+      }
+      var targetOperation = 'func',
+          targetCommand   = func.identifier || 'plot';
+      if (targetCommand in command[targetOperation] === false) {
+        alert("Warning: This GeometryFunction does not exist");
+        return;        
+      }
+      var $command        = {
+        'targetOperation': targetOperation,
+        'targetCommand':   targetCommand,
+        'command':         command[targetOperation][targetCommand]
+      };
+      if (targetCommand === 'plot') {
+          // before storeAndExecute ensure the plot compiles
+          try {
+            App.board.jc.snippet(e.target.value, true, 'x,y', true);
+          } catch(e) {  
+            alert("Expression Error: " + e.message);           
+            return;
+          }
+      }
+      try {
+        App.storeAndExecute($command);
+      } catch(e) {
+        alert("Warning: " + e.message.replace("JSXGraph: ", ''));
+        return;
+      }
+      e.target.value = "";
+      if (App.length > 0) {
+        $('.button.undo').addClass('visible');
+        if (targetCommand === 'plot') {
+          $('.button.delete_').removeClass('hidden')
+        }
+      }
+      $('.close-slider').click();
+    }
+  },
+  function(e) {
+    console.log("Error: %s", e.message);
+  });
+};
+},{"../events/run":10,"../board/functions/parser":23,"../../components/rxjs/rx.lite":24}],9:[function(require,module,exports){
+var command    = require('../events/run'),
+    Rx         = require('../../components/rxjs/rx.lite').Rx;
+
+module.exports = function(App, board) {
+  var $zoomSources      = $('.zoom.in, .zoom.out');
+  var $zoomSource       = Rx.Observable.fromEvent($zoomSources, "click");
+
+  // Filter when the application is 'off'
+  $zoomSource = $zoomSource.filter(function() {
+    return !$('#application').hasClass('off');
+  });
+
+  var $zoomSubscription = $zoomSource.subscribe(function(e) {
+    var target          = $(e.target),
+        targetCommand = target.hasClass('in') ? 'zoomIn' : 'zoomOut'; 
+    if ((targetCommand == 'zoomIn'  && board.zoomX < 5.9) ||
+        (targetCommand == 'zoomOut' && board.zoomX > 0.167)) {
+      var $command  = {
+        'targetOperation': 'zoom',
+        'targetCommand':   targetCommand,
+        'command':         command['zoom'][targetCommand]
+      };
+      try {
+        App.storeAndExecute($command);
+      } catch(e) {
+        alert("Warning: " + e.message.replace("JSXGraph: ", ''));
+        return;
+      }
+      if (App.length > 0) {
+        $('.button.undo').addClass('visible');
+      }   
+    } 
+  });
+
+}
+},{"../events/run":10,"../../components/rxjs/rx.lite":24}],8:[function(require,module,exports){
 var command    = require('../events/run'),
     slider     = require('../helper/slider'),
     validate   = require('../helper/validate')(),
@@ -488,105 +586,84 @@ module.exports = function(App) {
       console.log("Error: %s", e.message);
     });
 };
-},{"../helper/slider":23,"../helper/validate":24,"../../components/rxjs/rx.lite":25,"../events/run":20}],8:[function(require,module,exports){
-var command    = require('../events/run'),
-    Parser     = require('../board/functions/parser'),
-    Rx         = require('../../components/rxjs/rx.lite').Rx;
+},{"../events/run":10,"../helper/validate":25,"../helper/slider":26,"../../components/rxjs/rx.lite":24}],16:[function(require,module,exports){
+var execute = require('../operation');
 
 module.exports = function(App) {
-  var $sources = $('.function'),
-      $source  = Rx.Observable.fromEvent($sources, "keypress");
-  // Filter when the application is 'off'
-  $source      = $source.filter(function() {
-    return !$('#application').hasClass('off');
-  });
-  var $functionSubscription = $source.subscribe(function(e) {
-    if (e.keyCode == 13) {
-      var func = new Parser(e.target.value);
-      try {
-        func.run(); // generate parse tree
-      } catch(e) {
-        // syntax error
-        alert("Syntax: " + e.message);
-        return false;
-      }
-      var targetOperation = 'func',
-          targetCommand   = func.identifier || 'plot';
-      if (targetCommand in command[targetOperation] === false) {
-        alert("Warning: This GeometryFunction does not exist");
-        return;        
-      }
-      var $command        = {
-        'targetOperation': targetOperation,
-        'targetCommand':   targetCommand,
-        'command':         command[targetOperation][targetCommand]
-      };
-      if (targetCommand === 'plot') {
-          // before storeAndExecute ensure the plot compiles
-          try {
-            App.board.jc.snippet(e.target.value, true, 'x,y', true);
-          } catch(e) {  
-            alert("Expression Error: " + e.message);           
-            return;
-          }
-      }
-      try {
-        App.storeAndExecute($command);
-      } catch(e) {
-        alert("Warning: " + e.message.replace("JSXGraph: ", ''));
-        return;
-      }
-      e.target.value = "";
-      if (App.length > 0) {
-        $('.button.undo').addClass('visible');
-        if (targetCommand === 'plot') {
-          $('.button.delete_').removeClass('hidden')
+  $(function() {
+    var board = App.board;
+    $('.button.clear').click(function() {
+      for(point in board.points) {
+        if (board.points.hasOwnProperty(point)) {
+          board.removeObject(board.points[point]);
         }
       }
-      $('.close-slider').click();
-    }
-  },
-  function(e) {
-    console.log("Error: %s", e.message);
+      board.points = {};
+      var size = board.shapes.length;
+      for (var i = 0; i < size; i++) {
+        board.removeObject(board.shapes[i]);
+      }
+      board.shapes = [];
+      $('.function').val('');
+      $('.undo').removeClass('visible');
+      board.zoom100();
+      board.update();
+
+      App.clearCommandList();
+
+      // Reset recording UI
+      require('./record')(App); // reattach record events   
+      $('.start-record').removeClass('dim').html('Start Record');
+      $('.end-record').removeClass('dim').html('End Record');
+    })
   });
 };
-},{"../board/functions/parser":26,"../../components/rxjs/rx.lite":25,"../events/run":20}],9:[function(require,module,exports){
-var command    = require('../events/run'),
-    Rx         = require('../../components/rxjs/rx.lite').Rx;
+},{"../operation":6,"./record":14}],18:[function(require,module,exports){
+var slider = require('./slider');
 
-module.exports = function(App, board) {
-  var $zoomSources      = $('.zoom.in, .zoom.out');
-  var $zoomSource       = Rx.Observable.fromEvent($zoomSources, "click");
-
-  // Filter when the application is 'off'
-  $zoomSource = $zoomSource.filter(function() {
-    return !$('#application').hasClass('off');
-  });
-
-  var $zoomSubscription = $zoomSource.subscribe(function(e) {
-    var target          = $(e.target),
-        targetCommand = target.hasClass('in') ? 'zoomIn' : 'zoomOut'; 
-    if ((targetCommand == 'zoomIn'  && board.zoomX < 5.9) ||
-        (targetCommand == 'zoomOut' && board.zoomX > 0.167)) {
-      var $command  = {
-        'targetOperation': 'zoom',
-        'targetCommand':   targetCommand,
-        'command':         command['zoom'][targetCommand]
-      };
-      try {
-        App.storeAndExecute($command);
-      } catch(e) {
-        alert("Warning: " + e.message.replace("JSXGraph: ", ''));
-        return;
+module.exports = function(App) {
+  var $html;
+  $(function() {
+    $('.share').click(function() {
+      if (Object.isFrozen(App)) {
+        var done;
+        if (typeof $html !== 'undefined') {
+          slider($html, 230, 'auto', '#application', $('#transform'));           
+          return;
+        }
+        slider($(this).next().html(), 230, 'auto', '#application', $('#transform')); 
+        $('#application').on('click', '.submit', function() {
+          var $paste = App.getRecorded.map(function(e) {
+            delete e.command; // we no longer need constructors
+            return e;
+          });
+          var data   = {
+            title: $('input.title:last').val(),
+            paste: $paste
+          };
+          $('.close-slider').click();
+          $.ajax({
+            url: '/paste',
+            type: 'POST',
+            data: JSON.stringify(data),
+            contentType: "application/json",
+            complete: function(token) {
+              $html = ['<div class="misc-done">',
+                '<label for="url">The URL!</label><input type="text" name="url" class="inside url" value="',
+                document.location.href + token.responseJSON.token,
+                '" />',
+                '</div>'
+              ].join('');
+              $('#application').addClass('shared');
+              slider($html, 250, 'auto', '#application', $('#transform'));
+            }
+          });
+        });
       }
-      if (App.length > 0) {
-        $('.button.undo').addClass('visible');
-      }   
-    } 
+    })
   });
-
 }
-},{"../events/run":20,"../../components/rxjs/rx.lite":25}],14:[function(require,module,exports){
+},{"./slider":26}],17:[function(require,module,exports){
 var transform = require('../events/transform');
 var last = [],
   initialX,
@@ -668,84 +745,18 @@ module.exports = function(e) {
     }.bind(dragged));
   });
 };
-},{"./text.js":27,"../events/transform":28}],13:[function(require,module,exports){
-var execute = require('../operation');
+},{"./text.js":27,"../events/transform":28}],10:[function(require,module,exports){
 
-module.exports = function(App) {
-  $(function() {
-    var board = App.board;
-    $('.button.clear').click(function() {
-      for(point in board.points) {
-        if (board.points.hasOwnProperty(point)) {
-          board.removeObject(board.points[point]);
-        }
-      }
-      board.points = {};
-      var size = board.shapes.length;
-      for (var i = 0; i < size; i++) {
-        board.removeObject(board.shapes[i]);
-      }
-      board.shapes = [];
-      $('.function').val('');
-      $('.undo').removeClass('visible');
-      board.zoom100();
-      board.update();
-
-      App.clearCommandList();
-
-      // Reset recording UI
-      require('./record')(App); // reattach record events   
-      $('.start-record').removeClass('dim').html('Start Record');
-      $('.end-record').removeClass('dim').html('End Record');
-    })
-  });
+module.exports = {
+  draw:      require('./draw'),
+  transform: require('./transform'),
+  zoom:      require('./zoom'),
+  func:      require('./function'),
+  misc:      require('./misc')
 };
-},{"../operation":6,"./record":12}],15:[function(require,module,exports){
-var slider = require('./slider');
 
-module.exports = function(App) {
-  var $html;
-  $(function() {
-    $('.share').click(function() {
-      if (Object.isFrozen(App)) {
-        var done;
-        if (typeof $html !== 'undefined') {
-          slider($html, 230, 'auto', '#application', $('#transform'));           
-          return;
-        }
-        slider($(this).next().html(), 230, 'auto', '#application', $('#transform')); 
-        $('#application').on('click', '.submit', function() {
-          var $paste = App.getRecorded.map(function(e) {
-            delete e.command; // we no longer need constructors
-            return e;
-          });
-          var data   = {
-            title: $('input.title:last').val(),
-            paste: $paste
-          };
-          $('.close-slider').click();
-          $.ajax({
-            url: '/paste',
-            type: 'POST',
-            data: JSON.stringify(data),
-            contentType: "application/json",
-            complete: function(token) {
-              $html = ['<div class="misc-done">',
-                '<label for="url">The URL!</label><input type="text" name="url" class="inside url" value="',
-                document.location.href + token.responseJSON.token,
-                '" />',
-                '</div>'
-              ].join('');
-              $('#application').addClass('shared');
-              slider($html, 250, 'auto', '#application', $('#transform'));
-            }
-          });
-        });
-      }
-    })
-  });
-}
-},{"./slider":23}],16:[function(require,module,exports){
+
+},{"./draw":29,"./transform":28,"./zoom":30,"./function":31,"./misc":32}],19:[function(require,module,exports){
 var command = require('../events/run'),
     slider     = require('../helper/slider');
 
@@ -824,18 +835,7 @@ module.exports = function(App) {
     })
   });
 };
-},{"../events/run":20,"../helper/slider":23,"../../components/mousetrap/mousetrap.min":29}],20:[function(require,module,exports){
-
-module.exports = {
-  draw:      require('./draw'),
-  transform: require('./transform'),
-  zoom:      require('./zoom'),
-  func:      require('./function'),
-  misc:      require('./misc')
-};
-
-
-},{"./draw":30,"./transform":28,"./zoom":31,"./function":32,"./misc":33}],22:[function(require,module,exports){
+},{"../helper/slider":26,"../events/run":10,"../../components/mousetrap/mousetrap.min":33}],22:[function(require,module,exports){
 /*
   OperationDecorator
 */
@@ -897,29 +897,7 @@ module.exports = function(Operation) {
   }; 
 };
 
-},{}],27:[function(require,module,exports){
-var still;
-module.exports = function(board, text) {
-  if (typeof text.labelAt !== 'undefined') {
-    return false;
-  }
-    still = setTimeout(function() {
-      text.labelAt = board.create("text", 
-        [text.X() - 5, text.Y(), // away from cursor
-        text.name]
-      );
-      setTimeout(function() {
-        if (typeof text.labelAt !== 'undefined') {
-          clearTimeout(still);
-          if (typeof text.labelAt !== 'undefined') {
-            board.removeObject(text.labelAt);
-            delete text.labelAt;
-          }
-        }        
-      }, 1000);
-    }, 300);
-};
-},{}],23:[function(require,module,exports){
+},{}],26:[function(require,module,exports){
 module.exports = function(content, width, height, source, top, slide) {
   var animate = {};
   var $block = $('<div class="slider"> <div class="close-slider">x</div> </div>');
@@ -963,6 +941,28 @@ module.exports = function(content, width, height, source, top, slide) {
       $(this).remove();
     });
   });
+};
+},{}],27:[function(require,module,exports){
+var still;
+module.exports = function(board, text) {
+  if (typeof text.labelAt !== 'undefined') {
+    return false;
+  }
+    still = setTimeout(function() {
+      text.labelAt = board.create("text", 
+        [text.X() - 5, text.Y(), // away from cursor
+        text.name]
+      );
+      setTimeout(function() {
+        if (typeof text.labelAt !== 'undefined') {
+          clearTimeout(still);
+          if (typeof text.labelAt !== 'undefined') {
+            board.removeObject(text.labelAt);
+            delete text.labelAt;
+          }
+        }        
+      }, 1000);
+    }, 300);
 };
 },{}],34:[function(require,module,exports){
 // shim for using process in browser
@@ -1019,7 +1019,7 @@ process.chdir = function (dir) {
     throw new Error('process.chdir is not supported');
 };
 
-},{}],25:[function(require,module,exports){
+},{}],24:[function(require,module,exports){
 (function(process,global){// Copyright (c) Microsoft Open Technologies, Inc. All rights reserved. See License.txt in the project root for license information.
 
 ;(function (undefined) {
@@ -6497,18 +6497,7 @@ process.chdir = function (dir) {
     }
 }.call(this));
 })(require("__browserify_process"),window)
-},{"__browserify_process":34}],29:[function(require,module,exports){
-/* mousetrap v1.4.6 craig.is/killing/mice */
-(function(J,r,f){function s(a,b,d){a.addEventListener?a.addEventListener(b,d,!1):a.attachEvent("on"+b,d)}function A(a){if("keypress"==a.type){var b=String.fromCharCode(a.which);a.shiftKey||(b=b.toLowerCase());return b}return h[a.which]?h[a.which]:B[a.which]?B[a.which]:String.fromCharCode(a.which).toLowerCase()}function t(a){a=a||{};var b=!1,d;for(d in n)a[d]?b=!0:n[d]=0;b||(u=!1)}function C(a,b,d,c,e,v){var g,k,f=[],h=d.type;if(!l[a])return[];"keyup"==h&&w(a)&&(b=[a]);for(g=0;g<l[a].length;++g)if(k=
-l[a][g],!(!c&&k.seq&&n[k.seq]!=k.level||h!=k.action||("keypress"!=h||d.metaKey||d.ctrlKey)&&b.sort().join(",")!==k.modifiers.sort().join(","))){var m=c&&k.seq==c&&k.level==v;(!c&&k.combo==e||m)&&l[a].splice(g,1);f.push(k)}return f}function K(a){var b=[];a.shiftKey&&b.push("shift");a.altKey&&b.push("alt");a.ctrlKey&&b.push("ctrl");a.metaKey&&b.push("meta");return b}function x(a,b,d,c){m.stopCallback(b,b.target||b.srcElement,d,c)||!1!==a(b,d)||(b.preventDefault?b.preventDefault():b.returnValue=!1,b.stopPropagation?
-b.stopPropagation():b.cancelBubble=!0)}function y(a){"number"!==typeof a.which&&(a.which=a.keyCode);var b=A(a);b&&("keyup"==a.type&&z===b?z=!1:m.handleKey(b,K(a),a))}function w(a){return"shift"==a||"ctrl"==a||"alt"==a||"meta"==a}function L(a,b,d,c){function e(b){return function(){u=b;++n[a];clearTimeout(D);D=setTimeout(t,1E3)}}function v(b){x(d,b,a);"keyup"!==c&&(z=A(b));setTimeout(t,10)}for(var g=n[a]=0;g<b.length;++g){var f=g+1===b.length?v:e(c||E(b[g+1]).action);F(b[g],f,c,a,g)}}function E(a,b){var d,
-c,e,f=[];d="+"===a?["+"]:a.split("+");for(e=0;e<d.length;++e)c=d[e],G[c]&&(c=G[c]),b&&"keypress"!=b&&H[c]&&(c=H[c],f.push("shift")),w(c)&&f.push(c);d=c;e=b;if(!e){if(!p){p={};for(var g in h)95<g&&112>g||h.hasOwnProperty(g)&&(p[h[g]]=g)}e=p[d]?"keydown":"keypress"}"keypress"==e&&f.length&&(e="keydown");return{key:c,modifiers:f,action:e}}function F(a,b,d,c,e){q[a+":"+d]=b;a=a.replace(/\s+/g," ");var f=a.split(" ");1<f.length?L(a,f,b,d):(d=E(a,d),l[d.key]=l[d.key]||[],C(d.key,d.modifiers,{type:d.action},
-c,a,e),l[d.key][c?"unshift":"push"]({callback:b,modifiers:d.modifiers,action:d.action,seq:c,level:e,combo:a}))}var h={8:"backspace",9:"tab",13:"enter",16:"shift",17:"ctrl",18:"alt",20:"capslock",27:"esc",32:"space",33:"pageup",34:"pagedown",35:"end",36:"home",37:"left",38:"up",39:"right",40:"down",45:"ins",46:"del",91:"meta",93:"meta",224:"meta"},B={106:"*",107:"+",109:"-",110:".",111:"/",186:";",187:"=",188:",",189:"-",190:".",191:"/",192:"`",219:"[",220:"\\",221:"]",222:"'"},H={"~":"`","!":"1",
-"@":"2","#":"3",$:"4","%":"5","^":"6","&":"7","*":"8","(":"9",")":"0",_:"-","+":"=",":":";",'"':"'","<":",",">":".","?":"/","|":"\\"},G={option:"alt",command:"meta","return":"enter",escape:"esc",mod:/Mac|iPod|iPhone|iPad/.test(navigator.platform)?"meta":"ctrl"},p,l={},q={},n={},D,z=!1,I=!1,u=!1;for(f=1;20>f;++f)h[111+f]="f"+f;for(f=0;9>=f;++f)h[f+96]=f;s(r,"keypress",y);s(r,"keydown",y);s(r,"keyup",y);var m={bind:function(a,b,d){a=a instanceof Array?a:[a];for(var c=0;c<a.length;++c)F(a[c],b,d);return this},
-unbind:function(a,b){return m.bind(a,function(){},b)},trigger:function(a,b){if(q[a+":"+b])q[a+":"+b]({},a);return this},reset:function(){l={};q={};return this},stopCallback:function(a,b){return-1<(" "+b.className+" ").indexOf(" mousetrap ")?!1:"INPUT"==b.tagName||"SELECT"==b.tagName||"TEXTAREA"==b.tagName||b.isContentEditable},handleKey:function(a,b,d){var c=C(a,b,d),e;b={};var f=0,g=!1;for(e=0;e<c.length;++e)c[e].seq&&(f=Math.max(f,c[e].level));for(e=0;e<c.length;++e)c[e].seq?c[e].level==f&&(g=!0,
-b[c[e].seq]=1,x(c[e].callback,d,c[e].combo,c[e].seq)):g||x(c[e].callback,d,c[e].combo);c="keypress"==d.type&&I;d.type!=u||w(a)||c||t(b);I=g&&"keydown"==d.type}};J.Mousetrap=m;"function"===typeof define&&define.amd&&define(m)})(window,document);
-
-},{}],31:[function(require,module,exports){
+},{"__browserify_process":34}],30:[function(require,module,exports){
 /* Commands */
 
 /*--
@@ -6552,7 +6541,7 @@ module.exports = {
   zoomIn: zoomIn,
   zoomOut: zoomOut
 };
-},{}],33:[function(require,module,exports){
+},{}],32:[function(require,module,exports){
 /* Commands */
 
 /*--
@@ -6611,7 +6600,18 @@ var delete_ = function(board, args) {
 module.exports = {
   delete_: delete_
 };
-},{}],24:[function(require,module,exports){
+},{}],33:[function(require,module,exports){
+/* mousetrap v1.4.6 craig.is/killing/mice */
+(function(J,r,f){function s(a,b,d){a.addEventListener?a.addEventListener(b,d,!1):a.attachEvent("on"+b,d)}function A(a){if("keypress"==a.type){var b=String.fromCharCode(a.which);a.shiftKey||(b=b.toLowerCase());return b}return h[a.which]?h[a.which]:B[a.which]?B[a.which]:String.fromCharCode(a.which).toLowerCase()}function t(a){a=a||{};var b=!1,d;for(d in n)a[d]?b=!0:n[d]=0;b||(u=!1)}function C(a,b,d,c,e,v){var g,k,f=[],h=d.type;if(!l[a])return[];"keyup"==h&&w(a)&&(b=[a]);for(g=0;g<l[a].length;++g)if(k=
+l[a][g],!(!c&&k.seq&&n[k.seq]!=k.level||h!=k.action||("keypress"!=h||d.metaKey||d.ctrlKey)&&b.sort().join(",")!==k.modifiers.sort().join(","))){var m=c&&k.seq==c&&k.level==v;(!c&&k.combo==e||m)&&l[a].splice(g,1);f.push(k)}return f}function K(a){var b=[];a.shiftKey&&b.push("shift");a.altKey&&b.push("alt");a.ctrlKey&&b.push("ctrl");a.metaKey&&b.push("meta");return b}function x(a,b,d,c){m.stopCallback(b,b.target||b.srcElement,d,c)||!1!==a(b,d)||(b.preventDefault?b.preventDefault():b.returnValue=!1,b.stopPropagation?
+b.stopPropagation():b.cancelBubble=!0)}function y(a){"number"!==typeof a.which&&(a.which=a.keyCode);var b=A(a);b&&("keyup"==a.type&&z===b?z=!1:m.handleKey(b,K(a),a))}function w(a){return"shift"==a||"ctrl"==a||"alt"==a||"meta"==a}function L(a,b,d,c){function e(b){return function(){u=b;++n[a];clearTimeout(D);D=setTimeout(t,1E3)}}function v(b){x(d,b,a);"keyup"!==c&&(z=A(b));setTimeout(t,10)}for(var g=n[a]=0;g<b.length;++g){var f=g+1===b.length?v:e(c||E(b[g+1]).action);F(b[g],f,c,a,g)}}function E(a,b){var d,
+c,e,f=[];d="+"===a?["+"]:a.split("+");for(e=0;e<d.length;++e)c=d[e],G[c]&&(c=G[c]),b&&"keypress"!=b&&H[c]&&(c=H[c],f.push("shift")),w(c)&&f.push(c);d=c;e=b;if(!e){if(!p){p={};for(var g in h)95<g&&112>g||h.hasOwnProperty(g)&&(p[h[g]]=g)}e=p[d]?"keydown":"keypress"}"keypress"==e&&f.length&&(e="keydown");return{key:c,modifiers:f,action:e}}function F(a,b,d,c,e){q[a+":"+d]=b;a=a.replace(/\s+/g," ");var f=a.split(" ");1<f.length?L(a,f,b,d):(d=E(a,d),l[d.key]=l[d.key]||[],C(d.key,d.modifiers,{type:d.action},
+c,a,e),l[d.key][c?"unshift":"push"]({callback:b,modifiers:d.modifiers,action:d.action,seq:c,level:e,combo:a}))}var h={8:"backspace",9:"tab",13:"enter",16:"shift",17:"ctrl",18:"alt",20:"capslock",27:"esc",32:"space",33:"pageup",34:"pagedown",35:"end",36:"home",37:"left",38:"up",39:"right",40:"down",45:"ins",46:"del",91:"meta",93:"meta",224:"meta"},B={106:"*",107:"+",109:"-",110:".",111:"/",186:";",187:"=",188:",",189:"-",190:".",191:"/",192:"`",219:"[",220:"\\",221:"]",222:"'"},H={"~":"`","!":"1",
+"@":"2","#":"3",$:"4","%":"5","^":"6","&":"7","*":"8","(":"9",")":"0",_:"-","+":"=",":":";",'"':"'","<":",",">":".","?":"/","|":"\\"},G={option:"alt",command:"meta","return":"enter",escape:"esc",mod:/Mac|iPod|iPhone|iPad/.test(navigator.platform)?"meta":"ctrl"},p,l={},q={},n={},D,z=!1,I=!1,u=!1;for(f=1;20>f;++f)h[111+f]="f"+f;for(f=0;9>=f;++f)h[f+96]=f;s(r,"keypress",y);s(r,"keydown",y);s(r,"keyup",y);var m={bind:function(a,b,d){a=a instanceof Array?a:[a];for(var c=0;c<a.length;++c)F(a[c],b,d);return this},
+unbind:function(a,b){return m.bind(a,function(){},b)},trigger:function(a,b){if(q[a+":"+b])q[a+":"+b]({},a);return this},reset:function(){l={};q={};return this},stopCallback:function(a,b){return-1<(" "+b.className+" ").indexOf(" mousetrap ")?!1:"INPUT"==b.tagName||"SELECT"==b.tagName||"TEXTAREA"==b.tagName||b.isContentEditable},handleKey:function(a,b,d){var c=C(a,b,d),e;b={};var f=0,g=!1;for(e=0;e<c.length;++e)c[e].seq&&(f=Math.max(f,c[e].level));for(e=0;e<c.length;++e)c[e].seq?c[e].level==f&&(g=!0,
+b[c[e].seq]=1,x(c[e].callback,d,c[e].combo,c[e].seq)):g||x(c[e].callback,d,c[e].combo);c="keypress"==d.type&&I;d.type!=u||w(a)||c||t(b);I=g&&"keydown"==d.type}};J.Mousetrap=m;"function"===typeof define&&define.amd&&define(m)})(window,document);
+
+},{}],25:[function(require,module,exports){
 var Lexer = require('../board/functions/lexer');
 
 module.exports = function() {
@@ -6680,7 +6680,123 @@ module.exports = function() {
     }
   });
 };
-},{"../board/functions/lexer":35}],28:[function(require,module,exports){
+},{"../board/functions/lexer":35}],23:[function(require,module,exports){
+var Lexer = require('./lexer');
+
+/*
+ * Geometry Function Parser
+ */
+
+var Parser = function(expr) {
+  this.llex       = new Lexer(expr);
+  this._arguments = [];
+  this._identifier;
+  Object.defineProperty(this, "arguments", {
+    get: function() { return this._arguments; }
+  });
+  Object.defineProperty(this, "identifier", {
+    get: function() { return this._identifier; }
+  });
+  Object.defineProperty(this, "object", {
+    get: function() {return {
+        'identifier': this._identifier, 
+        'arguments':  this._arguments
+      };
+    }
+  });
+};
+
+Parser.prototype = (function() {
+  var tokens = Object.freeze({
+    T_UNKNOWN:     1,
+    T_INTEGER:     2,
+    T_FLOAT:       3,
+    T_LETTER:      4,
+    T_OPEN_PAREN:  5,
+    T_CLOSE_PAREN: 6,
+    T_COMMA:       7,
+    T_IDENTIFIER:  8,
+    T_EQUAL:       9,
+    T_LABEL:       10,
+    T_EXPR:        11,
+    T_EOL:         12
+  });
+
+  var token_strings = Object.freeze({
+    1:     "unknown",
+    2:     "integer",
+    3:       "float",
+    4:      "letter",
+    5:           "(",
+    6:           ")",
+    7:           ",",
+    8:  "identifier",
+    9:           "=",
+    10:      "label",
+    11: "expression",
+    12:        "EOL"
+  });
+
+  var t_error = function(llex, token, expected) {
+    if (expected instanceof Array) {
+      expected = expected[0];
+    }
+    var unexpected = (token_strings[token] == "unknown") ?
+      llex.scanner : token_strings[token];    
+    var msg = ["Unexpected token: '",
+      unexpected,
+      "', expected ",
+      token_strings[expected]
+    ].join('');
+    throw new Error(msg);
+  };
+
+  var accept  = function(t) {
+    this.llex.getNextToken();
+    if (t instanceof Array) {
+      var isIn = false, lex  = this.llex;
+      t.forEach(function(e) {
+        if (e == lex.current_token) {
+          isIn  = true;
+        }
+      });
+      if (!isIn) {
+        t_error(this.llex, this.llex.current_token, t);
+        return false;
+      }
+    } else if (this.llex.current_token !== t) {
+        t_error(this.llex, this.llex.current_token, t);
+        return false;
+    }
+    return this.llex.current_token;
+  };
+    
+  return {
+    Constructor: Parser,
+    run: function() {
+      if (this.llex.expr[this.llex.pointer] == '=') {
+        accept.call(this, tokens.T_EQUAL);
+      }
+      accept.call(this, [tokens.T_EXPR, tokens.T_IDENTIFIER]);
+      if (this.llex.current_token == tokens.T_EXPR) {
+        this._arguments.push({argument: this.llex.scanner, type: token_strings[tokens.T_EXPR]});
+      } else {
+        this._identifier = this.llex.scanner;
+        accept.call(this, [tokens.T_OPEN_PAREN]);
+        var token;
+        do {
+          token = accept.call(this, [tokens.T_LABEL, tokens.T_LETTER, tokens.T_INTEGER, tokens.T_FLOAT]);
+          this._arguments.push({argument: this.llex.scanner, type: token_strings[token]});
+        } while(accept.call(this, [tokens.T_COMMA, tokens.T_CLOSE_PAREN]) == tokens.T_COMMA);
+      }
+    accept.call(this, tokens.T_EOL);
+    }
+  };
+})();
+
+module.exports = Parser;
+
+},{"./lexer":35}],28:[function(require,module,exports){
 var transform = require('../board/transform'),
     coords    = require('../helper/coords')();
 
@@ -7014,123 +7130,235 @@ module.exports = {
   translate: translate,
   scale:     scale
 };
-},{"../helper/coords":36,"../board/transform":37}],26:[function(require,module,exports){
-var Lexer = require('./lexer');
+},{"../board/transform":36,"../helper/coords":37}],29:[function(require,module,exports){
+var element = require('../board/element'),
+    coords  = require('../helper/coords')();
 
-/*
- * Geometry Function Parser
- */
+/* Commands */
 
-var Parser = function(expr) {
-  this.llex       = new Lexer(expr);
-  this._arguments = [];
-  this._identifier;
-  Object.defineProperty(this, "arguments", {
-    get: function() { return this._arguments; }
-  });
-  Object.defineProperty(this, "identifier", {
-    get: function() { return this._identifier; }
-  });
-  Object.defineProperty(this, "object", {
-    get: function() {return {
-        'identifier': this._identifier, 
-        'arguments':  this._arguments
-      };
-    }
-  });
+/*--
+  Interface Command {
+    public void   constructor(JSXGraph board, Object Arguments)
+    public void   remove()
+    public object execute()
+  }
+--*/
+
+var circle = function(board, args) {
+  var args = args || {
+    center: $('input[name="center"]:last').coord(),
+    radius: parseFloat($('input[name="radius"]:last').val())
+  };
+
+  this.circle  = new element(board, "circle", args);
+  this.remove  = function() {
+    delete board.points[this.circleElement.center.name];
+    board.removeObject(this.circleElement.center);
+    board.removeObject(this.circleElement);
+    board.shapes.pop();
+  };
+  this.execute = function() {
+    this.circleElement = this.circle.draw(); 
+    return args;
+  };
 };
 
-Parser.prototype = (function() {
-  var tokens = Object.freeze({
-    T_UNKNOWN:     1,
-    T_INTEGER:     2,
-    T_FLOAT:       3,
-    T_LETTER:      4,
-    T_OPEN_PAREN:  5,
-    T_CLOSE_PAREN: 6,
-    T_COMMA:       7,
-    T_IDENTIFIER:  8,
-    T_EQUAL:       9,
-    T_LABEL:       10,
-    T_EXPR:        11,
-    T_EOL:         12
+//-----------------------------------------------------------------------
+
+
+var angle = function(board, args) {
+  var args = args || {
+    point1: $('input[name="point1"]:last').coord(),
+    point2: $('input[name="point2"]:last').coord(),
+    point3: $('input[name="point3"]:last').coord()
+  };
+
+  this.angle  = new element(board, "angle", args);
+  this.remove = function() {
+    delete board.points[this.angleElement.point1.name];
+    delete board.points[this.angleElement.point2.name];
+    delete board.points[this.angleElement.point3.name];
+    board.removeObject(this.angleElement.point1);
+    board.removeObject(this.angleElement.point2);
+    board.removeObject(this.angleElement.point3);
+    board.removeObject(this.angleElement);
+    board.shapes.pop();
+  };
+  this.execute = function() {
+    this.angleElement = this.angle.draw();
+    return args;
+  };
+};
+
+//-----------------------------------------------------------------------
+
+var arc = function(board, args) {
+  var args = args || {
+    point1: $('input[name="point1"]:last').coord(),
+    point2: $('input[name="point2"]:last').coord(),
+    point3: $('input[name="point3"]:last').coord()
+  };
+
+   this.arc     = new element(board, "arc", args);
+   this.remove  = function() {
+      delete board.points[this.arcElement.center.name];
+      delete board.points[this.arcElement.point2.name];
+      delete board.points[this.arcElement.point3.name];
+      board.removeObject(this.arcElement.center);
+      board.removeObject(this.arcElement.point2);
+      board.removeObject(this.arcElement.point3);
+      board.removeObject(this.arcElement);
+      board.shapes.pop();
+   };
+   this.execute = function() {
+      this.arcElement = this.arc.draw();
+      return args;
+   };
+};
+
+//-----------------------------------------------------------------------
+
+var ellipse = function(board, args) {
+  var args = args ||  {
+    point1: $('input[name="point1"]:last').coord(),
+    point2: $('input[name="point2"]:last').coord(),
+    point3: $('input[name="point3"]:last').coord()
+  };
+
+  this.ellipse = new element(board, "ellipse", args);
+  this.remove  = function() {
+    // curve points
+    var curve = board.shapes.pop();
+    board.removeObject(curve.usrSetCoords[0]);
+    board.removeObject(curve.usrSetCoords[1]);
+    board.removeObject(curve.usrSetCoords[2]);
+    board.removeObject(this.ellipseElement);
+  };
+  this.execute = function() {
+    this.ellipseElement = this.ellipse.draw()
+    return args;
+  };
+};
+
+//-----------------------------------------------------------------------
+
+var segment = function(board, args) {
+  var args = args || {
+    point1: $('input[name="point1"]:last').coord(),
+    point2: $('input[name="point2"]:last').coord(),
+  };
+  this.segment = new element(board, "segment", args);
+  this.remove  = function() {
+    delete board.points[this.segmentElement.point1.name];
+    delete board.points[this.segmentElement.point2.name];
+    board.removeObject(this.segmentElement.point1);
+    board.removeObject(this.segmentElement.point2);
+    board.removeObject(this.segmentElement);
+    board.shapes.pop();
+  };
+  this.execute = function() {
+    this.segmentElement = this.segment.draw();
+    return args;
+  };
+};
+
+//-----------------------------------------------------------------------
+
+var line = function(board, args) {
+  var args = args || {
+    point1: $('input[name="point1"]:last').coord(),
+    point2: $('input[name="point2"]:last').coord(),
+  };
+  this.line    = new element(board, "line", args);
+  this.remove  = function() {
+    delete board.points[this.lineElement.point1.name];
+    delete board.points[this.lineElement.point2.name];
+    board.removeObject(this.lineElement.point1);
+    board.removeObject(this.lineElement.point2);
+    board.removeObject(this.lineElement);
+    board.shapes.pop();
+  };
+  this.execute = function() {
+    this.lineElement = this.line.draw();
+    return args;
+  };
+};
+
+//-----------------------------------------------------------------------
+
+var polygon = function(board, args) {
+  var points   = 3,
+      vertices = {};
+  $('.draw-polygon:last input').each(function(i,m) {
+    vertices["point"+i] = $(m).coord();
   });
+  args = args || vertices;
 
-  var token_strings = Object.freeze({
-    1:     "unknown",
-    2:     "integer",
-    3:       "float",
-    4:      "letter",
-    5:           "(",
-    6:           ")",
-    7:           ",",
-    8:  "identifier",
-    9:           "=",
-    10:      "label",
-    11: "expression",
-    12:        "EOL"
-  });
-
-  var t_error = function(llex, token, expected) {
-    if (expected instanceof Array) {
-      expected = expected[0];
-    }
-    var unexpected = (token_strings[token] == "unknown") ?
-      llex.scanner : token_strings[token];    
-    var msg = ["Unexpected token: '",
-      unexpected,
-      "', expected ",
-      token_strings[expected]
-    ].join('');
-    throw new Error(msg);
+  this.polygon = new element(board, "polygon", args);
+  this.remove = function() {
+    this.polygonElement.vertices.pop();
+    this.polygonElement.vertices.forEach(function(vertex) {
+      delete board.points[vertex.name];
+      board.removeObject(vertex);
+    });
+    board.removeObject(this.polygonElement);
+    board.shapes.pop();
   };
-
-  var accept  = function(t) {
-    this.llex.getNextToken();
-    if (t instanceof Array) {
-      var isIn = false, lex  = this.llex;
-      t.forEach(function(e) {
-        if (e == lex.current_token) {
-          isIn  = true;
-        }
-      });
-      if (!isIn) {
-        t_error(this.llex, this.llex.current_token, t);
-        return false;
-      }
-    } else if (this.llex.current_token !== t) {
-        t_error(this.llex, this.llex.current_token, t);
-        return false;
-    }
-    return this.llex.current_token;
+  this.execute = function() {
+    this.polygonElement = this.polygon.draw();
+    return args;
   };
-    
-  return {
-    Constructor: Parser,
-    run: function() {
-      if (this.llex.expr[this.llex.pointer] == '=') {
-        accept.call(this, tokens.T_EQUAL);
-      }
-      accept.call(this, [tokens.T_EXPR, tokens.T_IDENTIFIER]);
-      if (this.llex.current_token == tokens.T_EXPR) {
-        this._arguments.push({argument: this.llex.scanner, type: token_strings[tokens.T_EXPR]});
-      } else {
-        this._identifier = this.llex.scanner;
-        accept.call(this, [tokens.T_OPEN_PAREN]);
-        var token;
-        do {
-          token = accept.call(this, [tokens.T_LABEL, tokens.T_LETTER, tokens.T_INTEGER, tokens.T_FLOAT]);
-          this._arguments.push({argument: this.llex.scanner, type: token_strings[token]});
-        } while(accept.call(this, [tokens.T_COMMA, tokens.T_CLOSE_PAREN]) == tokens.T_COMMA);
-      }
-    accept.call(this, tokens.T_EOL);
-    }
+};
+
+//-----------------------------------------------------------------------
+
+var point = function(board, args) {
+  var args = args || {
+    point: $('input[name="point"]:last').coord(),
   };
-})();
+  this.point = new element(board, "point", args);
+  this.remove  = function() {
+    delete board.points[this.pointElement.name];
+    board.removeObject(this.pointElement);
+  };
+  this.execute = function() {
+    this.pointElement = this.point.draw();
+    return args;
+  };
+};
 
-module.exports = Parser;
+//-----------------------------------------------------------------------
 
-},{"./lexer":35}],32:[function(require,module,exports){
+var text = function(board, args) {
+  var args = args || {
+    position: $('input[name="position"]:last').coord(),
+    size:     parseInt($('input[name="size"]:last').val()),
+    text:     $('input[name="text"]:last').val()       
+  };
+  this.text = new element(board, "text", args);
+  this.remove = function() {
+    board.removeObject(this.textElement);
+    board.shapes.pop();
+  };
+  this.execute = function() {
+    this.textElement = this.text.draw();
+    return args;
+  };
+};
+
+
+module.exports = {
+  circle: circle,
+  angle: angle,
+  arc: arc,
+  ellipse: ellipse,
+  segment: segment,
+  line: line,
+  polygon: polygon,
+  point: point,
+  text: text
+};
+},{"../board/element":38,"../helper/coords":37}],31:[function(require,module,exports){
 var func    = require('../board/functions/functions'),
     Parser  = require('../board/functions/parser'),
     element = require('../board/element');  
@@ -7394,235 +7622,7 @@ module.exports = {
   area:  area,
   plot:  plot,
 };
-},{"../board/functions/functions":38,"../board/element":39,"../board/functions/parser":26}],30:[function(require,module,exports){
-var element = require('../board/element'),
-    coords  = require('../helper/coords')();
-
-/* Commands */
-
-/*--
-  Interface Command {
-    public void   constructor(JSXGraph board, Object Arguments)
-    public void   remove()
-    public object execute()
-  }
---*/
-
-var circle = function(board, args) {
-  var args = args || {
-    center: $('input[name="center"]:last').coord(),
-    radius: parseFloat($('input[name="radius"]:last').val())
-  };
-
-  this.circle  = new element(board, "circle", args);
-  this.remove  = function() {
-    delete board.points[this.circleElement.center.name];
-    board.removeObject(this.circleElement.center);
-    board.removeObject(this.circleElement);
-    board.shapes.pop();
-  };
-  this.execute = function() {
-    this.circleElement = this.circle.draw(); 
-    return args;
-  };
-};
-
-//-----------------------------------------------------------------------
-
-
-var angle = function(board, args) {
-  var args = args || {
-    point1: $('input[name="point1"]:last').coord(),
-    point2: $('input[name="point2"]:last').coord(),
-    point3: $('input[name="point3"]:last').coord()
-  };
-
-  this.angle  = new element(board, "angle", args);
-  this.remove = function() {
-    delete board.points[this.angleElement.point1.name];
-    delete board.points[this.angleElement.point2.name];
-    delete board.points[this.angleElement.point3.name];
-    board.removeObject(this.angleElement.point1);
-    board.removeObject(this.angleElement.point2);
-    board.removeObject(this.angleElement.point3);
-    board.removeObject(this.angleElement);
-    board.shapes.pop();
-  };
-  this.execute = function() {
-    this.angleElement = this.angle.draw();
-    return args;
-  };
-};
-
-//-----------------------------------------------------------------------
-
-var arc = function(board, args) {
-  var args = args || {
-    point1: $('input[name="point1"]:last').coord(),
-    point2: $('input[name="point2"]:last').coord(),
-    point3: $('input[name="point3"]:last').coord()
-  };
-
-   this.arc     = new element(board, "arc", args);
-   this.remove  = function() {
-      delete board.points[this.arcElement.center.name];
-      delete board.points[this.arcElement.point2.name];
-      delete board.points[this.arcElement.point3.name];
-      board.removeObject(this.arcElement.center);
-      board.removeObject(this.arcElement.point2);
-      board.removeObject(this.arcElement.point3);
-      board.removeObject(this.arcElement);
-      board.shapes.pop();
-   };
-   this.execute = function() {
-      this.arcElement = this.arc.draw();
-      return args;
-   };
-};
-
-//-----------------------------------------------------------------------
-
-var ellipse = function(board, args) {
-  var args = args ||  {
-    point1: $('input[name="point1"]:last').coord(),
-    point2: $('input[name="point2"]:last').coord(),
-    point3: $('input[name="point3"]:last').coord()
-  };
-
-  this.ellipse = new element(board, "ellipse", args);
-  this.remove  = function() {
-    // curve points
-    var curve = board.shapes.pop();
-    board.removeObject(curve.usrSetCoords[0]);
-    board.removeObject(curve.usrSetCoords[1]);
-    board.removeObject(curve.usrSetCoords[2]);
-    board.removeObject(this.ellipseElement);
-  };
-  this.execute = function() {
-    this.ellipseElement = this.ellipse.draw()
-    return args;
-  };
-};
-
-//-----------------------------------------------------------------------
-
-var segment = function(board, args) {
-  var args = args || {
-    point1: $('input[name="point1"]:last').coord(),
-    point2: $('input[name="point2"]:last').coord(),
-  };
-  this.segment = new element(board, "segment", args);
-  this.remove  = function() {
-    delete board.points[this.segmentElement.point1.name];
-    delete board.points[this.segmentElement.point2.name];
-    board.removeObject(this.segmentElement.point1);
-    board.removeObject(this.segmentElement.point2);
-    board.removeObject(this.segmentElement);
-    board.shapes.pop();
-  };
-  this.execute = function() {
-    this.segmentElement = this.segment.draw();
-    return args;
-  };
-};
-
-//-----------------------------------------------------------------------
-
-var line = function(board, args) {
-  var args = args || {
-    point1: $('input[name="point1"]:last').coord(),
-    point2: $('input[name="point2"]:last').coord(),
-  };
-  this.line    = new element(board, "line", args);
-  this.remove  = function() {
-    delete board.points[this.lineElement.point1.name];
-    delete board.points[this.lineElement.point2.name];
-    board.removeObject(this.lineElement.point1);
-    board.removeObject(this.lineElement.point2);
-    board.removeObject(this.lineElement);
-    board.shapes.pop();
-  };
-  this.execute = function() {
-    this.lineElement = this.line.draw();
-    return args;
-  };
-};
-
-//-----------------------------------------------------------------------
-
-var polygon = function(board, args) {
-  var points   = 3,
-      vertices = {};
-  $('.draw-polygon:last input').each(function(i,m) {
-    vertices["point"+i] = $(m).coord();
-  });
-  args = args || vertices;
-
-  this.polygon = new element(board, "polygon", args);
-  this.remove = function() {
-    this.polygonElement.vertices.pop();
-    this.polygonElement.vertices.forEach(function(vertex) {
-      delete board.points[vertex.name];
-      board.removeObject(vertex);
-    });
-    board.removeObject(this.polygonElement);
-    board.shapes.pop();
-  };
-  this.execute = function() {
-    this.polygonElement = this.polygon.draw();
-    return args;
-  };
-};
-
-//-----------------------------------------------------------------------
-
-var point = function(board, args) {
-  var args = args || {
-    point: $('input[name="point"]:last').coord(),
-  };
-  this.point = new element(board, "point", args);
-  this.remove  = function() {
-    delete board.points[this.pointElement.name];
-    board.removeObject(this.pointElement);
-  };
-  this.execute = function() {
-    this.pointElement = this.point.draw();
-    return args;
-  };
-};
-
-//-----------------------------------------------------------------------
-
-var text = function(board, args) {
-  var args = args || {
-    position: $('input[name="position"]:last').coord(),
-    size:     parseInt($('input[name="size"]:last').val()),
-    text:     $('input[name="text"]:last').val()       
-  };
-  this.text = new element(board, "text", args);
-  this.remove = function() {
-    board.removeObject(this.textElement);
-    board.shapes.pop();
-  };
-  this.execute = function() {
-    this.textElement = this.text.draw();
-    return args;
-  };
-};
-
-
-module.exports = {
-  circle: circle,
-  angle: angle,
-  arc: arc,
-  ellipse: ellipse,
-  segment: segment,
-  line: line,
-  polygon: polygon,
-  point: point,
-  text: text
-};
-},{"../helper/coords":36,"../board/element":39}],35:[function(require,module,exports){
+},{"../board/functions/functions":39,"../board/functions/parser":23,"../board/element":38}],35:[function(require,module,exports){
 /*
  * Geometry Function Tokenizer
  */
@@ -7750,20 +7750,6 @@ Lexer.prototype = (function() {
 
 module.exports = Lexer;
 },{}],36:[function(require,module,exports){
-module.exports = function() {
-  jQuery.fn.coord = function() {
-    if (this.val()) {
-      if (this.val().indexOf(',') !== -1) {
-        return this.val().split(',')
-          .map(function(e) {
-            return parseFloat(e);
-          });
-      }
-    }
-  };
-};
-
-},{}],37:[function(require,module,exports){
 /*
   BoardTransform Factory
   */
@@ -7912,7 +7898,21 @@ BoardTransform.prototype = (function() {
 })();
 
 module.exports = BoardTransform;
-},{}],38:[function(require,module,exports){
+},{}],37:[function(require,module,exports){
+module.exports = function() {
+  jQuery.fn.coord = function() {
+    if (this.val()) {
+      if (this.val().indexOf(',') !== -1) {
+        return this.val().split(',')
+          .map(function(e) {
+            return parseFloat(e);
+          });
+      }
+    }
+  };
+};
+
+},{}],39:[function(require,module,exports){
 /* GeometryFunction Factory */
 
 var GeometryFunction = function(JXG, func, options) {
@@ -8057,7 +8057,7 @@ GeometryFunction.prototype = (function() {
 })();
 
 module.exports = GeometryFunction;
-},{}],39:[function(require,module,exports){
+},{}],38:[function(require,module,exports){
 var point = require('./point'),
     shape = require('./shape')
 
@@ -8361,7 +8361,7 @@ Point.prototype = (function() {
 
 module.exports = Point;
 
-},{"../helper/drag":14}],41:[function(require,module,exports){
+},{"../helper/drag":17}],41:[function(require,module,exports){
 var Shape = function(board, shape, parents, options) {
   this.board   = board;
   this.shape   = shape;
@@ -8393,5 +8393,5 @@ Shape.prototype = (function() {
 
 
 module.exports = Shape;
-},{"../helper/drag":14}]},{},[1])
+},{"../helper/drag":17}]},{},[1])
 ;
