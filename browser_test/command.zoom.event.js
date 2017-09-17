@@ -1,4 +1,4 @@
-var zoom = require('../public/app/events/zoom');
+var zoom = require('../app/javascripts/events/zoom');
 
 describe("zoom Command concrete", function() {
   var brd, command;

@@ -1,5 +1,5 @@
-var draw = require('../public/app/events/draw'),
-    misc = require('../public/app/events/misc');
+var draw = require('../app/javascripts/events/draw'),
+    misc = require('../app/javascripts/events/misc');
 
 describe("misc Command concrete", function() {
   var brd, command, circle;

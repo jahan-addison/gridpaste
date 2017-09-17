@@ -1,4 +1,4 @@
-var Lexer = require('../public/app/board/functions/lexer');
+var Lexer = require('../app/javascripts/board/functions/lexer');
 
 describe("Geometry Function Tokenizer", function() {
 

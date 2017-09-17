@@ -1,7 +1,7 @@
-var func   = require('../public/app/events/function'),
-    shape  = require('../public/app/board/shape'),
-    point  = require('../public/app/board/point'),
-    Parser = require('../public/app/board/functions/parser');
+var func   = require('../app/javascripts/events/function'),
+    shape  = require('../app/javascripts/board/shape'),
+    point  = require('../app/javascripts/board/point'),
+    Parser = require('../app/javascripts/board/functions/parser');
 
 describe("function Command concrete", function() {
   var brd, command;

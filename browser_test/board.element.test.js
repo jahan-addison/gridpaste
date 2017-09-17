@@ -1,4 +1,4 @@
-var element = require('../public/app/board/element');
+var element = require('../app/javascripts/board/element');
 
 describe("BoardElement Factory", function() {
   var brd, a, b, c, p;

@@ -1,4 +1,4 @@
-var point = require('../public/app/board/point');
+var point = require('../app/javascripts/board/point');
 
 describe("Point", function() {
   var brd, a;

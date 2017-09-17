@@ -1,5 +1,5 @@
-var point = require('../public/app/board/point');
-var shape = require('../public/app/board/shape');
+var point = require('../app/javascripts/board/point');
+var shape = require('../app/javascripts/board/shape');
 
 describe("Shape", function() {
   var brd, a, b;

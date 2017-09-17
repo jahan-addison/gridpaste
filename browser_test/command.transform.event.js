@@ -1,6 +1,6 @@
-var shape     = require('../public/app/board/shape'),
-    point     = require('../public/app/board/point'),
-    transform = require('../public/app/events/transform');
+var shape     = require('../app/javascripts/board/shape'),
+    point     = require('../app/javascripts/board/point'),
+    transform = require('../app/javascripts/events/transform');
 
 describe("transform Command concrete", function() {
   var brd, command;

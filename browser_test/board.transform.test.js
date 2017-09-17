@@ -1,5 +1,5 @@
-var element   = require('../public/app/board/element'),
-    transform = require('../public/app/board/transform');
+var element   = require('../app/javascripts/board/element'),
+    transform = require('../app/javascripts/board/transform');
 
 describe("BoardTransform Factory", function() {
   var brd, points, p;

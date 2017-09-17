@@ -1,4 +1,4 @@
-var draw = require('../public/app/events/draw');
+var draw = require('../app/javascripts/events/draw');
 
 describe("draw Command concrete", function() {
   var brd, command;

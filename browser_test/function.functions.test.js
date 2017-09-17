@@ -1,4 +1,4 @@
-var Func = require('../public/app/board/functions/functions');
+var Func = require('../app/javascripts/board/functions/functions');
 
 describe("GeometryFunction Factory", function() {
   var brd, a, b, c;

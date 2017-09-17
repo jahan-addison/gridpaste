@@ -1,4 +1,4 @@
-var Parser = require('../public/app/board/functions/parser');
+var Parser = require('../app/javascripts/board/functions/parser');
 
 describe("Geometry Function Parser", function() {
 
