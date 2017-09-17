@@ -29,7 +29,7 @@ app.configure(function(){
     app.use(express.session({
       secret:  require('./config').secret,
       cookie: {
-        expires: 2629740000        
+        expires: new Date(Date.now() + 2629740000)        
       },
       store:   new MongoStore({ db: Mongoose.db})
     }));
