@@ -16,7 +16,7 @@ module.exports = function (grunt) {
     uglify: {
       my_target: {
         files: {
-          './public/javascripts/dist/main.min.js': ['./app/javascripts/dist/build.js']
+          './app/javascripts/dist/main.min.js': ['./app/javascripts/dist/build.js']
         }
       }
     },
@@ -31,14 +31,14 @@ module.exports = function (grunt) {
     cssmin: {
       combine: {
         files: {
-          './public/css/build/main.min.css': ['./app/css/build/main.css']
+          './app/css/build/main.min.css': ['./app/css/build/main.css']
         }
       }
     },
     browserify2: {
       compile: {
-        entry: './public/app/main.js',
-        compile: './public/app/dist/build.js',
+        entry: './app/javascripts/main.js',
+        compile: './app/javascripts/dist/build.js',
         beforeHook: function(bundle) {
           shim(bundle, {
             Mousetrap: {
