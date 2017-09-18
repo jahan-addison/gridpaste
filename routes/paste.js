@@ -25,14 +25,13 @@ exports.show = function(req, res) {
  */
 
 exports.examples = function(req, res) {
-  Paste.paginate({ user: 'examples'  }, { page: req.query.page, limit: req.query.limit}, function(error, pageCount, paginatedResults, itemCount) {
+  Paste.paginate({ user: 'examples'  }, { page: req.query.page, limit: req.query.limit}, function(error, result) {
     if (error) return next(error);
     res.render('examples.html', {
       host:      req.get('host'),
       req:       req,
-      pastes:    paginatedResults,
-      pageCount: pageCount,
-      itemCount: itemCount
+      pastes:    result.docs,
+      pageCount: result.page
     });
   }, {sortBy: {_id: -1}});
 };
@@ -69,14 +68,13 @@ exports.list = function(req, res) {
   if (!req.session.loggedIn) {
     res.redirect('/');
   }
-  Paste.paginate({ user: req.session.user  }, { page: req.query.page, limit: req.query.limit}, function(error, pageCount, paginatedResults, itemCount) {
+  Paste.paginate({ user: req.session.user  }, { page: req.query.page, limit: req.query.limit}, function(error, results) {
     if (error) return next(error);
     res.render('pastes.html', {
       host:      req.get('host'),
       req:       req,
-      pastes:    paginatedResults,
-      pageCount: pageCount,
-      itemCount: itemCount
+      pastes:    results.docs,
+      pageCount: results.page
     });
   }, {sortBy: {_id: -1}});
 };
