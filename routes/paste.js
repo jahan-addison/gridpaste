@@ -30,8 +30,8 @@ exports.examples = function(req, res) {
     res.render('examples.html', {
       host:      req.get('host'),
       req:       req,
-      pastes:    result.docs,
-      pageCount: result.page
+      pastes:    result,
+      pageCount: req.query.page
     });
   }, {sortBy: {_id: -1}});
 };
@@ -73,8 +73,8 @@ exports.list = function(req, res) {
     res.render('pastes.html', {
       host:      req.get('host'),
       req:       req,
-      pastes:    results.docs,
-      pageCount: results.page
+      pastes:    results,
+      pageCount: req.query.page
     });
   }, {sortBy: {_id: -1}});
 };
