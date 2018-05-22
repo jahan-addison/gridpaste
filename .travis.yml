@@ -14,7 +14,7 @@ before_script:
   - npm install -g grunt-cli
   - npm install -g phantomjs
   - mysql -e 'create database gridpaste;'
-  - mongo gridpaste --eval 'db.addUser("travis", "test");'
+  - mongo gridpaste --eval 'db.createUser({user: "travis"}, "test");'
   - node ./environment/replay.js
 
 
