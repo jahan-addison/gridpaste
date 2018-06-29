@@ -144,7 +144,7 @@ module.exports = function (grunt) {
 
   grunt.registerTask('test', "Application wide test run", function() {
     console.log('********************************************************************\nApplication Spec:');
-    grunt.task.run('mochaTest');
+//    grunt.task.run('mochaTest');
     grunt.task.run('karma');
 
   });

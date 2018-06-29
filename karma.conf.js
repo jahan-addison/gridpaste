@@ -15,7 +15,7 @@ module.exports = function(config) {
 
     // list of files / patterns to load in the browser
     files: [
-        'public/app/external/jsxgraph.js',
+        'app/javascripts/external/jsxgraph.js',
         'public/components/jquery/dist/jquery.min.js',
         'public/components/rxjs/rx.lite.js',
         'browser_test/fixtures/*.html',
@@ -66,9 +66,9 @@ module.exports = function(config) {
     // start these browsers
     // available browser launchers: https://npmjs.org/browse/keyword/karma-launcher
     browsers: [
-      'PhantomJS', 
-    //  'Chrome', 
-    //  'Firefox', 
+      'PhantomJS',
+    //  'Chrome',
+    //  'Firefox',
     //  'Opera'
      ],
 
