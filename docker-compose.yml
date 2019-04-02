@@ -1,0 +1,30 @@
+version: '3'
+services:
+  postgres:
+    image: postgres:10.4
+    environment:
+      POSTGRES_DB: gridpaste
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: postgres
+    ports:
+      - "15432:5432"
+    volumes:
+      - ./run/pg:/var/lib/postgresql/data
+  flyway-migrate:
+    image: boxfuse/flyway:5.2.4-alpine
+    command: -url=jdbc:postgresql://postgres:5432/gridpaste -user=postgres -password=postgres migrate
+    volumes:
+      - ./migrations:/flyway/sql
+    links:
+      - postgres
+    depends_on:
+      - postgres
+  flyway-clean:
+    image: boxfuse/flyway:5.2.4-alpine
+    command: -url=jdbc:postgresql://postgres:5432/gridpaste -user=postgres -password=postgres clean
+    volumes:
+      - ./migrations:/flyway/sql
+    links:
+      - postgres
+    depends_on:
+      - postgres

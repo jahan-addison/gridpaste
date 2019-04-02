@@ -1,0 +1,52 @@
+@media only screen 
+and (min-width : 768px) 
+and (max-width : 1280px) 
+and (orientation : landscape) { 
+  #left-bar header p {
+    display: none;
+  }
+  #auth {
+    .col {
+      width:105px;
+    }
+    margin: 6px 5px 15px 5px;
+  }
+  #bottom {
+    & > .col:first-child + .col {
+      float:none;
+    }
+    & > .col:first-child .button {
+      width: 105px;
+    }
+  }
+  #bottom footer {
+    p {
+      display:none;
+    }
+    address {
+      margin-top:10px;
+      display:block;
+    }
+  }
+}
+
+@media screen and (max-height: 600px) {
+  #left-bar {
+    overflow: auto;
+  }  
+}
+
+@media screen and ( max-height: 768px ){
+  footer > p {
+   // display: none;
+  }
+  #bottom {
+    .button {
+      padding: 10px 15px !important;
+    }
+    & > .col:first-child {
+      margin-top:10px !important;
+    }
+    margin-top: 10px !important;
+  }
+}

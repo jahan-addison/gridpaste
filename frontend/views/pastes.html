@@ -1,0 +1,89 @@
+{% extends 'layout.html' %}
+{% block head %}
+  {% parent %}
+  <script type="text/javascript" src="//use.typekit.net/cmr6vjy.js"></script>
+  <script type="text/javascript">try{Typekit.load();}catch(e){}</script>
+{% endblock %}
+{% block content %}
+  <section class="page">
+    <header>
+      <figure>
+        <img src="/images/gridpaste-logo.svg" alt="logo" />
+      </figure>
+    </header>
+    <div id="content">
+      {% if !pastes.length %}
+      <div class="error center">You haven't created any Grid Pastes yet!</div>
+      {% else %}
+      <a href="/">
+        <div class="button new">New</div>
+      </a>
+      <ol id="items">
+      {% for paste in pastes %}
+          <li data-id="{{paste.id|escape}}">
+            <span>#{{paste.id|escape}}</span>&nbsp;<span></span>
+            <br />
+            <a class="item" href="http://{{ host|escape }}/{{paste.id|escape}}">{{ paste.title|escape }}</a>
+            <a class="right remove" href="http://{{ host|escape }}/delete/{{paste.id|escape}}">delete</a>
+            <a class="right edit" href="http://{{ host|escape }}/edit/{{paste.id|escape}}">edit</a></li>
+      {% endfor %}
+      </ol>
+      {% if paginate.hasPreviousPages || paginate.hasNextPages(pageCount) %}
+      <div id="pagination">
+        {% if paginate.hasNextPages(pageCount) %}
+        <li class="next"><a href="{{ paginate.href() }}">Next page</a></li>
+        {% endif %}
+        {% if paginate.hasPreviousPages %}
+        <li class="previous"><a href="{{ (paginate.href(true)) }}">Previous page</a></li>
+        {% endif %}
+      </div>
+      {% endif %}
+    {% endif %}
+    <div class="back">
+      <a href="javascript:void(0);" onclick="history.back(-1);return false;" >Go back</a>
+    </div>
+    </div>
+    <footer>
+      <address>Copyright &copy; 2014-2017</address>
+    </footer>
+  </section>
+    <script src="//code.jquery.com/jquery-1.11.0.min.js"></script>
+    <script>
+    $(function() {
+      var go = function() {
+        document.location.href = $(this).find('a').first().attr('href');
+      };
+      $('#items li').click(go);
+      $('.remove').click(function(e) {
+        e.preventDefault();
+        if (confirm('Are you sure you want to delete this grid paste?')) {
+          document.location.href = $(this).attr('href');
+        }
+        return false;
+      });
+      $('.edit').click(function(e) {
+        e.preventDefault();
+        $('#items li').off();
+        var ref     = $(this).prev().prev('a'),
+            content = ref.html(),
+            copy    = ref.clone();
+        ref.replaceWith("<input type='text' class='edit' value='" + content + "' />");
+          $(document).on('keypress', 'input.edit', function(e) {
+            if (e.which == 13) {
+              var name = $(this).val();
+              $.post('/edit/' + $(this).parent().attr('data-id'), {title: name}, function(data) {
+                if (data.result == 'failed') {
+                  alert('An error occurred while trying to edit your paste!');
+                }
+              });
+              copy.html($(this).val());
+              $(this).replaceWith(copy);
+              $('#items li').click(go);
+              $(document).off();
+            }
+          });
+        return false;
+      });
+    });
+    </script>
+{% endblock %}
