@@ -3,7 +3,7 @@ FROM python:3.7.3-stretch
 RUN apt-get update && \
     apt-get install libbz2-dev
 
-WORKDIR /dayz-maps
+WORKDIR /gridpaste
 
 COPY pyproject.toml .
 
