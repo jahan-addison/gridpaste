@@ -1,0 +1,17 @@
+[tool.poetry]
+name = "backend"
+version = "2.0.0"
+description = ""
+authors = ["Jahan Addison <jahan@jahanaddison.com>", "Brock Ramsey <me@brockramsey.com>"]
+
+[tool.poetry.dependencies]
+python = "^3.7"
+django = "^2.2"
+alembic = "^1.0"
+
+[tool.poetry.dev-dependencies]
+pytest = "^3.0"
+
+[build-system]
+requires = ["poetry>=0.12"]
+build-backend = "poetry.masonry.api"
