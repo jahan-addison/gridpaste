@@ -5,3 +5,8 @@ config.js
 app/javascripts/app/dist/*.js
 app/css/build/*.css
 sass_cache/
+
+# Byte-compiled / optimized / DLL files
+__pycache__/
+*.py[cod]
+*$py.class
