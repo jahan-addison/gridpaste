@@ -1,4 +1,4 @@
-import __version__
+from backend import __version__
 
 
 def test_version():
