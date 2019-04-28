@@ -1,8 +1,6 @@
 
 ![gridpaste](http://i.imgur.com/SgA43Vu.png) 
 
-[![Build Status](https://travis-ci.org/jahan-addison/gridpaste.svg?branch=staging)](https://travis-ci.org/jahan-addison/gridpaste)
-
 A tool to paste computations, transformations, and structures on a geometric plane.
 
 Gridpaste
