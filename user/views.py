@@ -1,26 +1,19 @@
-from django.http import HttpResponse
-from django.template.loader import get_template
+from django.contrib.auth import login, authenticate
+from django.shortcuts import render, redirect
 
-
-def login(request):
-    if request.method == 'GET':
-        template = get_template('login.html')
-        html = template.render()
-        
-        return HttpResponse(html)
-
-
-def logout(request):
-    if request.method == 'GET':
-        template = get_template('logout.html')
-        html = template.render()
-    
-        return HttpResponse(html)
+from user.forms import RegisterForm
 
 
 def register(request):
-    if request.method == 'GET':
-        template = get_template('register.html')
-        html = template.render()
-    
-        return HttpResponse(html)
+    if request.method == 'POST':
+        form = RegisterForm(request.POST)
+        if form.is_valid():
+            form.save()
+            username = form.cleaned_data.get('username')
+            password = form.cleaned_data.get('password')
+            user = authenticate(username=username, password=password)
+            login(request, user)
+            return redirect('home')
+    else:
+        form = RegisterForm()
+    return render(request, 'registration/register.html', {'form': form})
