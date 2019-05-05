@@ -37,6 +37,7 @@ INSTALLED_APPS = [
     'django.contrib.sessions',
     'django.contrib.messages',
     'django.contrib.staticfiles',
+    'django_registration',
     'pastes',
     'user',
 ]
@@ -136,3 +137,6 @@ USE_TZ = True
 # https://docs.djangoproject.com/en/2.1/howto/static-files/
 
 STATIC_URL = '/static/'
+
+REGISTRATION_TEMPLATE_DIR = os.path.join(os.path.dirname(__file__), "static/templates")
+AUTH_USER_MODEL = "user.User"

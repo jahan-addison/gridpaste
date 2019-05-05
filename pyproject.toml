@@ -8,6 +8,7 @@ authors = ["Jahan Addison <jahan@jahanaddison.com>", "Brock Ramsey <me@brockrams
 python = "^3.7"
 django = "^2.2"
 alembic = "^1.0"
+django-registration = "^3.0"
 
 [tool.poetry.dev-dependencies]
 pytest = "^3.0"

@@ -1,6 +1,5 @@
-from django.urls import path, include
+from django.conf.urls import include, url
 
-from . import views
 
 """ 
 This will cover the following paths with djangos built in authentication system.
@@ -17,6 +16,6 @@ user/register
 """
 
 urlpatterns = [
-    path('', include('django.contrib.auth.urls')),
-    path('register/', views.register)
+    url(r'^', include('django_registration.backends.one_step.urls')),
+    url(r'^', include('django.contrib.auth.urls')), 
 ]

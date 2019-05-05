@@ -1,12 +1,13 @@
 <!doctype html>
 <html>
 <head>
+  {% load static %}
   <meta charset="utf-8" />
   <title>Gridpaste{% if paste %} - {{ paste.title }} {% endif %}</title>
   <meta name="Description" content="A tool to paste functions, transformations, and structures on a geometric plane">
   {% block head %}
-  <link rel="stylesheet" href="/css/build/main.min.css">
-  <link rel="shortcut icon" href="/images/favicon.ico" type="image/x-icon" />
+  <link rel="stylesheet" href="{% static "/css/build/main.min.css" %}">
+  <link rel="shortcut icon" href="{% static "/images/favicon.ico" %}" type="image/x-icon" />
   {% endblock %}
 </head> 
 <body>
