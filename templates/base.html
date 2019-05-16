@@ -5,11 +5,12 @@
   <meta charset="utf-8" />
   <title>Gridpaste{% if paste %} - {{ paste.title }} {% endif %}</title>
   <meta name="Description" content="A tool to paste functions, transformations, and structures on a geometric plane">
-  {% block head %}
-  <link rel="stylesheet" href="{% static "/css/build/main.min.css" %}">
-  <link rel="shortcut icon" href="{% static "/images/favicon.ico" %}" type="image/x-icon" />
-  {% endblock %}
-</head> 
+  <link rel="stylesheet" href="{% static "/dist/main.css" %}">
+  <link rel="shortcut icon" href="{% static "/assets/images/favicon.ico" %}" type="image/x-icon" />
+  <script type="text/javascript" src="//use.typekit.net/cmr6vjy.js"></script>
+  <script type="text/javascript">try{Typekit.load();}catch(e){}</script>
+  {% block head %} {% endblock %}
+ </head>
 <body>
   {% block content %}{% endblock %}
 <script>
@@ -20,5 +21,7 @@
   ga('create', 'UA-46564217-2', 'auto');
   ga('send', 'pageview');
 </script>
+  <script src="//code.jquery.com/jquery-1.11.0.min.js"></script>
+  <script src="{% static "/src/dist/main.min.js" %}"></script>
 </body>
 </html>

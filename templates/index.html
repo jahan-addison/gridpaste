@@ -3,17 +3,17 @@
   {% load static %}
   <script type="text/javascript" src="//use.typekit.net/cmr6vjy.js"></script>
   <script type="text/javascript">try{Typekit.load();}catch(e){}</script>
-  <script type="text/javascript" src="{% static "/javascripts/external/jsxgraph.js" %}"></script>
+  <script type="text/javascript" src="{% static "/src/external/jsxgraph.js" %}"></script>
 {% endblock %}
 {% block content %}
     <div id="application" role="application">
         <main id="left-bar">
           <header>
-            <img src="{% static "/images/gridpaste-logo.svg" %}" alt="logo" />
+            <img src="{% static "/assets/images/gridpaste-logo.svg" %}" alt="logo" />
             <p>
               <span class="red">Gridpaste</span> is an online math tool to share computations, transformations, and annotations on geometric structures in a coordinate plane. One starts with a clean board and places their geometric elements and performs actions on these elements in a recordable sequence. The sequence may then be saved and shared by a unique URL to colleagues or instructors.
             </p>
-          </header> 
+          </header>
           <section id="auth">
             {% if session.loggedIn %}
             <div class="col user"><a href="/user/logout"> Log out ({{ session.user}}) </a></div>
@@ -199,7 +199,7 @@
             </div>
             <footer>
               <p>
-                This is an <a target="_blank" class="underline" href="https://github.com/jahan-addison/gridpaste">open</a> tool available as a public service. Please report bugs <a target="_blank" class="underline" href="https://github.com/jahan-addison/gridpaste/issues?state=open">here</a>, and to send any questions, suggestions, or concerns. 
+                This is an <a target="_blank" class="underline" href="https://github.com/jahan-addison/gridpaste">open</a> tool available as a public service. Please report bugs <a target="_blank" class="underline" href="https://github.com/jahan-addison/gridpaste/issues?state=open">here</a>, and to send any questions, suggestions, or concerns.
               </p>
               <address>Copyright &copy; 2014-2017</address>
             </footer>
@@ -219,15 +219,10 @@
           <p><span>d , [1 - 9]</span><span>Draw command corresponding to its element placement</span></p>
           <p><span>t , [1 - 5]</span><span>Transform command corresponding to its element placement</span></p>
         </div>
-        <div class="keyboard-hints"><img src="/images/keyboard.png" alt="keyboard" /></div>
+        <div class="keyboard-hints"><img src="{% static "/assets/images/keyboard.png" %}" alt="keyboard" /></div>
         <div class="demo-examples"><a href="/examples">Examples</a></div>
         <div class="zoom out"><span class="out">_</span></div>
         <section id="grid">
         </section>
     </div>
-    {% if env == "development" %}
-    <script src='//localhost:35728/livereload.js'></script>
-    {% endif %}
-    <script src="//code.jquery.com/jquery-1.11.0.min.js"></script>
-    <script src="/javascripts/dist/main.min.js"></script>
 {% endblock %}
