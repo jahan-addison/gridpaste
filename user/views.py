@@ -1,7 +1,11 @@
-from django.contrib.auth import login, authenticate, logout
+from django.contrib.auth import login, authenticate
 from django.shortcuts import render, redirect
 
 from .forms import RegisterForm
+
+
+def index_view(request):
+    return render(request, 'index.html')
 
 
 def register(request):

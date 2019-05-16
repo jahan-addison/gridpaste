@@ -12,14 +12,14 @@
               <span class="red">Gridpaste</span> is an online math tool to share computations, transformations, and annotations on geometric structures in a coordinate plane. One starts with a clean board and places their geometric elements and performs actions on these elements in a recordable sequence. The sequence may then be saved and shared by a unique URL to colleagues or instructors.
             </p>
           </header>
+          {% if user.is_authenticated %}
           <section id="auth">
-            {% if session.loggedIn %}
-            <div class="col user"><a href="/user/logout"> Log out ({{ session.user}}) </a></div>
+            <div class="col user"><a href="/user/logout"> Log out ({{ user.username }}) </a></div>
             <div class="col"><a href="/pastes">Manage Pastes</a></div>
-            {% else %}
+          {% else %}
             <div class="col"><a href="/user/register">Sign Up</a></div>
             <div class="col"><a href="/user/login">Login</a></div>
-            {% endif %}
+          {% endif %}
           </section>
           <section id="run-function">
             <span id="f">f</span> <input type="text" class="function" name="run" value="" /> <span data-tip="Here you may graph plots for x such as `sin(x) * x` OR use one of the built in functions such as area(figure) on structures. More information on github!">?</span>

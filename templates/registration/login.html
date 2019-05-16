@@ -6,15 +6,9 @@
 <p>Your username and password didn't match. Please try again.</p>
 {% endif %}
 
-{% if next %}
-    {% if user.is_authenticated %}
-    <p>Your account doesn't have access to this page. To proceed,
-    please login with an account that has access.</p>
-    {% else %}
-    <p>Please login to see this page.</p>
-    {% endif %}
-{% endif %}
-
+{% if user.is_authenticated %}
+<p>{{ user.username }} you're logged in already. <a href="{% url 'logout' %}">Logout?</a></p>
+{% else %}
 <form method="post" action="{% url 'login' %}">
 {% csrf_token %}
   <p>{{ form.username.label_tag }}</p>
@@ -22,9 +16,8 @@
   <p>{{ form.password.label_tag }}</p>
   <p>{{ form.password }}</p>
   <p><input type="submit" value="login"></p>
-  <input type="hidden" name="next" value="/">
 </form>
 
 <p><a href="{% url 'password_reset' %}">Lost password?</a></p>
-
+{% endif %}
 {% endblock %}

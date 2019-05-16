@@ -137,3 +137,5 @@ USE_TZ = True
 
 STATIC_URL = '/application/'
 STATICFILES_DIRS = ( os.path.join('application'), )
+LOGIN_REDIRECT_URL = '/'
+LOGOUT_REDIRECT_URL = '/'
