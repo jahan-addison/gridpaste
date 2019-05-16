@@ -1,23 +1,50 @@
 {% extends 'base.html' %}
-
+{% block head %}
+  {% load static %}
+{% endblock %}
 {% block content %}
-
-{% if form.errors %}
-<p>Your username and password didn't match. Please try again.</p>
-{% endif %}
-
-{% if user.is_authenticated %}
-<p>{{ user.username }} you're logged in already. <a href="{% url 'logout' %}">Logout?</a></p>
-{% else %}
-<form method="post" action="{% url 'login' %}">
-{% csrf_token %}
-  <p>{{ form.username.label_tag }}</p>
-  <p>{{ form.username }}</p>
-  <p>{{ form.password.label_tag }}</p>
-  <p>{{ form.password }}</p>
-  <p><input type="submit" value="login"></p>
-</form>
-
-<p><a href="{% url 'password_reset' %}">Lost password?</a></p>
-{% endif %}
+  <section class="page">
+    <header>
+      <figure>
+        <img src="{% static "/assets/images/gridpaste-logo.svg" %}" alt="logo" />
+      </figure>
+    </header>
+    <div class="form">
+            {% if form.errors %}
+            <p>Your username and password didn't match. Please try again.</p>
+            {% endif %}
+            
+            {% if user.is_authenticated %}
+            <p>{{ user.username }} you're logged in already. <a href="{% url 'logout' %}">Logout?</a></p>
+            {% else %}
+            <form method="post" action="{% url 'login' %}">
+            {% csrf_token %}
+              <p>{{ form.username.label_tag }}</p>
+              <p>{{ form.username }}</p>
+              <p>{{ form.password.label_tag }}</p>
+              <p>{{ form.password }}</p>
+              <p><input type="submit" value="login"></p>
+            </form>
+            {% endif %}
+    </div>
+    <footer>
+      <address>Copyright &copy; 2014-2019</address>
+    </footer>
+  </section>
+    <script src="//code.jquery.com/jquery-1.11.0.min.js"></script>
+    <script src="http://ajax.aspnetcdn.com/ajax/jquery.validate/1.12.0/jquery.validate.min.js"></script>
+    <script>
+    $(function() {
+      $('#form').validate();
+      $('.submit').click(function() {
+        $('#form').submit();
+      });
+      $('input').keypress(function (e) {
+        if (e.which == 13) {
+          $('form#form').submit();
+          return false;
+        }
+      });
+    });
+    </script>
 {% endblock %}

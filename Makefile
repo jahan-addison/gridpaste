@@ -12,7 +12,7 @@ install:
 	touch ~/.profile
 	sudo apt update
 	sudo apt install nodejs npm
-	curl -o- https://raw.githubusercontent.com/nvm-sh/nvm/v0.34.0/install.sh | bash
+	curl -o- https://raw.githubusercontent.com/nvm-sh/nvm/v0.34.0/install.sh | sh
 	sudo npm install -g yarn
 	source ~/.profile && nvm install v10.15.3
 	sudo sh build.sh
