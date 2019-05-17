@@ -1,5 +1,5 @@
-from backend import __version__
+from homepage import __version__
 
 
 def test_version():
-    assert __version__ == '2.0.0
+    assert __version__ == '2.0.0'
