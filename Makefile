@@ -22,5 +22,5 @@ postgres-start:
 	sudo docker-compose up postgres
 
 start: assets
-	source ~/.source && nvm use && yarn --cwd ./application install
+	source ~/.profile && nvm use && yarn --cwd ./application install
 	sh run.sh
