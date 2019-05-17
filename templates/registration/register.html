@@ -16,7 +16,19 @@
       {% if messages.error %}
         <div class="error">{{ messages.error }}</div>
       {% endif %}
-      {{ form.as_p }}
+      {% if form.errors %}
+        {% for field, errors in form.errors.items %}
+          {% for error in errors %}
+        <div class="error">{{ error }}</div>
+          {% endfor %}
+        {% endfor %}
+      {% endif %}
+      <p>{{ form.username.label_tag }}</p>
+      <p>{{ form.username }}</p>
+      <p>{{ form.password1.label_tag }}</p>
+      <p>{{ form.password1 }}</p>
+      <p>{{ form.password2.label_tag }}</p>
+      <p>{{ form.password2 }}</p>
       <button type="submit" class="button submit">Register</button>
       <div>
         <a href="/">Go back</a>
@@ -27,20 +39,4 @@
     <address>Copyright &copy; 2014-2019</address>
   </footer>
 </section>
-  <script src="//code.jquery.com/jquery-1.11.0.min.js"></script>
-  <script src="http://ajax.aspnetcdn.com/ajax/jquery.validate/1.12.0/jquery.validate.min.js"></script>
-  <script>
-  $(function() {
-    $('#form').validate();
-    $('.submit').click(function() {
-      $('#form').submit();
-    });
-    $('input').keypress(function (e) {
-      if (e.which == 13) {
-        $('form#form').submit();
-        return false;
-      }
-    });
-  });
-  </script>
 {% endblock %}
