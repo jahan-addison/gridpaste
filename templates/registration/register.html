@@ -1,9 +1,46 @@
 {% extends 'base.html' %}
-
+{% block head %}
+  {% load static %}
+{% endblock %}
 {% block content %}
-  <form method="post">
-    {% csrf_token %}
-    {{ form.as_p }}
-    <button type="submit">Register</button>
-  </form>
+<section class="page">
+  <header>
+    <figure>
+      {% load static %}
+      <img src="{% static "/assets/images/gridpaste-logo.svg" %}" alt="logo" />
+    </figure>
+  </header>
+  <div class="form">
+    <form id="form" method="post">
+      {% csrf_token %}
+      {% if messages.error %}
+        <div class="error">{{ messages.error }}</div>
+      {% endif %}
+      {{ form.as_p }}
+      <button type="submit" class="button submit">Register</button>
+      <div>
+        <a href="/">Go back</a>
+      </div>
+    </form>
+  </div>
+  <footer>
+    <address>Copyright &copy; 2014-2019</address>
+  </footer>
+</section>
+  <script src="//code.jquery.com/jquery-1.11.0.min.js"></script>
+  <script src="http://ajax.aspnetcdn.com/ajax/jquery.validate/1.12.0/jquery.validate.min.js"></script>
+  <script>
+  $(function() {
+    $('#form').validate();
+    $('.submit').click(function() {
+      $('#form').submit();
+    });
+    $('input').keypress(function (e) {
+      if (e.which == 13) {
+        $('form#form').submit();
+        return false;
+      }
+    });
+  });
+  </script>
 {% endblock %}
