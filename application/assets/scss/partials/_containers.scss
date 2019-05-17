@@ -29,6 +29,11 @@ body {
   color: lighten($red, 3%);
 }
 
+.submit {
+  outline: none;
+   border: none;
+ }
+
 .segment {
   padding: 10px 12px !important;
 }
@@ -302,14 +307,14 @@ input.edit {
   a, a:link, a:hover, a:visited {
     color: $off-white;
     font-weight:bold;
-    text-decoration:none;  
+    text-decoration:none;
   }
   padding:3px;
   text-align:center;
   left:calc(100% - 85px);
   height:18px;
   overflow:hidden;
-  cursor: pointer;  
+  cursor: pointer;
 }
 
 .keyboard-hints {
@@ -357,7 +362,7 @@ input.edit {
       bottom:32px;
       left:10px;
       @include adelle(4.4em);
-    }    
+    }
     left:75px + 259px;
   }
   position:absolute;
@@ -378,7 +383,7 @@ input.edit {
   div[class*="draw-"],
   div[class*="transform-"] {
     margin-left:5%;
-    width: intrinsic;  
+    width: intrinsic;
     input, label {
       clear:both;
       display:block;
@@ -618,7 +623,7 @@ h2 {
   width: 259px;
   overflow:auto;
   height:100%;
-  float:left; 
+  float:left;
   background: $oynx-brown;
 }
 
@@ -632,7 +637,7 @@ h2 {
       color: $light-brown;
       text-decoration:underline;
     }
-  } 
+  }
   .col:first-child {
     padding-right:35px;
   }
@@ -666,14 +671,14 @@ h2 {
 
 .col {
   float:left;
-  width: intrinsic;    
+  width: intrinsic;
   @include clearfix();
-  width: -moz-max-content; 
+  width: -moz-max-content;
 }
 
 #grid {
   .paste & {
-    width: calc(100% - 160px);    
+    width: calc(100% - 160px);
   }
   width: calc(100% - 259px);
   height:100%;
