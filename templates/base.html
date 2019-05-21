@@ -9,6 +9,9 @@
   <link rel="shortcut icon" href="{% static "/assets/images/favicon.ico" %}" type="image/x-icon" />
   <script type="text/javascript" src="//use.typekit.net/cmr6vjy.js"></script>
   <script type="text/javascript">try{Typekit.load();}catch(e){}</script>
+  <script>
+      var csrftoken = '{{ csrf_token }}'
+  </script>
   {% block head %} {% endblock %}
  </head>
 <body>
