@@ -1,7 +1,7 @@
 var command = require('../events/run'),
     slider     = require('../helper/slider');
 
-require('../../components/mousetrap/mousetrap.min');
+var Mousetrap = require('mousetrap');
 
 module.exports = function(App) {
   var drawBindLimit      = 9,
@@ -14,7 +14,7 @@ module.exports = function(App) {
     /* Function */
     Mousetrap.bind('f', function() { setTimeout(function() { $('.function').focus(); },200); });
     /* Undo */
-    Mousetrap.bind('ctrl+z', function() { $('.undo').click(); });    
+    Mousetrap.bind('ctrl+z', function() { $('.undo').click(); });
     /* Repeat last command */
     Mousetrap.bind('ctrl+enter', function() {
       if (!App.length) {
@@ -27,7 +27,7 @@ module.exports = function(App) {
       var $command = {
         targetOperation: target[0],
         targetCommand:   target[1],
-        command:         command[target[0]][target[1]] 
+        command:         command[target[0]][target[1]]
       };
       try {
         App.storeAndExecute($command, App.last.arguments);
@@ -39,9 +39,9 @@ module.exports = function(App) {
     /* Clear */
     Mousetrap.bind('m c', function() { $('.clear').click(); });
     /* Start recording */
-    Mousetrap.bind('tab', function() { $('.start-record').click(); return false; });    
+    Mousetrap.bind('tab', function() { $('.start-record').click(); return false; });
     /* Cancel query */
-    Mousetrap.bind('escape', function() { $('.close-slider').click(); });        
+    Mousetrap.bind('escape', function() { $('.close-slider').click(); });
 
     Mousetrap.stopCallback = function(e, element, combo) {
       // if the element has the class "mousetrap" then no need to stop
@@ -55,23 +55,23 @@ module.exports = function(App) {
       // stop for input, select, and textarea
       return element.tagName == 'INPUT' || element.tagName == 'SELECT' || element.tagName == 'TEXTAREA' || (element.contentEditable && element.contentEditable == 'true');
     };
-    
+
     /* Draw */
     for(i = 0; i < drawBindLimit; i++) {
-      Mousetrap.bind('d ' + (i+1), 
+      Mousetrap.bind('d ' + (i+1),
         new Function("$('#elements .button').not('.draw').not('.more').eq("+i+").click();")
-      ); 
+      );
     }
     /* Transform */
     for(i = 0; i < transformBindLimit; i++) {
-      Mousetrap.bind('t ' + (i+1), 
+      Mousetrap.bind('t ' + (i+1),
         new Function("$('#transform .button').not('.transform').not('.more').eq("+i+").click();")
-      ); 
+      );
     }
   // Keyboard helper box
     $('.keyboard-hints').click(function() {
       if (!$('.slider').length) {
-        slider($('.keyboard-helper').html(), 200, 460, '#application', 'body', 'top');      
+        slider($('.keyboard-helper').html(), 200, 460, '#application', 'body', 'top');
       }
     })
   });

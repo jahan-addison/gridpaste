@@ -1,7 +1,7 @@
 var command    = require('../events/run'),
     slider     = require('../helper/slider'),
     validate   = require('../helper/validate')(),
-    Rx         = require('../../components/rxjs/rx.lite').Rx;
+    Rx         = require('rx-lite').Rx;
 
 module.exports = function(App) {
   /**
@@ -29,18 +29,18 @@ module.exports = function(App) {
     }
     var target = $(e.target);
     if (!$('.slider').length) {
-      slider(target.next().html(), 230, 'auto', '#application', target.parent().parent()); 
+      slider(target.next().html(), 230, 'auto', '#application', target.parent().parent());
     }
-  }); 
-  
+  });
+
   /**
     Board operations
    */
 
   var $operationSources      = '.button.draw, .button.transform, .button.misc';
   var $operationSource       = Rx.Observable.fromEventPattern(
-    function addHandler(h) { $('#application').on('click', $operationSources, h) },  
-    function delHandler(h) { $('#application').off('click', $operationSources, h) }  
+    function addHandler(h) { $('#application').on('click', $operationSources, h) },
+    function delHandler(h) { $('#application').off('click', $operationSources, h) }
   );
 
   var $operationSubscription = $operationSource.subscribe(function(e) {

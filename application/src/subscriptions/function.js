@@ -1,6 +1,6 @@
 var command    = require('../events/run'),
     Parser     = require('../board/functions/parser'),
-    Rx         = require('../../components/rxjs/rx.lite').Rx;
+    Rx         = require('rx-lite').Rx;
 
 module.exports = function(App) {
   var $sources = $('.function'),
@@ -23,7 +23,7 @@ module.exports = function(App) {
           targetCommand   = func.identifier || 'plot';
       if (targetCommand in command[targetOperation] === false) {
         alert("Warning: This GeometryFunction does not exist");
-        return;        
+        return;
       }
       var $command        = {
         'targetOperation': targetOperation,
@@ -34,8 +34,8 @@ module.exports = function(App) {
           // before storeAndExecute ensure the plot compiles
           try {
             App.board.jc.snippet(e.target.value, true, 'x,y', true);
-          } catch(e) {  
-            alert("Expression Error: " + e.message);           
+          } catch(e) {
+            alert("Expression Error: " + e.message);
             return;
           }
       }

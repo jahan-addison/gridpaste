@@ -1,11 +1,6 @@
 .DS_Store
-public/
 __pycache__
 node_modules/
 *.asc
-dist/
 .vscode
-config.js
-app/javascripts/app/dist/*.js
-app/css/build/*.css
-sass_cache/
+dist/
