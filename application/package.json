@@ -3,9 +3,16 @@
   "version": "2.0.0",
   "license": "Apache-2.0",
   "scripts": {
+    "js": "./node_modules/.bin/browserify src/main.js | ./node_modules/.bin/uglifyjs > dist/main.min.js",
     "sass": "mkdir -p ./dist && ./node_modules/.bin/node-sass ./assets/scss/main.scss >./dist/main.css"
   },
   "devDependencies": {
-    "node-sass": "^4.12.0"
+    "browserify": "^16.2.3",
+    "node-sass": "^4.12.0",
+    "uglify": "^0.1.5"
+  },
+  "dependencies": {
+    "mousetrap": "^1.6.3",
+    "rx-lite": "^4.0.8"
   }
 }

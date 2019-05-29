@@ -6,7 +6,9 @@ lint:
 	poetry run flake8 .
 
 assets:
-	source ~/.profile && nvm use && yarn --cwd ./application run sass
+	source ~/.profile && nvm use \
+		&& yarn --cwd ./application run sass \
+		&& yarn --cwd ./application run js
 
 install:
 	touch ~/.profile

@@ -1,5 +1,5 @@
 var command    = require('../events/run'),
-    Rx         = require('../../components/rxjs/rx.lite').Rx;
+Rx             = require('rx-lite').Rx;
 
 module.exports = function(App, board) {
   var $zoomSources      = $('.zoom.in, .zoom.out');
@@ -12,7 +12,7 @@ module.exports = function(App, board) {
 
   var $zoomSubscription = $zoomSource.subscribe(function(e) {
     var target          = $(e.target),
-        targetCommand = target.hasClass('in') ? 'zoomIn' : 'zoomOut'; 
+        targetCommand = target.hasClass('in') ? 'zoomIn' : 'zoomOut';
     if ((targetCommand == 'zoomIn'  && board.zoomX < 5.9) ||
         (targetCommand == 'zoomOut' && board.zoomX > 0.167)) {
       var $command  = {
@@ -28,8 +28,8 @@ module.exports = function(App, board) {
       }
       if (App.length > 0) {
         $('.button.undo').addClass('visible');
-      }   
-    } 
+      }
+    }
   });
 
 }
