@@ -37,7 +37,6 @@ module.exports = function(App) {
             paste: $paste,
             csrfmiddlewaretoken: getCookie('csrftoken'),
           };
-          console.log(JSON.stringify(data))
           $('.close-slider').click();
           $.ajax({
             url: 'paste/',
@@ -45,7 +44,6 @@ module.exports = function(App) {
             headers:{
               "X-CSRFToken": getCookie('csrftoken')
             },
-            // data: data,
             data: JSON.stringify(data),
             contentType: "application/json",
             complete: function(token) {

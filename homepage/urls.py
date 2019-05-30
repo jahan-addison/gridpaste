@@ -29,6 +29,5 @@ urlpatterns = [
     path('admin/', admin.site.urls),
     path('user/', include('user.urls')),
     path('paste/', paste),
-    path('<token>/', show),
     path('pastes/', include('pastes.urls')),
 ] + staticfiles_urlpatterns()

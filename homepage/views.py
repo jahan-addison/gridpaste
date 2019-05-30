@@ -1,6 +1,5 @@
 from django.http import HttpResponse
 from django.template.loader import get_template
-from django.views.decorators.csrf import csrf_exempt
 
 
 def index(request):

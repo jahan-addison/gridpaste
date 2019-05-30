@@ -1,12 +1,11 @@
 {% extends 'base.html' %}
 {% block head %}
-  {% load static %}
-{% endblock %}
+{% endblock %}{% load static %}
 {% block content %}
   <section class="page">
     <header>
       <figure>
-        <img src="{% static "/assets/images/gridpaste-logo.svg" %}" alt="logo" />
+        <img src="{% static "assets/images/gridpaste-logo.svg" %}" alt="logo" />
       </figure>
     </header>
     <div class="form">
@@ -34,7 +33,7 @@
             {% endif %}
     </div>
     <footer>
-      <address>Copyright &copy; 2014-2019</address>
+      <address>Copyright &copy; 2014-{% now "Y" %}</address>
     </footer>
   </section>
 {% endblock %}

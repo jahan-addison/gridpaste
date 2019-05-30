@@ -1,13 +1,12 @@
 {% extends 'base.html' %}
-{% block head %}
-  {% load static %}
+{% block head %}{% load static %}
   <script type="text/javascript" src="{% static "/src/external/jsxgraph.js" %}"></script>
 {% endblock %}
 {% block content %}
     <div class="paste" id="application" role="application">
         <main id="left-bar">
           <header>
-            <img src="{% static "/assets/images/gridpaste-logo.svg" %}" alt="logo" />
+            <img src="{% static "assets/images/gridpaste-logo.svg" %}" alt="logo" />
             <p>
               <span class="red">Gridpaste</span> is an online math tool to share computations, transformations, and annotations on geometric structures in a coordinate plane. One starts with a clean board and places their geometric elements and performs actions on these elements in a recordable sequence. The sequence may then be saved and shared by a unique URL to colleagues or instructors.
             </p>
@@ -29,7 +28,7 @@
             <footer>
               <p> This is an <a target="_blank" class="underline" href="https://github.com/jahan-addison/gridpaste">open</a> tool available as a public service. Please report bugs <a target="_blank" class="underline" href="https://github.com/jahan-addison/gridpaste/issues?state=open">here</a>, and to send any questions, suggestions, or concerns. 
               </p>
-              <address>Copyright &copy; 2014-2019</address>
+              <address>Copyright &copy; 2014-{% now "Y" %}</address>
             </footer>
           </section>
         </main>
