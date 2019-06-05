@@ -26,7 +26,7 @@ apt-get install -y --no-install-recommends \
 
 PYTHON_GPG_KEY=0D96DF4D4110E5C43FBFB17F2D347EA6AA65421D
 PYTHON_VERSION=3.7.3
-PYTHON_PIP_VERSION=19.1.1
+PYTHON_PIP_VERSION=19.1
 
 wget -O python.tar.xz "https://www.python.org/ftp/python/${PYTHON_VERSION%%[a-z]*}/Python-$PYTHON_VERSION.tar.xz"
 wget -O python.tar.xz.asc "https://www.python.org/ftp/python/${PYTHON_VERSION%%[a-z]*}/Python-$PYTHON_VERSION.tar.xz.asc"
@@ -88,7 +88,7 @@ rm -f get-pip.py
 
 echo "Installing Docker CE via pip..."
 
-pip install docker-compose
+pip install docker docker-compose
 
 #
 # Clean up
