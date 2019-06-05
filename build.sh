@@ -21,6 +21,18 @@ apt-get install -y --no-install-recommends \
 
 
 #
+# Install NodeJS and NPM and frontend dependencies
+#
+
+touch ~/.profile
+apt-get install -y nodejs npm
+curl -o- https\://raw.githubusercontent.com/nvm-sh/nvm/v0.34.0/install.sh | sh
+npm install -g yarn
+nvm install v10.15.3
+
+
+
+#
 # Install Python
 #
 
