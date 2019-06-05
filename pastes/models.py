@@ -1,7 +1,8 @@
+from django.contrib.postgres.fields import JSONField
 from django.db import models
 
 class Pastes(models.Model):
-    id = models.CharField(max_length=255, primary_key=True)
     title = models.TextField()
     user = models.TextField(default='anonymous')
-    paste = models.TextField()
+    paste = JSONField()
+    token = models.TextField(default='null')

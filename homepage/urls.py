@@ -20,6 +20,7 @@ from django.urls import include, path
 
 from . import views
 from user.views import index_view
+from pastes.views import paste, show
 
 
 urlpatterns = [
@@ -27,4 +28,6 @@ urlpatterns = [
     path('examples/', views.examples, name='examples'),
     path('admin/', admin.site.urls),
     path('user/', include('user.urls')),
+    path('paste/', paste),
+    path('pastes/', include('pastes.urls')),
 ] + staticfiles_urlpatterns()
