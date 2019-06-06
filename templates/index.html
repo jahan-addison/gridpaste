@@ -14,11 +14,11 @@
           </header>
           <section id="auth">
           {% if user.is_authenticated %}
-            <div class="col user"><a href="/user/logout"> Log out ({{ user.username }}) </a></div>
-            <div class="col"><a href="/pastes">Manage Pastes</a></div>
+            <div class="col user"><a href="{% url 'logout' %}"> Log out ({{ user.username }}) </a></div>
+            <div class="col"><a href="{% url 'pastes' %}">Manage Pastes</a></div>
           {% else %}
-            <div class="col"><a href="/user/register">Sign Up</a></div>
-            <div class="col"><a href="/user/login">Login</a></div>
+            <div class="col"><a href="{% url 'register' %}">Sign Up</a></div>
+            <div class="col"><a href="{% url 'login' %}">Login</a></div>
           {% endif %}
           </section>
           <section id="run-function">
@@ -218,7 +218,7 @@
           <p><span>t , [1 - 5]</span><span>Transform command corresponding to its element placement</span></p>
         </div>
         <div class="keyboard-hints"><img src="{% static "/assets/images/keyboard.png" %}" alt="keyboard" /></div>
-        <div class="demo-examples"><a href="/examples">Examples</a></div>
+        <div class="demo-examples"><a href="{% url 'examples' %}">Examples</a></div>
         <div class="zoom out"><span class="out">_</span></div>
         <section id="grid">
         </section>

@@ -13,11 +13,11 @@
           </header> 
           <section id="auth">
             {% if user.is_authenticated %}
-            <div class="margin"><a href="/logout"> Log out ({{ user.username }}) </a></div>
-            <div class="margin"><a href="/pastes">Manage Pastes</a></div>
+            <div class="margin"><a href="{% url 'logout' %}"> Log out ({{ user.username }}) </a></div>
+            <div class="margin"><a href="{% url 'pastes' %}">Manage Pastes</a></div>
             {% else %}
-            <div class="col"><a href="/register">Sign Up</a></div>
-            <div class="col"><a href="/login">Login</a></div>
+            <div class="col"><a href="{% url 'register' %}">Sign Up</a></div>
+            <div class="col"><a href="{% url 'login' %}">Login</a></div>
             {% endif %}
           </section>
           <div id="new">

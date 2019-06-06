@@ -28,6 +28,6 @@ urlpatterns = [
     path('examples/', views.examples, name='examples'),
     path('admin/', admin.site.urls),
     path('user/', include('user.urls')),
-    path('paste/', paste),
+    path('paste/', paste, name='paste'),
     path('pastes/', include('pastes.urls')),
 ] + staticfiles_urlpatterns()
