@@ -1,5 +1,8 @@
 from django.http import HttpResponse
 from django.template.loader import get_template
+from django.shortcuts import render
+
+from pastes.models import Pastes
 
 
 def index(request):
@@ -9,6 +12,5 @@ def index(request):
 
 
 def examples(request):
-    template = get_template('examples.html')
-    html = template.render()
-    return HttpResponse(html)
+    p = Pastes.objects.filter(user='examples')
+    return render(request, 'examples.html', {'pastes': p})
