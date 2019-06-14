@@ -1,0 +1,13 @@
+[Unit]
+Description=gunicorn daemon
+After=network.target
+
+[Service]
+User=wired
+Group=www-data
+WorkingDirectory=/home/wired/gridpaste
+ExecStart=/bin/sh /home/wired/gridpaste/run.sh
+
+
+[Install]
+WantedBy=multi-user.target
