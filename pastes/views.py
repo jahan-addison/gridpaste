@@ -31,9 +31,15 @@ def paste(request):
         body = json.loads(request.body.decode('utf-8'))
         token = tokens.generate_token()
 
+
+        if request.user.id is None:
+            userid = 'anonymous'
+        else:
+            userid = request.user.id
+
         p = Pastes.objects.create(
             title=body['title'],
-            user=request.user.id,
+            user=userid,
             paste=body['paste'],
             token=token,
         )
@@ -43,3 +49,4 @@ def paste(request):
             json.dumps({'token': token,}),
             content_type="application/json"
         )
+
