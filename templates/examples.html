@@ -20,7 +20,7 @@
           <li data-id="{{paste.id}}">
             <span>#{{paste.id}}</span>&nbsp;<span></span>
             <br />
-            <a class="item" href="{% url 'pastes' %}/{{paste.id}}">{{ paste.title}}</a></li>
+            <a class="item" href="{% url 'pastes' %}{{paste.id}}">{{ paste.title}}</a></li>
       {% endfor %}
       </ol>
     <div class="back">
