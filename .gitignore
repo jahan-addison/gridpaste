@@ -4,3 +4,7 @@ node_modules/
 *.asc
 .vscode
 dist/
+.env
+logs/*.log
+application/admin/
+application/staticfiles.json

@@ -3,10 +3,10 @@ Description=gunicorn daemon
 After=network.target
 
 [Service]
-User=wired
+User=jahan
 Group=www-data
-WorkingDirectory=/home/wired/gridpaste
-ExecStart=/bin/sh /home/wired/gridpaste/run.sh
+WorkingDirectory=/home/jahan/gridpaste
+ExecStart=/bin/sh /home/jahan/gridpaste/run.sh
 
 
 [Install]

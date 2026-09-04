@@ -1,0 +1,10 @@
+.git
+.env
+node_modules
+application/node_modules
+application/dist
+__pycache__
+*.pyc
+logs/*
+gridpaste.sock
+.backups

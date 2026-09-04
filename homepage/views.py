@@ -10,6 +10,6 @@ def index(request):
     return HttpResponse(html)
 
 def examples(request):
-    p = Pastes.objects.filter(user='3')
+    p = Pastes.objects.filter(user='1')
     return render(request, 'examples.html', {'pastes': p})
 
